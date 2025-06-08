@@ -1,4 +1,7 @@
 {
+    files = {
+        [[src\animation\UIAnimationManager.cpp]]
+    },
     values = {
         [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
         {
@@ -21,6 +24,7 @@
             "-DNDEBUG"
         }
     },
+    depfiles_format = "cl_json",
     depfiles = "{\
     \"Version\": \"1.2\",\
     \"Data\": {\
@@ -155,9 +159,5 @@
         \"ImportedModules\": [],\
         \"ImportedHeaderUnits\": []\
     }\
-}",
-    files = {
-        [[src\animation\UIAnimationManager.cpp]]
-    },
-    depfiles_format = "cl_json"
+}"
 }

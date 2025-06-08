@@ -1,5 +1,4 @@
 {
-    depfiles_format = "cl_json",
     files = {
         [[src\main.cpp]]
     },
@@ -26,6 +25,7 @@
             "-DNDEBUG"
         }
     },
+    depfiles_format = "cl_json",
     depfiles = "{\
     \"Version\": \"1.2\",\
     \"Data\": {\
