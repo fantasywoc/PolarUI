@@ -16,28 +16,35 @@ void UITextInput::render(NVGcontext* vg) {
     
     nvgSave(vg);
     
-    // 应用动画变换
-    nvgTranslate(vg, m_animationOffsetX, m_animationOffsetY);
+    // 先移动到组件位置
+    nvgTranslate(vg, m_x + m_animationOffsetX, m_y + m_animationOffsetY);
+    
+    // 缩放变换（以组件中心为原点）
+    if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
+        nvgTranslate(vg, m_width/2, m_height/2);
+        nvgScale(vg, m_animationScaleX, m_animationScaleY);
+        nvgTranslate(vg, -m_width/2, -m_height/2);
+    }
     
     // 应用透明度
     nvgGlobalAlpha(vg, m_animationOpacity);
     
-    // 绘制背景（使用原始坐标，因为已经应用了变换）
+    // 绘制背景（使用相对坐标）
     nvgBeginPath(vg);
-    nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
+    nvgRoundedRect(vg, 0, 0, m_width, m_height, m_cornerRadius);
     nvgFillColor(vg, m_backgroundColor);
     nvgFill(vg);
     
     // 绘制边框
     nvgBeginPath(vg);
-    nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
+    nvgRoundedRect(vg, 0, 0, m_width, m_height, m_cornerRadius);
     nvgStrokeColor(vg, m_isFocused ? m_focusedBorderColor : m_borderColor);
     nvgStrokeWidth(vg, m_borderWidth);
     nvgStroke(vg);
     
-    // 设置裁剪区域
+    // 设置裁剪区域（使用相对坐标）
     nvgSave(vg);
-    nvgIntersectScissor(vg, m_x + m_padding, m_y, m_width - 2 * m_padding, m_height);
+    nvgIntersectScissor(vg, m_padding, 0, m_width - 2 * m_padding, m_height);
     
     // 绘制选择区域
     if (m_hasSelection && m_isFocused) {
@@ -212,11 +219,13 @@ void UITextInput::insertText(const std::string& text) {
 }
 
 void UITextInput::renderText(NVGcontext* vg) {
+    nvgFontFace(vg, "default");  // 添加字体设置
     nvgFontSize(vg, m_fontSize);
     nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
     
-    float textY = m_y + m_height * 0.5f;
-    float textX = m_x + m_padding;
+    // 使用相对坐标
+    float textY = m_height * 0.5f;
+    float textX = m_padding;
     
     if (m_text.empty() && !m_isFocused) {
         // 显示占位符
@@ -270,9 +279,10 @@ void UITextInput::renderText(NVGcontext* vg) {
 }
 
 void UITextInput::renderCursor(NVGcontext* vg) {
-    float cursorX = m_x + m_padding + getCharPositionX(vg, m_cursorPos);
-    float cursorY1 = m_y + m_padding;
-    float cursorY2 = m_y + m_height - m_padding;
+    // 使用相对坐标
+    float cursorX = m_padding + getCharPositionX(vg, m_cursorPos);
+    float cursorY1 = m_padding;
+    float cursorY2 = m_height - m_padding;
     
     nvgBeginPath(vg);
     nvgMoveTo(vg, cursorX, cursorY1);
@@ -288,11 +298,12 @@ void UITextInput::renderSelection(NVGcontext* vg) {
     size_t start = std::min(m_selectionStart, m_selectionEnd);
     size_t end = std::max(m_selectionStart, m_selectionEnd);
     
-    float startX = m_x + m_padding + getCharPositionX(vg, start);
-    float endX = m_x + m_padding + getCharPositionX(vg, end);
+    // 使用相对坐标
+    float startX = m_padding + getCharPositionX(vg, start);
+    float endX = m_padding + getCharPositionX(vg, end);
     
     nvgBeginPath(vg);
-    nvgRect(vg, startX, m_y + m_padding, endX - startX, m_height - 2 * m_padding);
+    nvgRect(vg, startX, m_padding, endX - startX, m_height - 2 * m_padding);
     nvgFillColor(vg, m_selectionColor);
     nvgFill(vg);
 }

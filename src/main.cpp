@@ -171,7 +171,7 @@ int main() {
         std::cout << "Focus changed: " << (focused ? "focused" : "unfocused") << std::endl;
         if (focused) {
             // 获得焦点时轻微放大
-            UIAnimationManager::getInstance().scaleTo(inputBox.get(), 1.05f, 1.05f, 0.2f, UIAnimation::EASE_OUT);
+            UIAnimationManager::getInstance().scaleTo(inputBox.get(), 1.55f, 1.5f, 0.2f, UIAnimation::EASE_OUT);
         } else {
             // 失去焦点时恢复原大小
             UIAnimationManager::getInstance().scaleTo(inputBox.get(), 1.0f, 1.0f, 0.2f, UIAnimation::EASE_IN);
