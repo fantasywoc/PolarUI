@@ -213,17 +213,7 @@ if (currentTime - lastFPSTime >= 1.0) {
 
 这些优化可以显著降低CPU和GPU的使用率，同时保持流畅的用户体验。
 
-// ... existing code ...
 
-
-
-        
-
-
-
-
-
-          
 # 控件布局
 根据FlexLayout的实现，控件间距和边距是通过以下两个参数控制的：
 
@@ -314,3 +304,51 @@ if (layout) {
 }
 ```
         
+
+
+
+## 已知问题与解决方案
+
+### 动画系统崩溃问题
+
+**问题描述**：
+在旋转动画播放过程中点击其他带有动画的按钮会导致程序崩溃，错误代码为 `-1073741819`（访问违规）。
+
+**崩溃原因**：
+1. **容器修改冲突**：`UIAnimationManager::update()` 方法在遍历动画列表时，其他操作（如 `removeAnimation`）同时修改了该列表，导致迭代器失效
+2. **动画生命周期问题**：在同一组件上创建多个动画时，新动画的添加可能与正在执行的动画产生冲突
+3. **回调函数时序问题**：动画完成回调可能在动画被移除后仍然被触发
+
+**解决方案**：
+
+#### 方案一：延迟移除机制（已实施）
+在 `UIAnimationManager` 中添加延迟移除机制，避免在遍历过程中直接修改容器：
+
+```cpp
+// 在 UIAnimationManager.h 中添加成员变量
+private:
+    bool m_isUpdating = false;
+    std::vector<UIComponent*> m_pendingRemovals;
+
+// 在 UIAnimationManager.cpp 中修改 removeAnimation 和 update 方法
+void UIAnimationManager::removeAnimation(UIComponent* target) {
+    if (!target) return;
+    
+    if (m_isUpdating) {
+        m_pendingRemovals.push_back(target);
+        return;
+    }
+    
+    // 立即移除逻辑...
+}
+
+void UIAnimationManager::update(double deltaTime) {
+    m_isUpdating = true;
+    
+    // 更新动画...
+    
+    m_isUpdating = false;
+    
+    // 处理延迟移除...
+}
+```

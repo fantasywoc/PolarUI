@@ -1,4 +1,4 @@
-.xmake/
+.xmake/*
 ./build/*
 .xmake/windows/x64/cache/config
 .xmake/windows/x64/cache/history
