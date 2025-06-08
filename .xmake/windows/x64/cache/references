@@ -1,0 +1,8 @@
+{
+    packages = {
+        [[C:\Users\CK\AppData\Local\.xmake\packages\o\opengl\latest\3c332be551f6485e8d17e1830ee49789]],
+        [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d]],
+        [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050]],
+        [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159]]
+    }
+}

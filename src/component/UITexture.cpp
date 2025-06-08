@@ -1,0 +1,177 @@
+#include "UITexture.h"
+#include <iostream>
+#include <algorithm>
+
+// 需要包含 stb_image
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+UITexture::UITexture(float x, float y, float width, float height, const std::string& imagePath)
+    : UIComponent(x, y, width, height)
+    , m_imagePath(imagePath)
+    , m_nvgImage(-1)
+    , m_imageWidth(0)
+    , m_imageHeight(0)
+    , m_scaleMode(ScaleMode::STRETCH)
+    , m_alpha(1.0f)
+    , m_needsLoad(!imagePath.empty()) {
+    // 不在构造函数中加载图像，延迟到render时加载
+}
+
+UITexture::~UITexture() {
+    // 析构函数中无法获取NVGcontext，所以不能在这里卸载
+    // 需要在适当的时候手动调用unloadImage
+}
+
+void UITexture::render(NVGcontext* vg) {
+    if (!m_visible) return;
+    
+    if (!m_visible || (m_alpha * m_animationOpacity) <= 0.0f) {  // 检查总透明度
+        return;
+    }
+    
+    // 如果需要加载图像且还未加载
+    if (m_needsLoad && m_nvgImage == -1 && !m_imagePath.empty()) {
+        loadImage(vg, m_imagePath);
+        m_needsLoad = false;
+    }
+    
+    if (m_nvgImage == -1) {
+        return;
+    }
+    
+    // 绘制背景（如果设置了）
+    if (m_backgroundColor.a > 0) {
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
+        nvgFillColor(vg, m_backgroundColor);
+        nvgFill(vg);
+    }
+    
+    // 计算图像渲染区域
+    float renderX, renderY, renderW, renderH;
+    calculateRenderBounds(renderX, renderY, renderW, renderH);
+    
+    // 绘制图像
+    nvgSave(vg);
+    
+    // 设置透明度（考虑动画透明度）
+    nvgGlobalAlpha(vg, m_alpha * m_animationOpacity);
+    
+    // 创建图像填充模式
+    NVGpaint imgPaint = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
+    
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, renderX, renderY, renderW, renderH, m_cornerRadius);
+    nvgFillPaint(vg, imgPaint);
+    nvgFill(vg);
+    
+    nvgRestore(vg);
+    
+    // 绘制边框（如果设置了）
+    if (m_borderWidth > 0 && m_borderColor.a > 0) {
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
+        nvgStrokeColor(vg, m_borderColor);
+        nvgStrokeWidth(vg, m_borderWidth);
+        nvgStroke(vg);
+    }
+}
+
+void UITexture::update(double deltaTime) {
+    // 纹理控件通常不需要更新逻辑
+}
+
+bool UITexture::handleEvent(const UIEvent& event) {
+    if (!m_visible || !m_enabled) {
+        return false;
+    }
+    return false;
+}
+
+bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
+    if (!vg) {
+        std::cerr << "NVGcontext is null, cannot load image" << std::endl;
+        return false;
+    }
+    
+    // 先卸载之前的图像
+    unloadImage(vg);
+    
+    // 使用 stb_image 加载图像
+    int channels;
+    unsigned char* data = stbi_load(imagePath.c_str(), &m_imageWidth, &m_imageHeight, &channels, 4);
+    
+    if (!data) {
+        std::cerr << "Failed to load image: " << imagePath << std::endl;
+        std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
+        return false;
+    }
+    
+    // 创建 NanoVG 图像
+    m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
+    
+    // 释放 stb_image 分配的内存
+    stbi_image_free(data);
+    
+    if (m_nvgImage == -1) {
+        std::cerr << "Failed to create NanoVG image from: " << imagePath << std::endl;
+        return false;
+    }
+    
+    m_imagePath = imagePath;
+    std::cout << "Loaded image: " << imagePath << " (" << m_imageWidth << "x" << m_imageHeight << ")" << std::endl;
+    
+    return true;
+}
+
+void UITexture::unloadImage(NVGcontext* vg) {
+    if (m_nvgImage != -1 && vg) {
+        nvgDeleteImage(vg, m_nvgImage);
+        m_nvgImage = -1;
+    }
+    m_imageWidth = 0;
+    m_imageHeight = 0;
+}
+
+void UITexture::setImagePath(const std::string& imagePath) {
+    if (m_imagePath != imagePath) {
+        m_imagePath = imagePath;
+        m_needsLoad = !imagePath.empty();
+        if (m_nvgImage != -1) {
+            // 如果已经有图像加载，标记需要重新加载
+            m_nvgImage = -1;
+        }
+    }
+}
+
+void UITexture::calculateRenderBounds(float& renderX, float& renderY, 
+                                     float& renderW, float& renderH) const {
+    switch (m_scaleMode) {
+        case ScaleMode::STRETCH:
+            renderX = m_x;
+            renderY = m_y;
+            renderW = m_width;
+            renderH = m_height;
+            break;
+            
+        case ScaleMode::KEEP_ASPECT: {
+            float scaleX = m_width / (float)m_imageWidth;
+            float scaleY = m_height / (float)m_imageHeight;
+            float scale = std::min(scaleX, scaleY);
+            
+            renderW = m_imageWidth * scale;
+            renderH = m_imageHeight * scale;
+            renderX = m_x + (m_width - renderW) * 0.5f;
+            renderY = m_y + (m_height - renderH) * 0.5f;
+            break;
+        }
+        
+        case ScaleMode::ORIGINAL_SIZE:
+            renderW = (float)m_imageWidth;
+            renderH = (float)m_imageHeight;
+            renderX = m_x + (m_width - renderW) * 0.5f;
+            renderY = m_y + (m_height - renderH) * 0.5f;
+            break;
+    }
+}

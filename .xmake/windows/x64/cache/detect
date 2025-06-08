@@ -1,0 +1,112 @@
+{
+    find_programver_fetch_package_system = {
+        ["D:\\Sofeware\\cmake-4.0.0-rc4-windows-x86_64\\bin\\cmake.exe"] = "4.0.0-rc4",
+        ["E:\\Program\\VS2022\\VS\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja\\ninja"] = "1.12.1"
+    },
+    find_program_fetch_package_system = {
+        cmake = [[D:\Sofeware\cmake-4.0.0-rc4-windows-x86_64\bin\cmake.exe]],
+        ninja = [[E:\Program\VS2022\VS\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja\ninja]]
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolld = {
+        ["link.exe"] = [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\link.exe]]
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolcxx = {
+        ["cl.exe"] = [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]]
+    },
+    ["lib.detect.has_flags"] = {
+        ["windows_x64_E:\\Program\\VS2022\\VS\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\cl.exe_19.43.34809_cxx_cxxflags_-nologo_/EHsc"] = true,
+        ["windows_x64_E:\\Program\\VS2022\\VS\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\cl.exe_19.43.34809_cxx_cxflags_-nologo_/utf-8"] = true,
+        ["windows_x64_E:\\Program\\VS2022\\VS\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\cl.exe_19.43.34809_cxx_cxflags_-nologo_-DNDEBUG"] = true,
+        ["windows_x64_E:\\Program\\VS2022\\VS\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\cl.exe_19.43.34809_cxx__-nologo_-O2"] = true,
+        ["windows_x64_E:\\Program\\VS2022\\VS\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\cl.exe_19.43.34809_cxx_cxflags_-nologo_cl_external_includedir"] = true,
+        ["windows_x64_E:\\Program\\VS2022\\VS\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\cl.exe_19.43.34809_cxx_cxflags_-nologo_cl_sourceDependencies"] = true
+    },
+    find_program = {
+        git = [[D:\Sofeware\Git\cmd\git.exe]],
+        nim = false,
+        gzip = false,
+        ping = [[C:\Windows\System32\PING.EXE]],
+        ["E:\\Program\\VS2022\\VS\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\cl.exe"] = [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
+        ["cl.exe"] = [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
+        ["7z"] = [[C:\Program Files\xmake\winenv\bin\7z]]
+    },
+    find_program_fetch_package_xmake = {
+        cmake = false,
+        ninja = false
+    },
+    find_programver = {
+        ["E:\\Program\\VS2022\\VS\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\cl.exe"] = "19.43.34809"
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolcc = {
+        ["cl.exe"] = [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]]
+    },
+    find_package_windows_x64_fetch_package_xmake = {
+        ["xmake::glew_7e77cab88e014bf2a64860fbbda75159_release_2.2.0_external"] = {
+            syslinks = "opengl32",
+            links = {
+                "glew32"
+            },
+            defines = "GLEW_NO_GLU",
+            shared = true,
+            libfiles = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\lib\glew32.lib]],
+                [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\bin\glew32.dll]]
+            },
+            linkdirs = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\lib]]
+            },
+            version = "2.2.0",
+            static = true,
+            sysincludedirs = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\include]]
+            }
+        },
+        ["xmake::glfw_7f33961a41e640bfa5bdb78428d3267d_release_3.3.8_external"] = {
+            syslinks = {
+                "user32",
+                "shell32",
+                "gdi32"
+            },
+            links = {
+                "glfw3dll"
+            },
+            sysincludedirs = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\include]]
+            },
+            shared = true,
+            libfiles = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\lib\glfw3dll.lib]],
+                [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\bin\glfw3.dll]]
+            },
+            linkdirs = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\lib]]
+            },
+            version = "3.3.8",
+            license = "zlib",
+            defines = "GLFW_INCLUDE_NONE",
+            static = true
+        },
+        ["xmake::nanovg_cb0b287f2781439aaebe7fcc2bebc050_release_2023.8.27_external"] = {
+            version = "2023.8.27",
+            sysincludedirs = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\include]]
+            },
+            libfiles = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\lib\nanovg.lib]],
+                [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\bin\nanovg.dll]]
+            },
+            linkdirs = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\lib]]
+            },
+            links = {
+                "nanovg"
+            },
+            license = "zlib",
+            shared = true,
+            static = true
+        }
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolar = {
+        ["link.exe"] = [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\link.exe]]
+    }
+}

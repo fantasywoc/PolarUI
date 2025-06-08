@@ -1,0 +1,20 @@
+动画
+
+// 按钮点击动画
+button->scaleTo(0.95f, 0.95f, 0.1f);
+button->scaleTo(1.0f, 1.0f, 0.1f); // 链式动画
+
+// 面板淡入效果
+panel->setAnimationOpacity(0.0f);
+panel->fadeIn(0.5f, UIAnimation::EASE_OUT);
+
+// 文本输入框获得焦点动画
+textInput->scaleTo(1.05f, 1.05f, 0.2f);
+
+// 自定义动画
+auto customAnim = std::make_shared<UIAnimation>();
+customAnim->setDuration(1.0f);
+customAnim->setOnUpdate([component](float progress) {
+    component->setBackgroundColor(lerp(startColor, endColor, progress));
+});
+UIAnimationManager::getInstance().addAnimation(customAnim, component);
