@@ -180,10 +180,48 @@ int main() {
     
     leftPanel->addChild(inputBox);
     
+    // 先创建纹理组件
+    auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
+    texture->setScaleMode(UITexture::ScaleMode::KEEP_ASPECT);
+    texture->setAlpha(0.9f);
+    texture->setCornerRadius(10.0f);
+    texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
+    texture->setBorderWidth(2.0f);
+    
     // 右面板的按钮，添加动画效果
     auto okButton = std::make_shared<UIButton>(0, 0, 70, 40, "OK");
-    okButton->setOnClick([okButton]() {
+    okButton->setOnClick([okButton, texture]() {
         std::cout << "OK button clicked!" << std::endl;
+        
+        // 检查图片当前的可见状态
+        bool isVisible = texture->isVisible() && texture->getAlpha() > 0.0f;
+        
+        if (isVisible) {
+            // 当前可见，执行隐藏动画
+            auto hideAnim = std::make_shared<UIAnimation>(UIAnimation::FADE, 0.5f, UIAnimation::EASE_OUT);
+            hideAnim->setValues(texture->getAlpha(), 0.0f);
+            hideAnim->setOnUpdate([texture](float value) {
+                texture->setAlpha(value);
+            });
+            hideAnim->setOnComplete([texture]() {
+                texture->setVisible(false);
+            });
+            UIAnimationManager::getInstance().addAnimation(hideAnim, texture.get());
+            
+            std::cout << "Hiding texture..." << std::endl;
+        } else {
+            // 当前隐藏，执行显示动画
+            texture->setVisible(true);
+            auto showAnim = std::make_shared<UIAnimation>(UIAnimation::FADE, 0.5f, UIAnimation::EASE_IN);
+            showAnim->setValues(0.0f, 0.9f); // 恢复到原来的透明度
+            showAnim->setOnUpdate([texture](float value) {
+                texture->setAlpha(value);
+            });
+            UIAnimationManager::getInstance().addAnimation(showAnim, texture.get());
+            
+            std::cout << "Showing texture..." << std::endl;
+        }
+        
         // 成功动画：绿色闪烁效果
         auto flashAnim = std::make_shared<UIAnimation>(UIAnimation::CUSTOM, 0.5f, UIAnimation::EASE_IN_OUT);
         flashAnim->setValues(0.0f, 1.0f);
@@ -224,14 +262,6 @@ int main() {
     rightPanel1->setHorizontalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
     rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 100));
 
-    // 创建纹理组件（添加在这里）
-    auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
-    texture->setScaleMode(UITexture::ScaleMode::KEEP_ASPECT);
-    texture->setAlpha(0.9f);
-    texture->setCornerRadius(10.0f);
-    texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
-    texture->setBorderWidth(2.0f);
-    
     rightPanel->addChild(okButton);
     rightPanel->addChild(exitButton);
     rightPanel1->addChild(texture);
