@@ -19,7 +19,6 @@ public:
     void fadeIn(UIComponent* target, float duration = 0.3f, UIAnimation::EasingType easing = UIAnimation::EASE_OUT);
     void fadeOut(UIComponent* target, float duration = 0.3f, UIAnimation::EasingType easing = UIAnimation::EASE_IN);
     void moveTo(UIComponent* target, float x, float y, float duration = 0.3f, UIAnimation::EasingType easing = UIAnimation::EASE_OUT);
-    // 更新方法签名
     void scaleTo(UIComponent* target, float scaleX, float scaleY, float duration = 0.3f, UIAnimation::EasingType easing = UIAnimation::EASE_OUT, UIAnimation::ScaleOrigin origin = UIAnimation::TOP_LEFT);
     void rotateTo(UIComponent* target, float angle, float duration = 0.3f, UIAnimation::EasingType easing = UIAnimation::EASE_OUT, UIAnimation::RotateOrigin origin = UIAnimation::ROTATE_CENTER);
     
@@ -43,4 +42,6 @@ private:
     };
     
     std::vector<AnimationInfo> m_animations;
+    bool m_isUpdating = false;  // 添加更新状态标志
+    std::vector<UIComponent*> m_pendingRemovals;  // 待移除的组件列表
 };

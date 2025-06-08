@@ -22,6 +22,13 @@ void UIAnimationManager::removeAnimation(UIComponent* target) {
         return;
     }
     
+    // 如果正在更新，将移除操作延迟
+    if (m_isUpdating) {
+        m_pendingRemovals.push_back(target);
+        return;
+    }
+    
+    // 立即移除
     m_animations.erase(
         std::remove_if(m_animations.begin(), m_animations.end(),
             [target](const AnimationInfo& info) {
@@ -32,21 +39,59 @@ void UIAnimationManager::removeAnimation(UIComponent* target) {
 }
 
 void UIAnimationManager::removeAllAnimations() {
-    m_animations.clear();
+    if (m_isUpdating) {
+        // 如果正在更新，标记所有动画为待移除
+        for (auto& info : m_animations) {
+            if (info.target) {
+                m_pendingRemovals.push_back(info.target);
+            }
+        }
+    } else {
+        m_animations.clear();
+    }
 }
 
 void UIAnimationManager::update(double deltaTime) {
+    m_isUpdating = true;
+    
+    // 创建当前帧要更新的动画副本，避免在遍历过程中修改
+    std::vector<AnimationInfo> currentAnimations = m_animations;
+    
     // 更新所有动画
-    for (auto& info : m_animations) {
-        if (info.isActive && info.animation) {
+    for (size_t i = 0; i < currentAnimations.size(); ++i) {
+        auto& info = currentAnimations[i];
+        
+        // 检查原始动画是否仍然存在且活跃
+        auto it = std::find_if(m_animations.begin(), m_animations.end(),
+            [&info](const AnimationInfo& original) {
+                return original.animation == info.animation && 
+                       original.target == info.target && 
+                       original.isActive;
+            });
+        
+        if (it != m_animations.end() && info.isActive && info.animation) {
             info.animation->update(deltaTime);
             
             // 检查动画是否完成
             if (info.animation->isFinished()) {
-                info.isActive = false;
+                it->isActive = false;
             }
         }
     }
+    
+    m_isUpdating = false;
+    
+    // 处理延迟的移除操作
+    for (UIComponent* target : m_pendingRemovals) {
+        m_animations.erase(
+            std::remove_if(m_animations.begin(), m_animations.end(),
+                [target](const AnimationInfo& info) {
+                    return info.target == target;
+                }),
+            m_animations.end()
+        );
+    }
+    m_pendingRemovals.clear();
     
     // 移除已完成的动画
     m_animations.erase(

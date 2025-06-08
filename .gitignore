@@ -23,3 +23,15 @@ build/.objs/ui/windows/x64/release/src/component/UITextInput.cpp.obj
 build/.objs/ui/windows/x64/release/src/component/UITexture.cpp.obj
 build/windows/x64/release/button-demo.exe
 build/windows/x64/release/ui.lib
+.xmake/windows/x64/cache/config
+.xmake/windows/x64/cache/history
+build/.deps/button-demo/windows/x64/release/button-demo.exe.d
+build/.deps/button-demo/windows/x64/release/src/main.cpp.obj.d
+build/.deps/ui/windows/x64/release/ui.lib.d
+build/.deps/ui/windows/x64/release/src/animation/UIAnimationManager.cpp.obj.d
+build/.deps/ui/windows/x64/release/src/component/UIComponent.cpp.obj.d
+build/.objs/button-demo/windows/x64/release/src/main.cpp.obj
+build/.objs/ui/windows/x64/release/src/animation/UIAnimationManager.cpp.obj
+build/.objs/ui/windows/x64/release/src/component/UIComponent.cpp.obj
+build/windows/x64/release/button-demo.exe
+build/windows/x64/release/ui.lib
