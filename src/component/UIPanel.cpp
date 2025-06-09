@@ -63,10 +63,10 @@ bool UIPanel::handleEvent(const UIEvent& event) {
     // 从后往前遍历子组件（后添加的在上层）
     for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
         if (*it) {
-            // 创建相对坐标的事件副本
+            // 创建相对坐标的事件副本 - 考虑动画偏移
             UIEvent localEvent = event;
-            localEvent.mouseX = event.mouseX - m_x;
-            localEvent.mouseY = event.mouseY - m_y;
+            localEvent.mouseX = event.mouseX - (m_x + m_animationOffsetX);
+            localEvent.mouseY = event.mouseY - (m_y + m_animationOffsetY);
             
             if ((*it)->handleEvent(localEvent)) {
                 return true; // 事件被子组件处理
@@ -74,10 +74,12 @@ bool UIPanel::handleEvent(const UIEvent& event) {
         }
     }
     
-    // 检查事件是否在面板范围内
+    // 检查事件是否在面板范围内 - 也要考虑动画偏移
     if (event.type == UIEvent::MOUSE_PRESS || event.type == UIEvent::MOUSE_MOVE) {
-        return (event.mouseX >= m_x && event.mouseX <= m_x + m_width &&
-                event.mouseY >= m_y && event.mouseY <= m_y + m_height);
+        float actualX = m_x + m_animationOffsetX;
+        float actualY = m_y + m_animationOffsetY;
+        return (event.mouseX >= actualX && event.mouseX <= actualX + m_width &&
+                event.mouseY >= actualY && event.mouseY <= actualY + m_height);
     }
     
     return false;

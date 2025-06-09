@@ -289,20 +289,13 @@ int main() {
     std::cout << "Left panel offset: " << actualOffset << std::endl;
     });
     UIAnimationManager::getInstance().addAnimation(leftSlideAnim, leftPanel.get());
+    leftSlideAnim->start();  // 添加这行！
     
-    // 右面板从右侧滑入 - 修正值计算
-    rightPanel->setAnimationOffsetX(rightPanel->getWidth()); // 设置初始偏移
-    auto rightSlideAnim = std::make_shared<UIAnimation>(UIAnimation::MOVE, 3.0f, UIAnimation::EASE_OUT);
-    rightSlideAnim->setValues(0.0f, 1.0f); // 动画进度从0到1
-    rightSlideAnim->setOnUpdate([rightPanel](float progress) {
-    // 手动计算实际偏移量：从+width到0
-    float actualOffset = rightPanel->getWidth() * (1.0f - progress);
-    rightPanel->setAnimationOffsetX(actualOffset);
-    std::cout << "Right panel offset: " << actualOffset << std::endl;
-    });
-    UIAnimationManager::getInstance().addAnimation(rightSlideAnim, rightPanel.get());
-    rightSlideAnim->start();  // 添加这行
-    
+   // 右面板从右侧滑入 - 使用 moveTo 方法
+    float rightTargetX = rightPanel->getX();  // 目标位置
+    rightPanel->setPosition(rightTargetX + rightPanel->getWidth(), rightPanel->getY());  // 设置初始位置在屏幕外
+    UIAnimationManager::getInstance().moveTo(rightPanel.get(), rightTargetX, rightPanel->getY(), 3.0f, UIAnimation::EASE_OUT);
+        
     // 图片面板弹跳进入
     rightPanel1->setAnimationScaleX(0.0f);
     rightPanel1->setAnimationScaleY(0.0f);
