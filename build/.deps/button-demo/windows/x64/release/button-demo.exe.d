@@ -1,4 +1,8 @@
 {
+    files = {
+        [[build\.objs\button-demo\windows\x64\release\src\main.cpp.obj]],
+        [[build\windows\x64\release\ui.lib]]
+    },
     values = {
         [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\link.exe]],
         {
@@ -22,9 +26,5 @@
             "gdi32.lib",
             "opengl32.lib"
         }
-    },
-    files = {
-        [[build\.objs\button-demo\windows\x64\release\src\main.cpp.obj]],
-        [[build\windows\x64\release\ui.lib]]
     }
 }

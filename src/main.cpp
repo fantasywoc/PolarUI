@@ -278,23 +278,30 @@ int main() {
     mainPanel->setAnimationOpacity(0.0f);
     UIAnimationManager::getInstance().fadeIn(mainPanel.get(), 1.0f, UIAnimation::EASE_OUT);
     
-    // 左面板从左侧滑入
-    leftPanel->setAnimationOffsetX(-320.0f);
-    auto leftSlideAnim = std::make_shared<UIAnimation>(UIAnimation::MOVE, 0.8f, UIAnimation::EASE_OUT);
-    leftSlideAnim->setValues(-320.0f, 0.0f);
-    leftSlideAnim->setOnUpdate([leftPanel](float value) {
-        leftPanel->setAnimationOffsetX(value);
+    // 左面板从左侧滑入 - 修正值计算
+    leftPanel->setAnimationOffsetX(-leftPanel->getWidth()); // 设置初始偏移
+    auto leftSlideAnim = std::make_shared<UIAnimation>(UIAnimation::MOVE, 3.0f, UIAnimation::EASE_OUT);
+    leftSlideAnim->setValues(0.0f, 1.0f); // 动画进度从0到1
+    leftSlideAnim->setOnUpdate([leftPanel](float progress) {
+    // 手动计算实际偏移量：从-width到0
+    float actualOffset = -leftPanel->getWidth() * (1.0f - progress);
+    leftPanel->setAnimationOffsetX(actualOffset);
+    std::cout << "Left panel offset: " << actualOffset << std::endl;
     });
     UIAnimationManager::getInstance().addAnimation(leftSlideAnim, leftPanel.get());
     
-    // 右面板从右侧滑入
-    rightPanel->setAnimationOffsetX(320.0f);
-    auto rightSlideAnim = std::make_shared<UIAnimation>(UIAnimation::MOVE, 0.8f, UIAnimation::EASE_OUT);
-    rightSlideAnim->setValues(320.0f, 0.0f);
-    rightSlideAnim->setOnUpdate([rightPanel](float value) {
-        rightPanel->setAnimationOffsetX(value);
+    // 右面板从右侧滑入 - 修正值计算
+    rightPanel->setAnimationOffsetX(rightPanel->getWidth()); // 设置初始偏移
+    auto rightSlideAnim = std::make_shared<UIAnimation>(UIAnimation::MOVE, 3.0f, UIAnimation::EASE_OUT);
+    rightSlideAnim->setValues(0.0f, 1.0f); // 动画进度从0到1
+    rightSlideAnim->setOnUpdate([rightPanel](float progress) {
+    // 手动计算实际偏移量：从+width到0
+    float actualOffset = rightPanel->getWidth() * (1.0f - progress);
+    rightPanel->setAnimationOffsetX(actualOffset);
+    std::cout << "Right panel offset: " << actualOffset << std::endl;
     });
     UIAnimationManager::getInstance().addAnimation(rightSlideAnim, rightPanel.get());
+    rightSlideAnim->start();  // 添加这行
     
     // 图片面板弹跳进入
     rightPanel1->setAnimationScaleX(0.0f);
@@ -306,6 +313,7 @@ int main() {
         rightPanel1->setAnimationScaleY(value);
     });
     UIAnimationManager::getInstance().addAnimation(bounceAnim, rightPanel1.get());
+    bounceAnim->start();  // 添加这行
     
     // 设置鼠标事件回调
     window.setMouseButtonCallback([mainPanel](int button, int action, int mods) {

@@ -12,10 +12,17 @@ void UIPanel::render(NVGcontext* vg) {
     
     nvgSave(vg);
     
-    // 应用动画变换
+    // 应用动画变换 - 修正变换顺序
+    // 1. 先移动到组件位置（包含动画偏移）
     nvgTranslate(vg, m_x + m_animationOffsetX, m_y + m_animationOffsetY);
+    
+    // 2. 移动到组件中心进行旋转和缩放
+    nvgTranslate(vg, m_width * 0.5f, m_height * 0.5f);
     nvgRotate(vg, m_animationRotation);
     nvgScale(vg, m_animationScaleX, m_animationScaleY);
+    
+    // 3. 移回到组件左上角
+    nvgTranslate(vg, -m_width * 0.5f, -m_height * 0.5f);
     
     // 应用透明度
     nvgGlobalAlpha(vg, m_animationOpacity);
