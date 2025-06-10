@@ -42,7 +42,7 @@ void UIPanel::render(NVGcontext* vg) {
     
     // 渲染所有子组件
     for (auto& child : m_children) {
-        if (child) {
+        if (child && child->isDisplay()) {
             child->render(vg);
         }
     }
