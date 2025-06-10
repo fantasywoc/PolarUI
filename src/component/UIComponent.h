@@ -49,6 +49,10 @@ public:
     bool isEnabled() const { return m_enabled; }
     void setEnabled(bool enabled) { m_enabled = enabled; }
     
+    // 添加display属性的访问器
+    bool isDisplay() const { return m_display; }
+    void setDisplay(bool display) { m_display = display; }
+    
     // 样式设置
     void setBackgroundColor(NVGcolor color) { m_backgroundColor = color; }
     void setBorderColor(NVGcolor color) { m_borderColor = color; }
@@ -86,6 +90,7 @@ protected:
     float m_x, m_y, m_width, m_height;
     bool m_visible = true;
     bool m_enabled = true;
+    bool m_display = true;  // 新增display属性，默认为true
     
     // 样式属性
     NVGcolor m_backgroundColor = nvgRGB(200, 200, 200);

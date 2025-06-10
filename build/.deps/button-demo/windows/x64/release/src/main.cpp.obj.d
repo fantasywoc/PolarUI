@@ -1,7 +1,4 @@
 {
-    files = {
-        [[src\main.cpp]]
-    },
     depfiles_format = "cl_json",
     depfiles = "{\
     \"Version\": \"1.2\",\
@@ -171,5 +168,8 @@
             "/utf-8",
             "-DNDEBUG"
         }
+    },
+    files = {
+        [[src\main.cpp]]
     }
 }

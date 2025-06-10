@@ -86,10 +86,11 @@ bool UIPanel::handleEvent(const UIEvent& event) {
 }
 
 void UIPanel::addChild(std::shared_ptr<UIComponent> child) {
-    if (child) {
+    if (child && child->isDisplay()) {  // 检查display属性
         m_children.push_back(child);
         updateLayout();
     }
+    // 如果child的display为false，则跳过添加
 }
 
 void UIPanel::removeChild(std::shared_ptr<UIComponent> child) {

@@ -2,7 +2,8 @@
 #include "../animation/UIAnimationManager.h"
 
 UIComponent::UIComponent(float x, float y, float width, float height)
-    : m_x(x), m_y(y), m_width(width), m_height(height) {
+    : m_x(x), m_y(y), m_width(width), m_height(height), 
+      m_visible(true), m_enabled(true), m_display(true) {
 }
 
 void UIComponent::setPosition(float x, float y) {
@@ -68,8 +69,6 @@ void UIComponent::scaleTo(float scaleX, float scaleY, float duration) {
 void UIComponent::rotateTo(float angle, float duration) {
     UIAnimationManager::getInstance().rotateTo(this, angle, duration);
 }
-// 删除以下整个方法（第70-97行）：
-/*
 void UIComponent::render(NVGcontext* vg) {
     if (!m_visible || m_animationOpacity <= 0.0f) return;
     
@@ -98,4 +97,3 @@ void UIComponent::render(NVGcontext* vg) {
     
     nvgRestore(vg);
 }
-*/
