@@ -103,6 +103,9 @@
         \"ImportedHeaderUnits\": []\
     }\
 }",
+    files = {
+        [[src\component\UIComponent.cpp]]
+    },
     values = {
         [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
         {
@@ -125,8 +128,5 @@
             "-DNDEBUG"
         }
     },
-    depfiles_format = "cl_json",
-    files = {
-        [[src\component\UIComponent.cpp]]
-    }
+    depfiles_format = "cl_json"
 }

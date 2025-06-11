@@ -1,4 +1,30 @@
 {
+    values = {
+        [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
+        {
+            "-nologo",
+            "-MD",
+            "-O2",
+            "-std:c++17",
+            "-Isrc",
+            [[-Isrc\component]],
+            [[-Isrc\animation]],
+            "-DGLFW_INCLUDE_NONE",
+            "-DGLEW_NO_GLU",
+            "/EHsc",
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\include]],
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\include]],
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\include]],
+            "-DNDEBUG"
+        }
+    },
+    files = {
+        [[src\component\FlexLayout.cpp]]
+    },
+    depfiles_format = "cl_json",
     depfiles = "{\
     \"Version\": \"1.2\",\
     \"Data\": {\
@@ -134,31 +160,5 @@
         \"ImportedModules\": [],\
         \"ImportedHeaderUnits\": []\
     }\
-}",
-    depfiles_format = "cl_json",
-    values = {
-        [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
-        {
-            "-nologo",
-            "-MD",
-            "-O2",
-            "-std:c++17",
-            "-Isrc",
-            [[-Isrc\component]],
-            [[-Isrc\animation]],
-            "-DGLFW_INCLUDE_NONE",
-            "-DGLEW_NO_GLU",
-            "/EHsc",
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\include]],
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\include]],
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\include]],
-            "-DNDEBUG"
-        }
-    },
-    files = {
-        [[src\component\FlexLayout.cpp]]
-    }
+}"
 }

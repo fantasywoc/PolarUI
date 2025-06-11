@@ -70,10 +70,16 @@ int main() {
     rightPanel->setHorizontalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
     rightPanel->setBackgroundColor(nvgRGB(255, 100, 100));
     
+    // 创建右图像面板
+    auto rightPanel1 = std::make_shared<UIPanel>(0, 0, 500, 700);
+    rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
+    rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 100));
+
+
     // 添加标签到左面板 - 修改宽度为150px
     auto label = std::make_shared<UILabel>(0, 0, 150, 30, "Left Panel Label");
     label->setTextAlign(UILabel::TextAlign::CENTER);
-    leftPanel->addChild(label);
+
     
     // 创建按钮 - 统一宽度为150px，并添加动画效果
     auto button1 = std::make_shared<UIButton>(0, 0, 150, 40, "Fade Animation");
@@ -257,15 +263,12 @@ int main() {
         UIAnimationManager::getInstance().addAnimation(flashAnim, exitButton.get());
     });
     
-    // 创建右图像面板
-    auto rightPanel1 = std::make_shared<UIPanel>(0, 0, 500, 700);
-    rightPanel1->setHorizontalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
-    rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 100));
+
 
     rightPanel->addChild(okButton);
     rightPanel->addChild(exitButton);
     rightPanel1->addChild(texture);
-    
+    rightPanel1->addChild(label);
     // 添加子面板到主面板
     mainPanel->addChild(leftPanel);
     mainPanel->addChild(rightPanel);

@@ -1,4 +1,8 @@
 {
+    depfiles_format = "cl_json",
+    files = {
+        [[src\animation\UIAnimation.cpp]]
+    },
     depfiles = "{\
     \"Version\": \"1.2\",\
     \"Data\": {\
@@ -98,7 +102,6 @@
         \"ImportedHeaderUnits\": []\
     }\
 }",
-    depfiles_format = "cl_json",
     values = {
         [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
         {
@@ -120,8 +123,5 @@
             [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\include]],
             "-DNDEBUG"
         }
-    },
-    files = {
-        [[src\animation\UIAnimation.cpp]]
     }
 }
