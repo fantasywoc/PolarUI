@@ -1,30 +1,56 @@
 {
+    nanovg = {
+        __requireconfs = {
+            configs = {
+                shared = true
+            }
+        },
+        __enabled = true,
+        linkdirs = [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\lib]],
+        links = "nanovg",
+        sysincludedirs = [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\include]],
+        libfiles = {
+            [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\lib\nanovg.lib]],
+            [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\bin\nanovg.dll]]
+        },
+        version = "2023.8.27",
+        shared = true,
+        installdir = [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050]],
+        static = true,
+        license = "zlib",
+        __requirestr = "nanovg",
+        envs = {
+            PATH = {
+                [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\bin]]
+            }
+        }
+    },
     glew = {
         __requireconfs = {
             configs = {
                 shared = true
             }
         },
-        sysincludedirs = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\include]],
-        __requirestr = "glew",
+        __enabled = true,
         version = "2.2.0",
+        links = "glew32",
+        sysincludedirs = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\include]],
         libfiles = {
             [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\lib\glew32.lib]],
             [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\bin\glew32.dll]]
         },
-        syslinks = "opengl32",
+        linkdirs = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\lib]],
+        defines = "GLEW_NO_GLU",
         shared = true,
+        installdir = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159]],
+        static = true,
+        syslinks = "opengl32",
+        __requirestr = "glew",
         envs = {
             PATH = {
                 [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\bin]]
             }
-        },
-        installdir = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159]],
-        __enabled = true,
-        defines = "GLEW_NO_GLU",
-        links = "glew32",
-        linkdirs = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\lib]],
-        static = true
+        }
     },
     glfw = {
         __requireconfs = {
@@ -32,61 +58,35 @@
                 shared = true
             }
         },
-        sysincludedirs = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\include]],
-        __requirestr = "glfw 3.3.8",
-        installdir = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d]],
-        license = "zlib",
+        __enabled = true,
+        linkdirs = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\lib]],
         libfiles = {
             [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\lib\glfw3dll.lib]],
             [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\bin\glfw3.dll]]
         },
+        links = {
+            "glfw3dll",
+            "opengl32"
+        },
+        sysincludedirs = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\include]],
+        license = "zlib",
+        static = true,
+        defines = "GLFW_INCLUDE_NONE",
+        shared = true,
+        installdir = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d]],
+        version = "3.3.8",
         syslinks = {
             "user32",
             "shell32",
             "gdi32"
         },
-        shared = true,
+        __requirestr = "glfw 3.3.8",
         envs = {
             PATH = {
                 [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\bin]],
                 [[C:\Users\CK\AppData\Local\.xmake\packages\n\ninja\v1.12.1\f99acdf63a7d4fc88c165b22351691b6\bin]],
                 [[C:\Users\CK\AppData\Local\.xmake\packages\c\cmake\4.0.1\633b091b036c4e68b6936c6489244ee6\bin]]
             }
-        },
-        version = "3.3.8",
-        __enabled = true,
-        links = {
-            "glfw3dll",
-            "opengl32"
-        },
-        defines = "GLFW_INCLUDE_NONE",
-        static = true,
-        linkdirs = [[C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\7f33961a41e640bfa5bdb78428d3267d\lib]]
-    },
-    nanovg = {
-        __requireconfs = {
-            configs = {
-                shared = true
-            }
-        },
-        installdir = [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050]],
-        __requirestr = "nanovg",
-        version = "2023.8.27",
-        libfiles = {
-            [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\lib\nanovg.lib]],
-            [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\bin\nanovg.dll]]
-        },
-        shared = true,
-        envs = {
-            PATH = {
-                [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\bin]]
-            }
-        },
-        sysincludedirs = [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\include]],
-        __enabled = true,
-        links = "nanovg",
-        linkdirs = [[C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\cb0b287f2781439aaebe7fcc2bebc050\lib]],
-        license = "zlib",
-        static = true
+        }
     }
 }

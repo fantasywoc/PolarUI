@@ -1,7 +1,5 @@
 {
-    files = {
-        [[src\main.cpp]]
-    },
+    depfiles_format = "cl_json",
     values = {
         [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
         {
@@ -24,6 +22,9 @@
             "/utf-8",
             "-DNDEBUG"
         }
+    },
+    files = {
+        [[src\main.cpp]]
     },
     depfiles = "{\
     \"Version\": \"1.2\",\
@@ -170,6 +171,5 @@
         \"ImportedModules\": [],\
         \"ImportedHeaderUnits\": []\
     }\
-}",
-    depfiles_format = "cl_json"
+}"
 }

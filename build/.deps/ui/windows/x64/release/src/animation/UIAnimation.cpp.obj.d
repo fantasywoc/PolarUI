@@ -1,5 +1,4 @@
 {
-    depfiles_format = "cl_json",
     files = {
         [[src\animation\UIAnimation.cpp]]
     },
@@ -123,5 +122,6 @@
             [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\7e77cab88e014bf2a64860fbbda75159\include]],
             "-DNDEBUG"
         }
-    }
+    },
+    depfiles_format = "cl_json"
 }
