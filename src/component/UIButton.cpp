@@ -59,6 +59,14 @@ void UIButton::update(double deltaTime) {
 bool UIButton::handleEvent(const UIEvent& event) {
     if (!m_visible || !m_enabled) return false;
     
+    // 添加调试信息
+    if (event.type == UIEvent::MOUSE_PRESS) {
+        std::cout << "Button事件: 鼠标坐标(" << event.mouseX << ", " << event.mouseY << ")" << std::endl;
+        std::cout << "Button位置: (" << m_x << ", " << m_y << ") 大小: (" << m_width << ", " << m_height << ")" << std::endl;
+        std::cout << "Button动画偏移: (" << m_animationOffsetX << ", " << m_animationOffsetY << ")" << std::endl;
+        std::cout << "contains结果: " << contains(event.mouseX, event.mouseY) << std::endl;
+    }
+    
     switch (event.type) {
         case UIEvent::MOUSE_MOVE:
             m_isHovered = contains(event.mouseX, event.mouseY);

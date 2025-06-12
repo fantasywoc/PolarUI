@@ -60,6 +60,12 @@ void UIPanel::update(double deltaTime) {
 }
 
 bool UIPanel::handleEvent(const UIEvent& event) {
+    // 添加调试输出
+    if (event.type == UIEvent::MOUSE_PRESS) {
+        std::cout << "Panel处理事件: 面板位置(" << m_x << ", " << m_y << ")" << std::endl;
+        std::cout << "原始鼠标坐标: (" << event.mouseX << ", " << event.mouseY << ")" << std::endl;
+    }
+    
     // 从后往前遍历子组件（后添加的在上层）
     for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
         if (*it) {
@@ -67,6 +73,11 @@ bool UIPanel::handleEvent(const UIEvent& event) {
             UIEvent localEvent = event;
             localEvent.mouseX = event.mouseX - (m_x + m_animationOffsetX);
             localEvent.mouseY = event.mouseY - (m_y + m_animationOffsetY);
+            
+            // 添加调试输出
+            if (event.type == UIEvent::MOUSE_PRESS) {
+                std::cout << "转换后的鼠标坐标: (" << localEvent.mouseX << ", " << localEvent.mouseY << ")" << std::endl;
+            }
             
             if ((*it)->handleEvent(localEvent)) {
                 return true; // 事件被子组件处理
@@ -86,11 +97,10 @@ bool UIPanel::handleEvent(const UIEvent& event) {
 }
 
 void UIPanel::addChild(std::shared_ptr<UIComponent> child) {
-    if (child && child->isDisplay()) {  // 检查display属性
-        m_children.push_back(child);
-        updateLayout();
+    if (child) {
+        m_children.push_back(child);  // 始终添加子组件
+        updateLayout();  // 布局会自动处理display属性
     }
-    // 如果child的display为false，则跳过添加
 }
 
 void UIPanel::removeChild(std::shared_ptr<UIComponent> child) {
@@ -141,4 +151,26 @@ void UIPanel::setHorizontalLayoutWithAlignment(FlexLayout::XAlignment xAlign,
 
 FlexLayout* UIPanel::getFlexLayout() const {
     return dynamic_cast<FlexLayout*>(m_layout.get());
+}
+
+
+void UIPanel::resetAllAnimationOffsets() {
+    // 重置自身的动画偏移
+    setAnimationOffsetX(0);
+    setAnimationOffsetY(0);
+    
+    // 递归重置所有子组件的动画偏移
+    for (auto& child : m_children) {
+        if (child) {
+            // 重置子组件自身的动画偏移
+            child->setAnimationOffsetX(0);
+            child->setAnimationOffsetY(0);
+            
+            // 如果子组件也是UIPanel，递归调用
+            auto childPanel = std::dynamic_pointer_cast<UIPanel>(child);
+            if (childPanel) {
+                childPanel->resetAllAnimationOffsets();
+            }
+        }
+    }
 }

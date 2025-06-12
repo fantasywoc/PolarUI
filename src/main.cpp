@@ -11,6 +11,11 @@
 #include "animation/UIAnimationManager.h"
 #include "animation/UIAnimation.h"
 
+#include <locale>
+#include <windows.h>  // 添加这行
+#include <io.h>       // 添加这行
+#include <fcntl.h>    // 添加这行
+
 void printComponentInfo(const std::string& name, std::shared_ptr<UIComponent> component) {
     std::cout << name << ": Position(" << component->getX() << ", " << component->getY() 
               << "), Size(" << component->getWidth() << " x " << component->getHeight() << ")" << std::endl;
@@ -41,6 +46,11 @@ void printAllComponentsInfo(std::shared_ptr<UIPanel> mainPanel,
 }
 
 int main() {
+
+    // 设置控制台输出为UTF-8
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
     UIWindow window(1300, 900, "Button Demo with Animations");
     
     // 设置透明帧缓冲区
@@ -67,7 +77,7 @@ int main() {
     
     // 创建右面板
     auto rightPanel = std::make_shared<UIPanel>(0, 0, 320, 480);
-    rightPanel->setHorizontalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
+    rightPanel->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
     rightPanel->setBackgroundColor(nvgRGB(255, 100, 100));
     
     // 创建右图像面板
@@ -196,7 +206,7 @@ int main() {
     
     // 右面板的按钮，添加动画效果
     auto okButton = std::make_shared<UIButton>(0, 0, 70, 40, "OK");
-    okButton->setOnClick([okButton, mainPanel,rightPanel1]() {
+    okButton->setOnClick([okButton, mainPanel, rightPanel1, leftPanel, rightPanel]() {
         std::cout << "OK button clicked!" << std::endl;
         
         // 检查图片当前的可见状态
@@ -206,29 +216,32 @@ int main() {
             // 当前可见，执行隐藏动画
             rightPanel1->setDisplay(false);
             okButton->setText("Hide");
-            mainPanel->updateLayout();
             std::cout << "Hiding texture..." << std::endl;
         } else {
             // 当前隐藏，执行显示动画
             rightPanel1->setDisplay(true);
             okButton->setText("show");
-            mainPanel->updateLayout();
             std::cout << "Showing texture..." << std::endl;
         }
         
-        // 成功动画：绿色闪烁效果
-        auto flashAnim = std::make_shared<UIAnimation>(UIAnimation::CUSTOM, 0.5f, UIAnimation::EASE_IN_OUT);
-        flashAnim->setValues(0.0f, 1.0f);
-        flashAnim->setRepeatCount(2); // 重复2次
-        flashAnim->setReverse(true);  // 反向播放
-        flashAnim->setOnUpdate([okButton](float value) {
-            // 在原色和绿色之间插值
-            NVGcolor originalColor = nvgRGB(100, 100, 100);
-            NVGcolor flashColor = nvgRGB(100, 255, 100);
-            NVGcolor currentColor = nvgLerpRGBA(originalColor, flashColor, value);
-            okButton->setBackgroundColor(currentColor);
-        });
-        UIAnimationManager::getInstance().addAnimation(flashAnim, okButton.get());
+        // 先更新布局
+        mainPanel->updateLayout();
+        
+        // 使用递归方法重置所有组件的动画偏移
+        mainPanel->resetAllAnimationOffsets();
+        
+        // 添加调试信息
+        std::cout << "=== 布局更新后的位置信息 ===" << std::endl;
+        std::cout << "mainPanel: (" << mainPanel->getX() << ", " << mainPanel->getY() << ")" << std::endl;
+        std::cout << "rightPanel: (" << rightPanel->getX() << ", " << rightPanel->getY() << ")" << std::endl;
+        std::cout << "okButton: (" << okButton->getX() << ", " << okButton->getY() << ")" << std::endl;
+        std::cout << "rightPanel动画偏移: (" << rightPanel->getAnimationOffsetX() << ", " << rightPanel->getAnimationOffsetY() << ")" << std::endl;
+        
+        // 强制更新rightPanel的位置
+        rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
+        
+        // 注意：getChildren()方法可能不存在，需要检查UIPanel.h中是否有这个方法
+        // 如果没有，需要先在UIPanel.h中添加这个方法
     });
     
     auto exitButton = std::make_shared<UIButton>(0, 0, 120, 40, "Exit");
@@ -339,3 +352,17 @@ int main() {
     window.cleanup();
     return 0;
 }
+
+// 在main.cpp中添加辅助函数
+void resetAllAnimationOffsets(std::shared_ptr<UIPanel> panel) {
+    if (!panel) return;
+    
+    // 重置面板自身的动画偏移
+    panel->setAnimationOffsetX(0);
+    panel->setAnimationOffsetY(0);
+    
+    // 重置所有子组件的动画偏移
+    // 注意：这需要UIPanel提供访问子组件的方法
+    // 或者在UIPanel中添加resetAllChildrenAnimationOffsets方法
+}
+

@@ -44,6 +44,12 @@ public:
     // 获取当前布局
     FlexLayout* getFlexLayout() const;
     
+    // 添加这个方法来访问子组件
+    const std::vector<std::shared_ptr<UIComponent>>& getChildren() const { return m_children; }
+    
+    // 添加递归重置动画偏移的方法
+    void resetAllAnimationOffsets();
+    
 private:
     std::vector<std::shared_ptr<UIComponent>> m_children;
     std::unique_ptr<UILayout> m_layout;

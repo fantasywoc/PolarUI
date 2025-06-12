@@ -23,13 +23,17 @@ void FlexLayout::layoutHorizontal(const std::vector<std::shared_ptr<UIComponent>
     float availableWidth = containerWidth - 2 * m_padding;
     float availableHeight = containerHeight - 2 * m_padding;
     
-    // 计算所有子组件的总宽度
+    // 计算所有显示的子组件的总宽度
     float totalChildWidth = 0;
+    int visibleChildCount = 0;
     for (auto& child : children) {
-        if (child) {
+        if (child && child->isDisplay()) {  // 只计算display为true的组件
             totalChildWidth += child->getWidth();
+            visibleChildCount++;
         }
     }
+    
+    if (visibleChildCount == 0) return;  // 没有可见组件
     
     // 计算起始X位置
     float startX = containerX + m_padding;
@@ -42,24 +46,24 @@ void FlexLayout::layoutHorizontal(const std::vector<std::shared_ptr<UIComponent>
             break;
         case X_CENTER: {
             // 居中对齐
-            float totalWidth = totalChildWidth + (children.size() - 1) * spacing;
+            float totalWidth = totalChildWidth + (visibleChildCount - 1) * spacing;  // 使用visibleChildCount
             float remainingWidth = availableWidth - totalWidth;
             startX += remainingWidth / 2.0f;
             break;
         }
         case X_END: {
             // 右对齐
-            float totalWidth = totalChildWidth + (children.size() - 1) * spacing;
+            float totalWidth = totalChildWidth + (visibleChildCount - 1) * spacing;  // 使用visibleChildCount
             float remainingWidth = availableWidth - totalWidth;
             startX += remainingWidth;
             break;
         }
     }
     
-    // 布局所有子组件
+    // 布局所有显示的子组件
     float currentX = startX;
     for (auto& child : children) {
-        if (child) {
+        if (child && child->isDisplay()) {  // 只布局display为true的组件
             // 计算Y位置（交叉轴对齐）
             float childY;
             switch (m_yAlignment) {
@@ -86,18 +90,25 @@ void FlexLayout::layoutHorizontal(const std::vector<std::shared_ptr<UIComponent>
 void FlexLayout::layoutVertical(const std::vector<std::shared_ptr<UIComponent>>& children,
                                float containerX, float containerY,
                                float containerWidth, float containerHeight) {
+    if (children.empty()) return;
+    
     float availableWidth = containerWidth - 2 * m_padding;
     float availableHeight = containerHeight - 2 * m_padding;
     
-    // 计算所有子组件的总高度
+    // 计算所有显示的子组件的总高度
     float totalChildHeight = 0;
+    int visibleChildCount = 0;
     for (auto& child : children) {
-        if (child) {
+        if (child && child->isDisplay()) {  // 添加display检查
             totalChildHeight += child->getHeight();
+            visibleChildCount++;
         }
     }
     
-    float totalSpacing = (children.size() - 1) * m_spacing;
+    if (visibleChildCount == 0) return;  // 没有可见组件
+    
+    // 修复：使用可见子组件数量计算间距
+    float totalSpacing = (visibleChildCount - 1) * m_spacing;
     float remainingHeight = availableHeight - totalChildHeight - totalSpacing;
     
     float startY = containerY + m_padding;
@@ -115,13 +126,13 @@ void FlexLayout::layoutVertical(const std::vector<std::shared_ptr<UIComponent>>&
             startY += remainingHeight;
             break;
         case Y_SPACE_BETWEEN:
-            if (children.size() > 1) {
-                currentSpacing = remainingHeight / (children.size() - 1);
+            if (visibleChildCount > 1) {  // 修复：使用visibleChildCount
+                currentSpacing = remainingHeight / (visibleChildCount - 1);
             }
             break;
         case Y_SPACE_AROUND:
-            if (children.size() > 0) {
-                float extraSpace = remainingHeight / children.size();
+            if (visibleChildCount > 0) {  // 修复：使用visibleChildCount
+                float extraSpace = remainingHeight / visibleChildCount;
                 startY += extraSpace / 2.0f;
                 currentSpacing += extraSpace;
             }
@@ -131,12 +142,12 @@ void FlexLayout::layoutVertical(const std::vector<std::shared_ptr<UIComponent>>&
     // 布局所有组件
     float currentY = startY;
     for (auto& child : children) {
-        if (child) {
+        if (child && child->isDisplay()) {  // 添加display检查
             // 计算子组件在交叉轴（X轴）上的位置
             float childX = calculateXPosition(containerX + m_padding, availableWidth, child->getWidth());
             
             child->setPosition(childX, currentY);
-            currentY += child->getHeight() + currentSpacing;
+            currentY += child->getHeight() + currentSpacing;  // 修改：spacing -> currentSpacing
         }
     }
 }
