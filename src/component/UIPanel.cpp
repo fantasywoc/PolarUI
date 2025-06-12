@@ -60,10 +60,19 @@ void UIPanel::update(double deltaTime) {
 }
 
 bool UIPanel::handleEvent(const UIEvent& event) {
+    if (!m_visible || !m_enabled) {
+        return false;
+    }
+    
+    // 在处理鼠标事件前强制更新布局
+    if (event.type == UIEvent::MOUSE_PRESS || event.type == UIEvent::MOUSE_RELEASE || event.type == UIEvent::MOUSE_MOVE) {
+        updateLayout();
+    }
+    
     // 添加调试输出
     if (event.type == UIEvent::MOUSE_PRESS) {
-        std::cout << "Panel处理事件: 面板位置(" << m_x << ", " << m_y << ")" << std::endl;
-        std::cout << "原始鼠标坐标: (" << event.mouseX << ", " << event.mouseY << ")" << std::endl;
+        std::cout << "Panel处理事件: 面板位置(" << m_x << ", " << m_y << ") \n";
+        std::cout << " 原始鼠标坐标: (" << event.mouseX << ", " << event.mouseY << ") \n";
     }
     
     // 从后往前遍历子组件（后添加的在上层）
@@ -76,7 +85,7 @@ bool UIPanel::handleEvent(const UIEvent& event) {
             
             // 添加调试输出
             if (event.type == UIEvent::MOUSE_PRESS) {
-                std::cout << "转换后的鼠标坐标: (" << localEvent.mouseX << ", " << localEvent.mouseY << ")" << std::endl;
+                std::cout << " 转换后的鼠标坐标: (" << localEvent.mouseX << ", " << localEvent.mouseY << ") \n";
             }
             
             if ((*it)->handleEvent(localEvent)) {

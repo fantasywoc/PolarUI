@@ -206,42 +206,70 @@ int main() {
     
     // 右面板的按钮，添加动画效果
     auto okButton = std::make_shared<UIButton>(0, 0, 70, 40, "OK");
-    okButton->setOnClick([okButton, mainPanel, rightPanel1, leftPanel, rightPanel]() {
-        std::cout << "OK button clicked!" << std::endl;
+    okButton->setOnClick([&, okButton, rightPanel1, mainPanel, rightPanel]() {
+        std::cout << "\n=== OK按钮点击事件开始 ===" << std::endl;
+        
+        // 计算按钮的绝对坐标（用于调试）
+        float okButtonAbsX = mainPanel->getX() + rightPanel->getX() + okButton->getX();
+        float okButtonAbsY = mainPanel->getY() + rightPanel->getY() + okButton->getY();
+        std::cout << "okButton计算的绝对坐标: (" << okButtonAbsX << ", " << okButtonAbsY << ")" << std::endl;
         
         // 检查图片当前的可见状态
         bool isVisible = rightPanel1->isDisplay();
+        std::cout << "rightPanel1当前显示状态: " << (isVisible ? "显示" : "隐藏") << std::endl;
         
+        // 在OK按钮点击事件中
         if (isVisible) {
             // 当前可见，执行隐藏动画
             rightPanel1->setDisplay(false);
-            okButton->setText("Hide");
-            std::cout << "Hiding texture..." << std::endl;
+            rightPanel1->setEnabled(false);  // 禁用事件处理
+            okButton->setText("Show");
+            std::cout << "执行操作: 隐藏纹理" << std::endl;
         } else {
             // 当前隐藏，执行显示动画
             rightPanel1->setDisplay(true);
-            okButton->setText("show");
-            std::cout << "Showing texture..." << std::endl;
+            rightPanel1->setEnabled(true);   // 启用事件处理
+            okButton->setText("Hide");
+            std::cout << "执行操作: 显示纹理" << std::endl;
         }
         
-        // 先更新布局
+        // === 执行布局更新 ===
+        std::cout << "\n--- 开始布局更新 ---" << std::endl;
         mainPanel->updateLayout();
         
         // 使用递归方法重置所有组件的动画偏移
         mainPanel->resetAllAnimationOffsets();
         
-        // 添加调试信息
-        std::cout << "=== 布局更新后的位置信息 ===" << std::endl;
+        // 强制同步所有组件的位置信息
+        // 确保事件系统使用最新的位置数据
+        rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
+        okButton->setPosition(okButton->getX(), okButton->getY());
+        
+        // 或者添加一个强制刷新方法
+        // 让所有组件重新计算并同步位置信息
+        std::cout << "强制同步位置信息完成" << std::endl;
+        
+        std::cout << "\n--- 布局更新后的位置信息 ---" << std::endl;
         std::cout << "mainPanel: (" << mainPanel->getX() << ", " << mainPanel->getY() << ")" << std::endl;
         std::cout << "rightPanel: (" << rightPanel->getX() << ", " << rightPanel->getY() << ")" << std::endl;
         std::cout << "okButton: (" << okButton->getX() << ", " << okButton->getY() << ")" << std::endl;
         std::cout << "rightPanel动画偏移: (" << rightPanel->getAnimationOffsetX() << ", " << rightPanel->getAnimationOffsetY() << ")" << std::endl;
+        std::cout << "okButton动画偏移: (" << okButton->getAnimationOffsetX() << ", " << okButton->getAnimationOffsetY() << ")" << std::endl;
+        
+        // 重新计算按钮的绝对坐标
+        float okButtonAbsX_After = mainPanel->getX() + rightPanel->getX() + okButton->getX();
+        float okButtonAbsY_After = mainPanel->getY() + rightPanel->getY() + okButton->getY();
+        std::cout << "okButton更新后的绝对坐标: (" << okButtonAbsX_After << ", " << okButtonAbsY_After << ")" << std::endl;
+        
+        // 显示坐标变化
+        float deltaX = okButtonAbsX_After - okButtonAbsX;
+        float deltaY = okButtonAbsY_After - okButtonAbsY;
+        std::cout << "okButton坐标变化: (" << deltaX << ", " << deltaY << ")" << std::endl;
         
         // 强制更新rightPanel的位置
         rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
         
-        // 注意：getChildren()方法可能不存在，需要检查UIPanel.h中是否有这个方法
-        // 如果没有，需要先在UIPanel.h中添加这个方法
+        std::cout << "\n=== OK按钮点击事件结束 ===\n" << std::endl;
     });
     
     auto exitButton = std::make_shared<UIButton>(0, 0, 120, 40, "Exit");
@@ -351,18 +379,5 @@ int main() {
     
     window.cleanup();
     return 0;
-}
-
-// 在main.cpp中添加辅助函数
-void resetAllAnimationOffsets(std::shared_ptr<UIPanel> panel) {
-    if (!panel) return;
-    
-    // 重置面板自身的动画偏移
-    panel->setAnimationOffsetX(0);
-    panel->setAnimationOffsetY(0);
-    
-    // 重置所有子组件的动画偏移
-    // 注意：这需要UIPanel提供访问子组件的方法
-    // 或者在UIPanel中添加resetAllChildrenAnimationOffsets方法
 }
 
