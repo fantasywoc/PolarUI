@@ -8,6 +8,13 @@
 
 这是一个基于 GLFW、OpenGL 和 NanoVG 的 UI 窗口项目，提供了一个封装良好的 `UIWindow` 类来简化窗口和图形界面的开发。
 
+
+
+编译
+xmake 
+xmake run botton-demo
+xmake package  #打包库文件
+
 ## UIWindow 类的主要功能
 
 ### 1. 窗口管理

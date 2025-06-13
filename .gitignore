@@ -52,3 +52,25 @@ build/.deps/ui/windows/x64/release/src/component/UITexture.cpp.obj.d
 build/.objs/ui/windows/x64/release/src/animation/UIAnimation.cpp.obj    
 
 
+.xmake/windows/x64/cache/config
+.xmake/windows/x64/cache/detect
+.xmake/windows/x64/cache/package
+.xmake/windows/x64/cache/toolchain
+build/.deps/clipboard-demo/windows/x64/release/clipboard-demo.exe.d
+build/.deps/clipboard-demo/windows/x64/release/src/clipboard_demo.cpp.obj.d
+build/.objs/clipboard-demo/windows/x64/release/src/clipboard_demo.cpp.obj
+build/packages/b/button-demo/xmake.lua
+build/packages/b/button-demo/windows/x64/release/bin/button-demo.exe
+build/packages/b/button-demo/windows/x64/release/bin/glew32.dll
+build/packages/b/button-demo/windows/x64/release/bin/glfw3.dll
+build/packages/b/button-demo/windows/x64/release/bin/nanovg.dll
+build/packages/c/clipboard-demo/xmake.lua
+build/packages/c/clipboard-demo/windows/x64/release/bin/clipboard-demo.exe
+build/packages/c/clipboard-demo/windows/x64/release/bin/glew32.dll
+build/packages/c/clipboard-demo/windows/x64/release/bin/glfw3.dll
+build/packages/c/clipboard-demo/windows/x64/release/bin/nanovg.dll
+build/packages/u/ui/xmake.lua
+.xmake/windows/x64/cache/config
+.xmake/windows/x64/cache/detect
+.xmake/windows/x64/cache/package
+.xmake/windows/x64/cache/toolchain

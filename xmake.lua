@@ -78,3 +78,80 @@ target("clipboard-demo")
     
     add_cxxflags("/EHsc")
 
+-- 开发阶段自动复制（保持现有的 after_build）
+after_build(function (target)
+    local targetdir = path.directory(target:targetfile())
+    for _, pkg in ipairs(target:pkgs()) do
+        local libfiles = pkg:get("libfiles")
+        if libfiles then
+            for _, libfile in ipairs(libfiles) do
+                if libfile:endswith(".dll") then
+                    os.cp(libfile, targetdir)
+                end
+            end
+        end
+    end
+end)
+
+-- 发布打包任务（新增）
+-- 简化版打包任务
+task("package")
+    set_menu {
+        usage = "xmake package",
+        description = "Package application for distribution"
+    }
+    on_run(function()
+        -- 检查可执行文件是否存在
+        local exe_paths = {
+            "build/windows/x64/release/button-demo.exe",
+            "button-demo.exe",
+            "a.exe"
+        }
+        
+        local exe_file = nil
+        for _, path in ipairs(exe_paths) do
+            if os.isfile(path) then
+                exe_file = path
+                break
+            end
+        end
+        
+        if not exe_file then
+            print("错误: 请先运行 'xmake build button-demo' 构建项目")
+            return
+        end
+        
+        -- 创建分发目录
+        os.mkdir("dist")
+        
+        -- 复制可执行文件
+        os.cp(exe_file, "dist/button-demo.exe")
+        print("复制: " .. path.filename(exe_file))
+        
+        -- 查找并复制 DLL 文件（避免重复）
+        local dll_patterns = {
+            "build/**/glfw*.dll",
+            "build/**/glew*.dll", 
+            "build/**/nanovg*.dll",
+            "**/*glfw*.dll",
+            "**/*glew*.dll",
+            "**/*nanovg*.dll"
+        }
+        
+        local copied_dlls = {}
+        for _, pattern in ipairs(dll_patterns) do
+            local files = os.files(pattern)
+            for _, file in ipairs(files) do
+                local dll_name = path.filename(file)
+                if not copied_dlls[dll_name] then
+                    os.cp(file, "dist")
+                    print("复制: " .. dll_name)
+                    copied_dlls[dll_name] = true
+                end
+            end
+        end
+        
+        print("打包完成，分发文件在 dist 目录")
+        print("可以将 dist 目录整体复制给其他用户")
+    end)
+
