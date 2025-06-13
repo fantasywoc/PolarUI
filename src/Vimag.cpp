@@ -263,9 +263,9 @@ int main() {
 
     // 获取图片文件
     std::vector<fs::path> image_paths;
+    image_paths = find_image_files("D:/Picture/Saved Pictures/");
     int current_index =0;
     size_t limit_index =image_paths.size(); 
-    image_paths = find_image_files("D:/Picture/Saved Pictures/");
     std::string imagPath =image_paths[current_index].generic_string();
     // 先创建纹理组件
     // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");

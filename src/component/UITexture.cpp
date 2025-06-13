@@ -41,7 +41,7 @@ void UITexture::render(NVGcontext* vg) {
     }
     
     // 绘制背景（如果设置了）
-    if (m_backgroundColor.a > 0) {
+    if (m_backgroundColor.a >= 0) {
         nvgBeginPath(vg);
         nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
         nvgFillColor(vg, m_backgroundColor);

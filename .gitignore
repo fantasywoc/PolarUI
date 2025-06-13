@@ -74,3 +74,8 @@ build/packages/u/ui/xmake.lua
 .xmake/windows/x64/cache/detect
 .xmake/windows/x64/cache/package
 .xmake/windows/x64/cache/toolchain
+build/.deps/vimag-demo/windows/x64/release/vimag-demo.exe.d
+build/.deps/vimag-demo/windows/x64/release/src/Vimag.cpp.obj.d
+build/.objs/vimag-demo/windows/x64/release/src/Vimag.cpp.obj
+build/windows/x64/release/vimag-demo.exe
+xmake.lua

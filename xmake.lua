@@ -78,6 +78,38 @@ target("clipboard-demo")
     
     add_cxxflags("/EHsc")
 
+-- 图片查看器演示程序
+target("vimag-demo")
+    set_kind("binary")
+    add_files("src/Vimag.cpp")
+    add_deps("ui")
+    add_packages("glfw", "nanovg", "glew")
+    
+    -- 添加头文件搜索路径
+    add_includedirs("src", "src/component", "src/widget", "src/animation")
+    
+    -- 添加编码选项
+    if is_plat("windows") then
+        add_cxflags("/utf-8")
+        add_links("opengl32", "gdi32", "user32", "kernel32")
+    else
+        add_links("GL", "X11", "pthread", "Xrandr", "Xi", "dl")
+    end
+    
+    -- 设置运行目录
+    set_rundir("$(projectdir)")
+    
+    -- 添加调试信息
+    if is_mode("debug") then
+        set_symbols("debug")
+        set_optimize("none")
+        add_defines("DEBUG")
+    else
+        set_optimize("fast")
+    end
+    
+    add_cxxflags("/EHsc")
+
 -- 开发阶段自动复制（保持现有的 after_build）
 after_build(function (target)
     local targetdir = path.directory(target:targetfile())
