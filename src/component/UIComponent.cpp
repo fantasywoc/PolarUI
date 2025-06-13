@@ -47,38 +47,7 @@ void UIComponent::renderBorder(NVGcontext* vg) {
     }
 }
 
-// 动画接口实现 - 使用UIAnimationManager的便捷方法
-// 移除错误的 render 方法实现，只保留以下动画接口方法：
 
-// 移除第69-99行的错误render方法实现
-// void UIComponent::render(NVGcontext* vg) {
-//     if (!m_visible || m_animationOpacity <= 0.0f) return;
-//     
-//     nvgSave(vg);
-//     
-//     // 应用动画变换
-//     nvgTranslate(vg, m_x + m_animationOffsetX, m_y + m_animationOffsetY);
-//     
-//     if (m_animationRotation != 0.0f) {
-//         nvgTranslate(vg, m_width/2, m_height/2);
-//         nvgRotate(vg, m_animationRotation);
-//         nvgTranslate(vg, -m_width/2, -m_height/2);
-//     }
-//     
-//     if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
-//         nvgTranslate(vg, m_width/2, m_height/2);
-//         nvgScale(vg, m_animationScaleX, m_animationScaleY);
-//         nvgTranslate(vg, -m_width/2, -m_height/2);
-//     }
-//     
-//     // 应用透明度
-//     nvgGlobalAlpha(vg, m_animationOpacity);
-//     
-//     // 调用具体组件的渲染逻辑
-//     renderContent(vg);  // 这行导致错误
-//     
-//     nvgRestore(vg);
-// }
 void UIComponent::fadeIn(float duration, UIAnimation::EasingType easing) {
     UIAnimationManager::getInstance().fadeIn(this, duration, easing);
 }

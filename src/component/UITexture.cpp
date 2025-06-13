@@ -16,6 +16,7 @@ UITexture::UITexture(float x, float y, float width, float height, const std::str
     , m_alpha(1.0f)
     , m_needsLoad(!imagePath.empty()) {
     // 不在构造函数中加载图像，延迟到render时加载
+    
 }
 
 UITexture::~UITexture() {
@@ -90,6 +91,9 @@ bool UITexture::handleEvent(const UIEvent& event) {
 }
 
 bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
+
+    
+
     if (!vg) {
         std::cerr << "NVGcontext is null, cannot load image" << std::endl;
         return false;
@@ -108,6 +112,20 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
         return false;
     }
     
+    // 计算图片宽高比
+    float imageAspect = (float)m_imageWidth / (float)m_imageHeight;
+    // 计算当前容器宽高比
+    float containerAspect = getWidth() / getHeight();
+    
+    if (imageAspect >=1) {
+        // 图片比容器更宽，以宽度为准调整高度
+        float newHeight = getOriginWidth() / imageAspect;
+        setSize(getOriginWidth(), newHeight);
+    } else {
+        // 图片比容器更高，以高度为准调整宽度
+        float newWidth = getOriginWidth() * imageAspect;
+        setSize(newWidth, getOriginWidth());
+    }
     // 创建 NanoVG 图像
     m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
     
@@ -173,5 +191,11 @@ void UITexture::calculateRenderBounds(float& renderX, float& renderY,
             renderX = m_x + (m_width - renderW) * 0.5f;
             renderY = m_y + (m_height - renderH) * 0.5f;
             break;
+    }
+}
+
+void UITexture::setOriginWidth(float OriginWidth) {
+    if(OriginWidth >0){
+        m_OriginWidth = OriginWidth;
     }
 }

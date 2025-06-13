@@ -269,7 +269,7 @@ int main() {
     std::string imagPath =image_paths[current_index].generic_string();
     // 先创建纹理组件
     // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
-    auto texture = std::make_shared<UITexture>(0, 0, 400, 600, imagPath);
+    auto texture = std::make_shared<UITexture>(0, 0, 600, 600, imagPath);
 
     texture->setScaleMode(UITexture::ScaleMode::KEEP_ASPECT);
     texture->setAlpha(0.9f);

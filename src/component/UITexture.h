@@ -24,7 +24,8 @@ public:
     
     void setImagePath(const std::string& imagePath);
     const std::string& getImagePath() const { return m_imagePath; }
-    
+    float getOriginWidth() {return m_OriginWidth;}
+    void setOriginWidth(float OriginWidth);
     // 显示模式
     enum class ScaleMode {
         STRETCH,        // 拉伸填充
@@ -52,7 +53,7 @@ private:
     ScaleMode m_scaleMode;
     float m_alpha;
     bool m_needsLoad;        // 添加标志位
-    
+    float m_OriginWidth =600;
     // 计算渲染区域
     void calculateRenderBounds(float& renderX, float& renderY, 
                               float& renderW, float& renderH) const;
