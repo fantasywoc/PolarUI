@@ -263,7 +263,7 @@ int main() {
 
     // 获取图片文件
     std::vector<fs::path> image_paths;
-    image_paths = find_image_files("D:/Picture/Saved Pictures/");
+    image_paths = find_image_files("D:/Picture/JEPG/20241004/");
     int current_index =0;
     size_t limit_index =image_paths.size(); 
     std::string imagPath =image_paths[current_index].generic_string();
@@ -360,9 +360,8 @@ int main() {
 
         imagPath =image_paths[current_index].generic_string();
         std::cout<< "next imagPath:" << imagPath <<std::endl;
-        texture->setImagePath(imagPath);
-        mainPanel-> updateLayout();
-        
+        texture->setImagePath(window.getVGContext(), imagPath);
+        mainPanel->updateLayout();
     });
     //last 图片切换
     auto lastButton = std::make_shared<UIButton>(0, 0, 70, 40, "Last");
@@ -375,8 +374,8 @@ int main() {
 
         imagPath =image_paths[current_index].generic_string();
         std::cout<< "last imagPath:" << imagPath <<std::endl;
-        texture->setImagePath(imagPath);
-        mainPanel-> updateLayout();
+        texture->setImagePath(window.getVGContext(), imagPath);
+        mainPanel->updateLayout();
     });
 
 
@@ -465,7 +464,7 @@ int main() {
         window.clearBackground(0.0f, 0.0f, 0.0f, 0.0f);
         
         // 渲染主面板（会递归渲染所有子组件）
-        mainPanel->render(window.getNVGContext());
+        mainPanel->render(window.getVGContext());
         
         window.endFrame();
         window.swapBuffers();

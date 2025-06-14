@@ -44,7 +44,8 @@ public:
     int getImageWidth() const { return m_imageWidth; }
     int getImageHeight() const { return m_imageHeight; }
     bool isImageLoaded() const { return m_nvgImage != -1; }
-    
+    // 添加带NVGcontext的版本，可以立即释放资源
+    void setImagePath(NVGcontext* vg, const std::string& imagePath);
 private:
     std::string m_imagePath;
     int m_nvgImage;          // NanoVG 图像句柄
@@ -53,8 +54,10 @@ private:
     ScaleMode m_scaleMode;
     float m_alpha;
     bool m_needsLoad;        // 添加标志位
-    float m_OriginWidth =600;
+    float m_OriginWidth =600;   //添加默认值，防止窗口切换图片导致texture控件无限缩小
     // 计算渲染区域
     void calculateRenderBounds(float& renderX, float& renderY, 
                               float& renderW, float& renderH) const;
 };
+
+

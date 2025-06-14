@@ -152,14 +152,13 @@ void UITexture::unloadImage(NVGcontext* vg) {
     m_imageHeight = 0;
 }
 
-void UITexture::setImagePath(const std::string& imagePath) {
+void UITexture::setImagePath(NVGcontext* vg, const std::string& imagePath) {
     if (m_imagePath != imagePath) {
+        // 先释放旧资源
+        unloadImage(vg);
+        // 设置新路径
         m_imagePath = imagePath;
         m_needsLoad = !imagePath.empty();
-        if (m_nvgImage != -1) {
-            // 如果已经有图像加载，标记需要重新加载
-            m_nvgImage = -1;
-        }
     }
 }
 
