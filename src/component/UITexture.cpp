@@ -6,6 +6,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+std::vector<UITexture*> UITexture::s_instances;
+
 UITexture::UITexture(float x, float y, float width, float height, const std::string& imagePath)
     : UIComponent(x, y, width, height)
     , m_imagePath(imagePath)
@@ -16,12 +18,20 @@ UITexture::UITexture(float x, float y, float width, float height, const std::str
     , m_alpha(1.0f)
     , m_needsLoad(!imagePath.empty()) {
     // 不在构造函数中加载图像，延迟到render时加载
-    
+    s_instances.push_back(this);
 }
 
 UITexture::~UITexture() {
-    // 析构函数中无法获取NVGcontext，所以不能在这里卸载
-    // 需要在适当的时候手动调用unloadImage
+    auto it = std::find(s_instances.begin(), s_instances.end(), this);
+    if (it != s_instances.end()) {
+        s_instances.erase(it);
+    }
+}
+
+void UITexture::cleanupAll(NVGcontext* vg) {
+    for (auto* texture : s_instances) {
+        texture->unloadImage(vg);
+    }
 }
 
 void UITexture::render(NVGcontext* vg) {

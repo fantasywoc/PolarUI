@@ -115,7 +115,9 @@ int main() {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 
+    // 在现有代码中添加
     UIWindow window(1600, 900, "Button Demo with Animations");
+    
     
     // 设置透明帧缓冲区
     window.setTransparentFramebuffer(true);
@@ -125,9 +127,21 @@ int main() {
         std::cerr << "Failed to initialize window" << std::endl;
         return -1;
     }
+    // 方法1: 使用现有的帧缓冲区方法
+    int fbWidth, fbHeight;
+    window.getFramebufferSize(fbWidth, fbHeight);
+    std::cout << "帧缓冲区大小: " << fbWidth << "x" << fbHeight << std::endl;
     
+    // 方法2: 设置窗口大小变化监听
+    window.setWindowSizeCallback([](int width, int height) {
+        std::cout << "窗口大小实时更新: " << width << "x" << height << std::endl;
+    });
+
+
+
+
     // 创建主面板
-    auto mainPanel = std::make_shared<UIPanel>(10, 10, 1200, 800);
+    auto mainPanel = std::make_shared<UIPanel>(0, 0, 1600, 900);
     mainPanel->setHorizontalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 0.0f, 0.0f);
     mainPanel->setBackgroundColor(nvgRGBA(100, 200, 100, 10));
     mainPanel->setBorderColor(nvgRGBA(255, 255, 255,200));
@@ -140,12 +154,12 @@ int main() {
     leftPanel->setBackgroundColor(nvgRGB(100, 150, 255));
     
     // 创建右面板
-    auto rightPanel = std::make_shared<UIPanel>(0, 0, 320, 480);
+    auto rightPanel = std::make_shared<UIPanel>(0, 0, 300, 480);
     rightPanel->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
     rightPanel->setBackgroundColor(nvgRGB(255, 100, 100));
     
     // 创建右图像面板
-    auto rightPanel1 = std::make_shared<UIPanel>(0, 0, 500, 700);
+    auto rightPanel1 = std::make_shared<UIPanel>(0, 0, 900, 700);
     rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
     rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 100));
 
@@ -263,7 +277,7 @@ int main() {
 
     // 获取图片文件
     std::vector<fs::path> image_paths;
-    image_paths = find_image_files("D:/Picture/JEPG/20241004/");
+    image_paths = find_image_files("D:/Picture/JEPG/");
     int current_index =0;
     size_t limit_index =image_paths.size(); 
     std::string imagPath =image_paths[current_index].generic_string();
@@ -279,14 +293,10 @@ int main() {
     
     // 右面板的按钮，添加动画效果
     auto okButton = std::make_shared<UIButton>(0, 0, 70, 40, "OK");
-    okButton->setOnClick([&, okButton, rightPanel1, mainPanel, rightPanel]() {
+    okButton->setOnClick([&,label, okButton, rightPanel1, mainPanel, rightPanel]() {
         std::cout << "\n=== OK按钮点击事件开始 ===" << std::endl;
         
-        // // 计算按钮的绝对坐标（用于调试）
-        // // float okButtonAbsX = mainPanel->getX() + rightPanel->getX() + okButton->getX();
-        // // float okButtonAbsY = mainPanel->getY() + rightPanel->getY() + okButton->getY();
-        // std::cout << "okButton计算的绝对坐标: (" << okButtonAbsX << ", " << okButtonAbsY << ")" << std::endl;
-        
+
         // 检查图片当前的可见状态
         bool isVisible = rightPanel1->isDisplay();
         std::cout << "rightPanel1当前显示状态: " << (isVisible ? "显示" : "隐藏") << std::endl;
@@ -352,16 +362,18 @@ int main() {
     auto nextButton = std::make_shared<UIButton>(0, 0, 70, 40, "Next");
     nextButton->setOnClick([&, nextButton,texture, rightPanel1, mainPanel, rightPanel]() {
 
-        if (current_index == limit_index){
+        if (current_index == limit_index-1){
             return;
         }
 
-        if (current_index < limit_index)    { current_index++; }
+        if (current_index < limit_index-1)    { current_index++; }
 
         imagPath =image_paths[current_index].generic_string();
         std::cout<< "next imagPath:" << imagPath <<std::endl;
         texture->setImagePath(window.getVGContext(), imagPath);
-        mainPanel->updateLayout();
+        // mainPanel->updateLayout();
+        rightPanel1->updateLayout ();
+
     });
     //last 图片切换
     auto lastButton = std::make_shared<UIButton>(0, 0, 70, 40, "Last");
@@ -375,7 +387,8 @@ int main() {
         imagPath =image_paths[current_index].generic_string();
         std::cout<< "last imagPath:" << imagPath <<std::endl;
         texture->setImagePath(window.getVGContext(), imagPath);
-        mainPanel->updateLayout();
+        // mainPanel->updateLayout();
+        rightPanel1->updateLayout ();
     });
 
 
@@ -391,7 +404,7 @@ int main() {
     rightPanel1->addChild(texture);
     rightPanel1->addChild(label);
     // 添加子面板到主面板
-    mainPanel->addChild(leftPanel);
+    // mainPanel->addChild(leftPanel);
     mainPanel->addChild(rightPanel1);
     mainPanel->addChild(rightPanel);
  
@@ -451,7 +464,9 @@ int main() {
     auto lastTime = glfwGetTime();
     while (!window.shouldClose()) {
         window.pollEvents();
-        
+        // 每帧获取当前窗口大小
+        int currentWidth, currentHeight;
+        window.getFramebufferSize(currentWidth, currentHeight);
         // 计算时间差
         auto currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
@@ -470,6 +485,8 @@ int main() {
         window.swapBuffers();
     }
     
+    // 清理所有纹理资源
+    UITexture::cleanupAll(window.getVGContext());
     window.cleanup();
     return 0;
 }
