@@ -128,17 +128,15 @@ int main() {
         return -1;
     }
     // 方法1: 使用现有的帧缓冲区方法
-    int fbWidth, fbHeight;
+    int fbWidth, fbHeight ;
     window.getFramebufferSize(fbWidth, fbHeight);
     std::cout << "帧缓冲区大小: " << fbWidth << "x" << fbHeight << std::endl;
     
-    // 方法2: 设置窗口大小变化监听
-    window.setWindowSizeCallback([](int width, int height) {
-        std::cout << "窗口大小实时更新: " << width << "x" << height << std::endl;
-    });
+ 
 
 
-
+    int centerX = fbWidth / 2.0f;
+    int centerY = fbHeight / 2.0f;
 
     // 创建主面板
     auto mainPanel = std::make_shared<UIPanel>(0, 0, 1600, 900);
@@ -147,6 +145,20 @@ int main() {
     mainPanel->setBorderColor(nvgRGBA(255, 255, 255,200));
     mainPanel->setBorderWidth(1.0f);
     mainPanel->setCornerRadius(10.0f);
+
+   // 方法2: 设置窗口大小变化监听
+   window.setWindowSizeCallback([&,mainPanel](int width, int height) {
+    std::cout << "窗口大小实时更新: " << width << "x" << height << std::endl;
+    int centerX = (width - mainPanel->getWidth()) / 2.0f;
+    int centerY = (height - mainPanel->getHeight())/ 2.0f;
+
+    mainPanel->setPosition(centerX, centerY);
+});
+
+
+
+
+
 
     // 创建左面板 - 使用具体坐标（由布局系统自动计算）
     auto leftPanel = std::make_shared<UIPanel>(0, 0, 320, 480);
