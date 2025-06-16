@@ -332,7 +332,7 @@ int main() {
         // }
         
         // texture->scaleTo(2.0f, 2.0f, 0.5f);
-        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.55f, 1.5f, 0.2f, UIAnimation::EASE_OUT);
+        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.55f, 1.5f, 0.25f, UIAnimation::EASE_OUT);
 
 
         // === 执行布局更新 ===

@@ -75,17 +75,19 @@ void UITexture::render(NVGcontext* vg) {
     // 绘制图像
     nvgSave(vg);
     
-    // 缩放变换（以中心为原点）
+
+
+
+    // 设置透明度（考虑动画透明度）
+    nvgGlobalAlpha(vg, m_alpha * m_animationOpacity);
+
+    // 缩放变换（以中心为原点）#支持中心动画缩放
     if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
         nvgTranslate(vg, m_width/2, m_height/2);
         nvgScale(vg, m_animationScaleX, m_animationScaleY);
         nvgTranslate(vg, -m_width/2, -m_height/2); 
     }
 
-
-    // 设置透明度（考虑动画透明度）
-    nvgGlobalAlpha(vg, m_alpha * m_animationOpacity);
-    
     // 创建图像填充模式
     NVGpaint imgPaint = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
     
