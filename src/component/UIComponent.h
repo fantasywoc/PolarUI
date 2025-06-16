@@ -3,6 +3,7 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include <iostream>
 #include "UIEvent.h"
 #include "../animation/UIAnimation.h"
 

@@ -40,7 +40,12 @@ void UITexture::render(NVGcontext* vg) {
     if (!m_visible || (m_alpha * m_animationOpacity) <= 0.0f) {  // 检查总透明度
         return;
     }
-    
+
+
+
+
+
+
     // 如果需要加载图像且还未加载
     if (m_needsLoad && m_nvgImage == -1 && !m_imagePath.empty()) {
         loadImage(vg, m_imagePath);
@@ -59,6 +64,10 @@ void UITexture::render(NVGcontext* vg) {
         nvgFill(vg);
     }
     
+
+
+
+
     // 计算图像渲染区域
     float renderX, renderY, renderW, renderH;
     calculateRenderBounds(renderX, renderY, renderW, renderH);
@@ -66,6 +75,14 @@ void UITexture::render(NVGcontext* vg) {
     // 绘制图像
     nvgSave(vg);
     
+    // 缩放变换（以中心为原点）
+    if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
+        nvgTranslate(vg, m_width/2, m_height/2);
+        nvgScale(vg, m_animationScaleX, m_animationScaleY);
+        nvgTranslate(vg, -m_width/2, -m_height/2); 
+    }
+
+
     // 设置透明度（考虑动画透明度）
     nvgGlobalAlpha(vg, m_alpha * m_animationOpacity);
     
@@ -80,13 +97,13 @@ void UITexture::render(NVGcontext* vg) {
     nvgRestore(vg);
     
     // 绘制边框（如果设置了）
-    if (m_borderWidth > 0 && m_borderColor.a > 0) {
-        nvgBeginPath(vg);
-        nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
-        nvgStrokeColor(vg, m_borderColor);
-        nvgStrokeWidth(vg, m_borderWidth);
-        nvgStroke(vg);
-    }
+    // if (m_borderWidth > 0 && m_borderColor.a > 0) {
+    //     nvgBeginPath(vg);
+    //     nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
+    //     nvgStrokeColor(vg, m_borderColor);
+    //     nvgStrokeWidth(vg, m_borderWidth);
+    //     nvgStroke(vg);
+    // }
 }
 
 void UITexture::update(double deltaTime) {

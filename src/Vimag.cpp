@@ -308,29 +308,33 @@ int main() {
     
     // 右面板的按钮，添加动画效果
     auto okButton = std::make_shared<UIButton>(0, 0, 70, 40, "OK");
-    okButton->setOnClick([&,label, okButton, rightPanel1, mainPanel, rightPanel]() {
+    okButton->setOnClick([&,texture,label, okButton, rightPanel1, mainPanel, rightPanel]() {
         std::cout << "\n=== OK按钮点击事件开始 ===" << std::endl;
         
 
-        // 检查图片当前的可见状态
-        bool isVisible = rightPanel1->isDisplay();
-        std::cout << "rightPanel1当前显示状态: " << (isVisible ? "显示" : "隐藏") << std::endl;
+        // // 检查图片当前的可见状态
+        // bool isVisible = rightPanel1->isDisplay();
+        // std::cout << "rightPanel1当前显示状态: " << (isVisible ? "显示" : "隐藏") << std::endl;
         
-        // 在OK按钮点击事件中
-        if (isVisible) {
-            // 当前可见，执行隐藏动画
-            rightPanel1->setDisplay(false);
-            rightPanel1->setEnabled(false);  // 禁用事件处理
-            okButton->setText("Show");
-            std::cout << "执行操作: 隐藏纹理" << std::endl;
-        } else {
-            // 当前隐藏，执行显示动画
-            rightPanel1->setDisplay(true);
-            rightPanel1->setEnabled(true);   // 启用事件处理
-            okButton->setText("Hide");
-            std::cout << "执行操作: 显示纹理" << std::endl;
-        }
+        // // 在OK按钮点击事件中
+        // if (isVisible) {
+        //     // 当前可见，执行隐藏动画
+        //     rightPanel1->setDisplay(false);
+        //     rightPanel1->setEnabled(false);  // 禁用事件处理
+        //     okButton->setText("Show");
+        //     std::cout << "执行操作: 隐藏纹理" << std::endl;
+        // } else {
+        //     // 当前隐藏，执行显示动画
+        //     rightPanel1->setDisplay(true);
+        //     rightPanel1->setEnabled(true);   // 启用事件处理
+        //     okButton->setText("Hide");
+        //     std::cout << "执行操作: 显示纹理" << std::endl;
+        // }
         
+        // texture->scaleTo(2.0f, 2.0f, 0.5f);
+        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.55f, 1.5f, 0.2f, UIAnimation::EASE_OUT);
+
+
         // === 执行布局更新 ===
         std::cout << "\n--- 开始布局更新 ---" << std::endl;
         mainPanel->updateLayout();

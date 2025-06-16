@@ -61,7 +61,8 @@ void UIComponent::moveTo(float x, float y, float duration) {
 }
 
 void UIComponent::scaleTo(float scaleX, float scaleY, float duration) {
-    UIAnimationManager::getInstance().scaleTo(this, scaleX, scaleY, duration);
+    std::cerr << typeid(*this).name()<<" UIComponent::scaleTo called with scaleX: " << scaleX << ", scaleY: " << scaleY << std::endl;
+    UIAnimationManager::getInstance().scaleTo(this, scaleX, scaleY, duration, UIAnimation::EASE_OUT);
 }
 
 void UIComponent::rotateTo(float angle, float duration) {
