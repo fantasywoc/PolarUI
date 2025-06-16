@@ -10,7 +10,7 @@
 // 添加动画系统头文件
 #include "animation/UIAnimationManager.h"
 #include "animation/UIAnimation.h"
-
+#include "TinyEXIF/EXIF.h"
 #include <locale>
 #include <windows.h>  // 添加这行
 #include <io.h>       // 添加这行
@@ -156,10 +156,6 @@ int main() {
 });
 
 
-
-
-
-
     // 创建左面板 - 使用具体坐标（由布局系统自动计算）
     auto leftPanel = std::make_shared<UIPanel>(0, 0, 320, 480);
     leftPanel->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_START, 10.0f, 10.0f);
@@ -173,7 +169,7 @@ int main() {
     // 创建右图像面板
     auto rightPanel1 = std::make_shared<UIPanel>(0, 0, 900, 700);
     rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
-    rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 100));
+    rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 0));
 
     // 添加标签到左面板 - 修改宽度为150px
     auto label = std::make_shared<UILabel>(0, 0, 150, 30, "Left Panel Label");
@@ -290,9 +286,16 @@ int main() {
     // 获取图片文件
     std::vector<fs::path> image_paths;
     image_paths = find_image_files("D:/Picture/JEPG/");
-    int current_index =0;
+    int current_index =5;
     size_t limit_index =image_paths.size(); 
     std::string imagPath =image_paths[current_index].generic_string();
+    
+    EXIF exif(imagPath);
+    exif.printAllInfo();
+
+
+
+
     // 先创建纹理组件
     // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
     auto texture = std::make_shared<UITexture>(0, 0, 600, 600, imagPath);
@@ -393,19 +396,13 @@ int main() {
         if (current_index == 0){
             return;
         }
-
         if (current_index > 0)    { current_index--; }
-
         imagPath =image_paths[current_index].generic_string();
         std::cout<< "last imagPath:" << imagPath <<std::endl;
         texture->setImagePath(window.getVGContext(), imagPath);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
     });
-
-
-
-
 
     rightPanel->addChild(okButton);
     rightPanel->addChild(exitButton);
@@ -488,11 +485,12 @@ int main() {
         UIAnimationManager::getInstance().update(deltaTime);
         
         window.beginFrame();
-        window.clearBackground(0.0f, 0.0f, 0.0f, 0.0f);
+        window.clearBackground(1.0f, 1.0f, 1.0f, 0.95f);
         
         // 渲染主面板（会递归渲染所有子组件）
+        mainPanel->updateLayout();
         mainPanel->render(window.getVGContext());
-        
+        // texture->render(window.getVGContext());
         window.endFrame();
         window.swapBuffers();
     }

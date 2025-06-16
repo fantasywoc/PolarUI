@@ -169,6 +169,8 @@ void UITexture::setImagePath(NVGcontext* vg, const std::string& imagePath) {
         // 设置新路径
         m_imagePath = imagePath;
         m_needsLoad = !imagePath.empty();
+        loadImage(vg,m_imagePath);
+
     }
 }
 

@@ -54,7 +54,8 @@ target("clipboard-demo")
     add_packages("glfw", "nanovg", "glew")
     
     -- 添加头文件搜索路径
-    add_includedirs("src", "src/component", "src/widget", "src/animation")  -- 添加动画系统头文件路径
+    add_includedirs("src", "src/component", "src/widget", "src/animation", "src/TinyEXIF")  -- 添加动画系统头文件路径
+
     
     -- 添加编码选项
     if is_plat("windows") then
@@ -81,12 +82,12 @@ target("clipboard-demo")
 -- 图片查看器演示程序
 target("vimag-demo")
     set_kind("binary")
-    add_files("src/Vimag.cpp")
+    add_files("src/Vimag.cpp","src/TinyEXIF/TinyEXIF.cpp")
     add_deps("ui")
     add_packages("glfw", "nanovg", "glew")
     
     -- 添加头文件搜索路径
-    add_includedirs("src", "src/component", "src/widget", "src/animation")
+    add_includedirs("src", "src/component", "src/widget", "src/animation", "src/TinyEXIF")
     
     -- 添加编码选项
     if is_plat("windows") then
