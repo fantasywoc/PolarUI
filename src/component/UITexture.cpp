@@ -2,6 +2,8 @@
 #include <iostream>
 #include <algorithm>
 
+
+#define STBI_MAX_DIMENSIONS 32768  // 扩展到 32768x32768 ,默认最大支持尺寸为 ​16,777,216 像素
 // 需要包含 stb_image
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -40,10 +42,6 @@ void UITexture::render(NVGcontext* vg) {
     if (!m_visible || (m_alpha * m_animationOpacity) <= 0.0f) {  // 检查总透明度
         return;
     }
-
-
-
-
 
 
     // 如果需要加载图像且还未加载

@@ -306,33 +306,26 @@ int main() {
     texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
     texture->setBorderWidth(2.0f);
     
+    
+    
+    float scalex{}, scaley{};
     // 右面板的按钮，添加动画效果
-    auto okButton = std::make_shared<UIButton>(0, 0, 70, 40, "OK");
+    auto okButton = std::make_shared<UIButton>(0, 0, 70, 40, "SCALE OUT");
     okButton->setOnClick([&,texture,label, okButton, rightPanel1, mainPanel, rightPanel]() {
         std::cout << "\n=== OK按钮点击事件开始 ===" << std::endl;
         
 
-        // // 检查图片当前的可见状态
-        // bool isVisible = rightPanel1->isDisplay();
-        // std::cout << "rightPanel1当前显示状态: " << (isVisible ? "显示" : "隐藏") << std::endl;
-        
-        // // 在OK按钮点击事件中
-        // if (isVisible) {
-        //     // 当前可见，执行隐藏动画
-        //     rightPanel1->setDisplay(false);
-        //     rightPanel1->setEnabled(false);  // 禁用事件处理
-        //     okButton->setText("Show");
-        //     std::cout << "执行操作: 隐藏纹理" << std::endl;
-        // } else {
-        //     // 当前隐藏，执行显示动画
-        //     rightPanel1->setDisplay(true);
-        //     rightPanel1->setEnabled(true);   // 启用事件处理
-        //     okButton->setText("Hide");
-        //     std::cout << "执行操作: 显示纹理" << std::endl;
-        // }
-        
-        // texture->scaleTo(2.0f, 2.0f, 0.5f);
-        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.55f, 1.5f, 0.25f, UIAnimation::EASE_OUT);
+
+        if (scalex <= 3.0f) {
+            scalex += 0.2f;
+            scaley += 0.2f;  
+        }
+        else{
+            scalex = 3.0f;
+            scaley = 3.0f; 
+        }
+
+        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
 
 
         // === 执行布局更新 ===
@@ -357,6 +350,47 @@ int main() {
         std::cout << "\n=== OK按钮点击事件结束 ===\n" << std::endl;
     });
     
+    // 右面板的按钮，添加动画效果
+    auto scaleInButton = std::make_shared<UIButton>(0, 0, 70, 40, "SCALE IN");
+    scaleInButton->setOnClick([&,texture,label, scaleInButton, rightPanel1, mainPanel, rightPanel]() {
+       
+       
+       
+        if (scalex >= 0.2f) {
+            scalex -= 0.2f;
+            scaley -= 0.2f;  
+        }
+        else{
+            scalex = 0.2f;
+            scaley = 0.2f; 
+        }
+
+        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
+
+
+        // === 执行布局更新 ===
+        std::cout << "\n--- 开始布局更新 ---" << std::endl;
+        mainPanel->updateLayout();
+        
+        // 使用递归方法重置所有组件的动画偏移
+        // mainPanel->resetAllAnimationOffsets();
+        
+        // 强制同步所有组件的位置信息
+        // 确保事件系统使用最新的位置数据
+        rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
+        okButton->setPosition(okButton->getX(), okButton->getY());
+        
+        // 或者添加一个强制刷新方法
+        // 让所有组件重新计算并同步位置信息
+        std::cout << "强制同步位置信息完成" << std::endl;
+        
+        // 强制更新rightPanel的位置
+        rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
+        
+        std::cout << "\n=== OK按钮点击事件结束 ===\n" << std::endl;
+    });
+
+
     auto exitButton = std::make_shared<UIButton>(0, 0, 120, 40, "Exit");
     exitButton->setOnClick([&window, exitButton]() {
         std::cout << "Exit button clicked!" << std::endl;
@@ -409,6 +443,7 @@ int main() {
     });
 
     rightPanel->addChild(okButton);
+    rightPanel->addChild(scaleInButton);
     rightPanel->addChild(exitButton);
 
     rightPanel->addChild(nextButton);
