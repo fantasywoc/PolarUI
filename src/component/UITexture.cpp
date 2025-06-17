@@ -134,22 +134,52 @@ bool UITexture::handleEvent(const UIEvent& event) {
         case UIEvent::MOUSE_PRESS:
             if (event.mouseButton == 0 && m_dragEnabled) { // 左键
                 if (contains(event.mouseX, event.mouseY)) {
-                    m_isDragging = true;
-                    m_lastMouseX = event.mouseX;
-                    m_lastMouseY = event.mouseY;
-                    handled = true;
+                    // 检测双击
+                    if (m_doubleClickEnabled && 
+                        event.mouseButton == m_lastClickButton &&
+                        (event.clickTime - m_lastClickTime) < DOUBLE_CLICK_TIME) {
+                        // 双击事件
+                        if (m_onDoubleClick) {
+                            m_onDoubleClick(event.mouseButton);
+                        }
+                        handled = true;
+                    } else {
+                        // 只记录鼠标按下位置，不立即进入拖拽状态
+                        m_mousePressed = true;  // 需要添加这个成员变量
+                        m_lastMouseX = event.mouseX;
+                        m_lastMouseY = event.mouseY;
+                        handled = true;
+                    }
+                    
+                    // 记录点击信息用于双击检测
+                    m_lastClickTime = event.clickTime;
+                    m_lastClickButton = event.mouseButton;
                 }
             }
             break;
             
         case UIEvent::MOUSE_RELEASE:
-            if (event.mouseButton == 0 && m_isDragging) { // 左键释放
-                m_isDragging = false;
+            if (event.mouseButton == 0) { // 左键释放
+                if (m_isDragging) {
+                    m_isDragging = false;
+                }
+                m_mousePressed = false;
                 handled = true;
             }
             break;
             
         case UIEvent::MOUSE_MOVE:
+            if (m_mousePressed && m_dragEnabled && !m_isDragging) {
+                // 检查是否移动了足够的距离才开始拖拽
+                float deltaX = event.mouseX - m_lastMouseX;
+                float deltaY = event.mouseY - m_lastMouseY;
+                float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                if (distance > 3.0f) { // 移动超过3像素才开始拖拽
+                    m_isDragging = true;
+                }
+            }
+            
             if (m_isDragging && m_dragEnabled) {
                 float deltaX = event.mouseX - m_lastMouseX;
                 float deltaY = event.mouseY - m_lastMouseY;
@@ -164,6 +194,33 @@ bool UITexture::handleEvent(const UIEvent& event) {
                 
                 m_lastMouseX = event.mouseX;
                 m_lastMouseY = event.mouseY;
+                handled = true;
+            }
+            break;
+            
+        case UIEvent::MOUSE_SCROLL:
+            if (contains(event.mouseX, event.mouseY)) {
+                if (m_mousePressed && !m_isDragging && m_dragScrollEnabled) {
+                    // 按住左键不动时的滚轮事件（点击滚动）
+                    if (m_onDragScroll) {
+                        m_onDragScroll(event.scrollX, event.scrollY);
+                    }
+                    handled = true;
+                } else if (!m_mousePressed && m_scrollEnabled) {
+                    // 普通滚轮事件
+                    if (m_onScroll) {
+                        m_onScroll(event.scrollX, event.scrollY);
+                    }
+                    handled = true;
+                }
+            }
+            break;
+            
+        case UIEvent::MOUSE_DOUBLE_CLICK:
+            if (m_doubleClickEnabled && contains(event.mouseX, event.mouseY)) {
+                if (m_onDoubleClick) {
+                    m_onDoubleClick(event.mouseButton);
+                }
                 handled = true;
             }
             break;

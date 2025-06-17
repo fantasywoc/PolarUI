@@ -358,6 +358,15 @@ void UIWindow::windowSizeCallbackWrapper(GLFWwindow* window, int width, int heig
 }
 
 /**
+ * @brief 设置滚轮事件回调函数
+ * @param callback 回调函数，接收滚轮事件参数
+ */
+void UIWindow::setScrollCallback(std::function<void(double, double)> callback) {
+    scrollCallback = callback;
+    if (window) glfwSetScrollCallback(window, scrollCallbackWrapper);
+}
+
+/**
  * @brief 设置字符输入事件回调函数
  * @param callback 回调函数，接收字符输入参数
  */
@@ -374,5 +383,18 @@ void UIWindow::charCallbackWrapper(GLFWwindow* window, unsigned int codepoint) {
     UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
     if (uiWindow && uiWindow->charCallback) {
         uiWindow->charCallback(codepoint);
+    }
+}
+
+/**
+ * @brief 滚轮事件静态回调包装器
+ * @param window GLFW窗口句柄
+ * @param xoffset 水平滚动偏移量
+ * @param yoffset 垂直滚动偏移量
+ */
+void UIWindow::scrollCallbackWrapper(GLFWwindow* window, double xoffset, double yoffset) {
+    UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
+    if (uiWindow && uiWindow->scrollCallback) {
+        uiWindow->scrollCallback(xoffset, yoffset);
     }
 }

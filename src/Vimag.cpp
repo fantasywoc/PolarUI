@@ -317,6 +317,25 @@ int main() {
         std::cout << "按键: " << keyCode << ", 修饰键: " << modifiers << std::endl;
     });
     
+    // 设置拖拽时滚轮回调
+    texture->setOnDragScroll([](float scrollX, float scrollY) {
+        std::cout << "拖拽时滚轮: (" << scrollX << ", " << scrollY << ")" << std::endl;
+    });
+
+    // 设置双击回调
+    texture->setOnDoubleClick([](int mouseButton) {
+        if (mouseButton == 0) {
+            std::cout << "左键双击" << std::endl;
+        } else if (mouseButton == 1) {
+            std::cout << "右键双击" << std::endl;
+        }
+    });
+
+    // 启用所有事件
+    texture->setDragEnabled(true);
+    texture->setScrollEnabled(true);
+    texture->setDoubleClickEnabled(true);
+    texture->setDragScrollEnabled(true);
     
     float scalex{}, scaley{};
     // 右面板的按钮，添加动画效果
@@ -480,6 +499,9 @@ int main() {
             event.mouseY = static_cast<float>(ypos);
             event.mouseButton = button;
             
+            // 添加时间戳用于双击检测
+            event.clickTime = glfwGetTime();
+            
             mainPanel->handleEvent(event);
         }
     });
@@ -515,6 +537,25 @@ int main() {
         mainPanel->handleEvent(event);
     });
     
+    // 添加滚轮事件处理
+    window.setScrollCallback([mainPanel](double xoffset, double yoffset) {
+        UIEvent event;
+        event.type = UIEvent::MOUSE_SCROLL;
+        
+        // 获取当前鼠标位置
+        double xpos, ypos;
+        glfwGetCursorPos(glfwGetCurrentContext(), &xpos, &ypos);
+        event.mouseX = static_cast<float>(xpos);
+        event.mouseY = static_cast<float>(ypos);
+        
+        // 设置滚轮偏移量
+        event.scrollX = static_cast<float>(xoffset);
+        event.scrollY = static_cast<float>(yoffset);
+        
+        // 分发事件到主面板
+        mainPanel->handleEvent(event);
+    });
+    
     // 在渲染前输出所有组件的位置和尺寸信息
     printAllComponentsInfo(mainPanel, leftPanel, rightPanel, label, button1, button2, button3, okButton, exitButton);
     
@@ -537,7 +578,7 @@ int main() {
         window.clearBackground(1.0f, 1.0f, 1.0f, 0.95f);
         
         // 渲染主面板（会递归渲染所有子组件）
-        mainPanel->updateLayout();
+        // mainPanel->updateLayout();
         mainPanel->render(window.getNVGContext());
         // texture->render(window.getNVGContext());
         window.endFrame();
@@ -549,4 +590,3 @@ int main() {
     window.cleanup();
     return 0;
 }
-

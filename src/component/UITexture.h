@@ -58,16 +58,22 @@ public:
     using DragCallback = std::function<void(float deltaX, float deltaY)>;
     using ScrollCallback = std::function<void(float scrollX, float scrollY)>;
     using KeyCallback = std::function<void(int keyCode, int modifiers)>;
+    using DoubleClickCallback = std::function<void(int mouseButton)>;
+    using DragScrollCallback = std::function<void(float scrollX, float scrollY)>; // 拖拽时滚轮
     
     // 设置事件回调
     void setOnDrag(const DragCallback& callback) { m_onDrag = callback; }
     void setOnScroll(const ScrollCallback& callback) { m_onScroll = callback; }
     void setOnKeyPress(const KeyCallback& callback) { m_onKeyPress = callback; }
+    void setOnDoubleClick(const DoubleClickCallback& callback) { m_onDoubleClick = callback; }
+    void setOnDragScroll(const DragScrollCallback& callback) { m_onDragScroll = callback; }
     
     // 启用/禁用特定事件
     void setDragEnabled(bool enabled) { m_dragEnabled = enabled; }
     void setScrollEnabled(bool enabled) { m_scrollEnabled = enabled; }
     void setKeyEventsEnabled(bool enabled) { m_keyEventsEnabled = enabled; }
+    void setDoubleClickEnabled(bool enabled) { m_doubleClickEnabled = enabled; }
+    void setDragScrollEnabled(bool enabled) { m_dragScrollEnabled = enabled; }
     
     // 获取拖拽状态
     bool isDragging() const { return m_isDragging; }
@@ -82,6 +88,7 @@ private:
     float m_alpha;
     bool m_needsLoad;        // 添加标志位
     float m_OriginWidth = 900;   // 添加默认值，防止窗口切换图片导致texture控件无限缩小
+    bool m_mousePressed = false;  // 鼠标是否按下但未开始拖拽
     
     // 拖拽相关
     bool m_isDragging = false;
@@ -92,11 +99,20 @@ private:
     // 事件处理相关
     bool m_scrollEnabled = true;
     bool m_keyEventsEnabled = true;
+    bool m_doubleClickEnabled = true;
+    bool m_dragScrollEnabled = true;
+    
+    // 双击检测
+    double m_lastClickTime = 0.0;
+    int m_lastClickButton = -1;
+    static constexpr double DOUBLE_CLICK_TIME = 0.5; // 双击时间间隔（秒）
     
     // 事件回调
     DragCallback m_onDrag;
     ScrollCallback m_onScroll;
     KeyCallback m_onKeyPress;
+    DoubleClickCallback m_onDoubleClick;
+    DragScrollCallback m_onDragScroll;
     
     // 静态实例管理
     static std::vector<UITexture*> s_instances;

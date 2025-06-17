@@ -199,6 +199,12 @@ public:
      * @param callback 回调函数，参数为(codepoint)
      */
     void setCharCallback(std::function<void(unsigned int)> callback);
+    
+    /**
+     * @brief 设置滚轮事件回调函数
+     * @param callback 回调函数，参数为(xoffset, yoffset)
+     */
+    void setScrollCallback(std::function<void(double, double)> callback);
 
 private:
     // ==================== 私有成员变量 ====================
@@ -217,6 +223,7 @@ private:
     std::function<void(int, int)> windowSizeCallback;           ///< 窗口大小变化回调
     // 在 windowSizeCallback 后添加
     std::function<void(unsigned int)> charCallback;           ///< 字符输入回调
+    std::function<void(double, double)> scrollCallback;       ///< 滚轮事件回调
     
     // ==================== 静态回调函数包装器 ====================
     // GLFW要求回调函数为静态函数或C风格函数，这些包装器用于转发到成员函数
@@ -262,4 +269,12 @@ private:
      * @param codepoint Unicode字符代码点
      */
     static void charCallbackWrapper(GLFWwindow* window, unsigned int codepoint);
+    
+    /**
+     * @brief 滚轮事件静态回调包装器
+     * @param window GLFW窗口句柄
+     * @param xoffset 水平滚动偏移量
+     * @param yoffset 垂直滚动偏移量
+     */
+    static void scrollCallbackWrapper(GLFWwindow* window, double xoffset, double yoffset);
 };
