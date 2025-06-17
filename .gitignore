@@ -79,3 +79,5 @@ build/.deps/vimag-demo/windows/x64/release/src/Vimag.cpp.obj.d
 build/.objs/vimag-demo/windows/x64/release/src/Vimag.cpp.obj
 build/windows/x64/release/vimag-demo.exe
 xmake.lua
+build/.deps/vimag-demo/windows/x64/release/src/TinyEXIF/TinyEXIF.cpp.obj.d
+build/.objs/vimag-demo/windows/x64/release/src/TinyEXIF/TinyEXIF.cpp.obj

@@ -159,7 +159,7 @@ public:
      * @return NVGcontext* NanoVG上下文指针
      * @description 用于直接调用NanoVG绘图函数
      */
-    NVGcontext* getVGContext() const { return vg; }
+    NVGcontext* getNVGContext() const { return vg; }
     
     /**
      * @brief 获取GLFW窗口句柄

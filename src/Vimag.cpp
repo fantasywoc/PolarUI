@@ -420,7 +420,7 @@ int main() {
 
         imagPath =image_paths[current_index].generic_string();
         std::cout<< "next imagPath:" << imagPath <<std::endl;
-        texture->setImagePath(window.getVGContext(), imagPath);
+        texture->setImagePath(window.getNVGContext(), imagPath);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
 
@@ -434,7 +434,7 @@ int main() {
         if (current_index > 0)    { current_index--; }
         imagPath =image_paths[current_index].generic_string();
         std::cout<< "last imagPath:" << imagPath <<std::endl;
-        texture->setImagePath(window.getVGContext(), imagPath);
+        texture->setImagePath(window.getNVGContext(), imagPath);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
     });
@@ -525,14 +525,14 @@ int main() {
         
         // 渲染主面板（会递归渲染所有子组件）
         mainPanel->updateLayout();
-        mainPanel->render(window.getVGContext());
-        // texture->render(window.getVGContext());
+        mainPanel->render(window.getNVGContext());
+        // texture->render(window.getNVGContext());
         window.endFrame();
         window.swapBuffers();
     }
     
     // 清理所有纹理资源
-    UITexture::cleanupAll(window.getVGContext());
+    UITexture::cleanupAll(window.getNVGContext());
     window.cleanup();
     return 0;
 }
