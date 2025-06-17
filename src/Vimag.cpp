@@ -307,7 +307,7 @@ int main() {
     
     float scalex{}, scaley{};
     // 右面板的按钮，添加动画效果
-    auto okButton = std::make_shared<UIButton>(0, 0, 70, 40, "SCALE OUT");
+    auto okButton = std::make_shared<UIButton>(0, 0, 120, 50, "SCALE OUT");
     okButton->setOnClick([&,texture,label, okButton, rightPanel1, mainPanel, rightPanel]() {
         std::cout << "\n=== OK按钮点击事件开始 ===" << std::endl;
         
@@ -348,7 +348,7 @@ int main() {
     });
     
     // 右面板的按钮，添加动画效果
-    auto scaleInButton = std::make_shared<UIButton>(0, 0, 70, 40, "SCALE IN");
+    auto scaleInButton = std::make_shared<UIButton>(0, 0, 110, 50, "SCALE IN");
     scaleInButton->setOnClick([&,texture,label, scaleInButton, rightPanel1, mainPanel, rightPanel]() {
        
        

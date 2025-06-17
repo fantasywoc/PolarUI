@@ -51,6 +51,9 @@ bool UIWindow::initialize() {
     // 第二步：设置窗口创建提示
     setWindowHints();
 
+
+
+
     // 第三步：创建GLFW窗口
     window = glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), nullptr, nullptr);
     if (!window) {
@@ -58,6 +61,17 @@ bool UIWindow::initialize() {
         glfwTerminate(); // 创建失败时清理GLFW
         return false;
     }
+
+    // 配置窗口图标
+    GLFWimage icon;
+    icon.pixels = stbi_load("src/icons/logo32.png", &icon.width, &icon.height, nullptr, 4); // 强制 RGBA
+    if (icon.pixels) {
+        glfwSetWindowIcon(window, 1, &icon); // 设置系统图标
+        stbi_image_free(icon.pixels); // 立即释放内存
+    } else {
+        std::cerr << "Warning: Failed to load window icon" << std::endl;
+    }
+
 
     // 第四步：设置OpenGL上下文为当前上下文
     // 在glfwMakeContextCurrent之后添加

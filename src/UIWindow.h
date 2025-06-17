@@ -14,6 +14,9 @@
 #include <functional>
 #include <string>
 
+#include "stb_image.h"
+
+
 /**
  * @class UIWindow
  * @brief UI窗口管理类
