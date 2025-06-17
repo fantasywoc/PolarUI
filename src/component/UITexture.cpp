@@ -54,13 +54,29 @@ void UITexture::render(NVGcontext* vg) {
         return;
     }
     
-    // 绘制背景（如果设置了）
-    if (m_backgroundColor.a >= 0) {
-        nvgBeginPath(vg);
-        nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
-        nvgFillColor(vg, m_backgroundColor);
-        nvgFill(vg);
+
+  
+    // 缩放变换（以中心为原点）#支持中心动画缩放   放在这个位置可以缩放整个texture
+    if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
+        // 计算全局中心点（世界坐标）
+        float centerX = m_x + m_width / 2.0f;
+        float centerY = m_y + m_height / 2.0f;
+    
+        // 变换顺序：平移到全局中心 → 缩放 → 平移回原位置
+        nvgTranslate(vg, centerX, centerY);
+        nvgScale(vg, m_animationScaleX, m_animationScaleY);
+        nvgTranslate(vg, -centerX, -centerY); 
     }
+
+
+  // 绘制背景（如果设置了）
+  if (m_backgroundColor.a >= 0) {
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, m_x, m_y, m_width, m_height, m_cornerRadius);
+    // nvgFillColor(vg, m_backgroundColor);
+    nvgFillColor(vg, nvgRGBA(0, 0, 0, 1)); // 全透明黑色
+    nvgFill(vg);
+}
     
 
 
@@ -72,19 +88,11 @@ void UITexture::render(NVGcontext* vg) {
     
     // 绘制图像
     nvgSave(vg);
-    
-
-
+  
 
     // 设置透明度（考虑动画透明度）
     nvgGlobalAlpha(vg, m_alpha * m_animationOpacity);
 
-    // 缩放变换（以中心为原点）#支持中心动画缩放
-    if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
-        nvgTranslate(vg, m_width/2, m_height/2);
-        nvgScale(vg, m_animationScaleX, m_animationScaleY);
-        nvgTranslate(vg, -m_width/2, -m_height/2); 
-    }
 
     // 创建图像填充模式
     NVGpaint imgPaint = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
@@ -94,6 +102,11 @@ void UITexture::render(NVGcontext* vg) {
     nvgFillPaint(vg, imgPaint);
     nvgFill(vg);
     
+
+
+
+
+
     nvgRestore(vg);
     
     // 绘制边框（如果设置了）

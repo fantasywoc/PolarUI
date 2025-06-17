@@ -169,7 +169,7 @@ int main() {
     // 创建右图像面板
     auto rightPanel1 = std::make_shared<UIPanel>(0, 0, 900, 700);
     rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
-    rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 0));
+    rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 50));
 
     // 添加标签到左面板 - 修改宽度为150px
     auto label = std::make_shared<UILabel>(0, 0, 150, 30, "Left Panel Label");
@@ -250,7 +250,6 @@ int main() {
     leftPanel->addChild(button3);
     
     
-
     // 添加输入框到左面板
     auto inputBox = std::make_shared<UITextInput>(0, 0, 200, 30, "Please input text...");
     inputBox->setTextColor(nvgRGB(255, 255, 255));
@@ -294,17 +293,15 @@ int main() {
     exif.printAllInfo();
 
 
-
-
     // 先创建纹理组件
     // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
     auto texture = std::make_shared<UITexture>(0, 0, 600, 600, imagPath);
 
     texture->setScaleMode(UITexture::ScaleMode::KEEP_ASPECT);
-    texture->setAlpha(0.9f);
+    texture->setAlpha(1.0f);
     texture->setCornerRadius(10.0f);
-    texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
-    texture->setBorderWidth(2.0f);
+    // texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
+    // texture->setBorderWidth(2.0f);
     
     
     
@@ -316,13 +313,13 @@ int main() {
         
 
 
-        if (scalex <= 3.0f) {
+        if (scalex <= 10.0f) {
             scalex += 0.2f;
             scaley += 0.2f;  
         }
         else{
-            scalex = 3.0f;
-            scaley = 3.0f; 
+            scalex = 10.0f;
+            scaley = 10.0f; 
         }
 
         UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
@@ -356,7 +353,7 @@ int main() {
        
        
        
-        if (scalex >= 0.2f) {
+        if (scalex > 0.2f) {
             scalex -= 0.2f;
             scaley -= 0.2f;  
         }
