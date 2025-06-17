@@ -285,7 +285,7 @@ int main() {
     // 获取图片文件
     std::vector<fs::path> image_paths;
     image_paths = find_image_files("D:/Picture/JEPG/");
-    int current_index =5;
+    int current_index =15;
     size_t limit_index =image_paths.size(); 
     std::string imagPath =image_paths[current_index].generic_string();
     
@@ -302,42 +302,8 @@ int main() {
     texture->setCornerRadius(10.0f);
     // texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
     // texture->setBorderWidth(2.0f);
-    // 事件处理   设置拖拽回调
-    texture->setOnDrag([](float deltaX, float deltaY) {
-        std::cout << "拖拽偏移: (" << deltaX << ", " << deltaY << ")" << std::endl;
-    });
-
-    // 设置滚动回调（需要在事件系统中添加滚动事件支持）
-    texture->setOnScroll([](float scrollX, float scrollY) {
-        std::cout << "滚动: (" << scrollX << ", " << scrollY << ")" << std::endl;
-    });
-
-    // 设置按键回调
-    texture->setOnKeyPress([](int keyCode, int modifiers) {
-        std::cout << "按键: " << keyCode << ", 修饰键: " << modifiers << std::endl;
-    });
-    
-    // 设置拖拽时滚轮回调
-    texture->setOnDragScroll([](float scrollX, float scrollY) {
-        std::cout << "拖拽时滚轮: (" << scrollX << ", " << scrollY << ")" << std::endl;
-    });
-
-    // 设置双击回调
-    texture->setOnDoubleClick([](int mouseButton) {
-        if (mouseButton == 0) {
-            std::cout << "左键双击" << std::endl;
-        } else if (mouseButton == 1) {
-            std::cout << "右键双击" << std::endl;
-        }
-    });
-
-    // 启用所有事件
-    texture->setDragEnabled(true);
-    texture->setScrollEnabled(true);
-    texture->setDoubleClickEnabled(true);
-    texture->setDragScrollEnabled(true);
-    
-    float scalex{}, scaley{};
+  
+    float scalex{1}, scaley{1};
     // 右面板的按钮，添加动画效果
     auto okButton = std::make_shared<UIButton>(0, 0, 120, 50, "SCALE OUT");
     okButton->setOnClick([&,texture,label, okButton, rightPanel1, mainPanel, rightPanel]() {
@@ -420,6 +386,69 @@ int main() {
     });
 
 
+
+    // 事件处理 /////////////////////////////////////////////////////////////
+    // // 设置拖拽回调
+    texture->setOnDrag([](float deltaX, float deltaY) {
+        std::cout << "拖拽偏移: (" << deltaX << ", " << deltaY << ")" << std::endl;
+    });
+
+    // 设置滚动回调（需要在事件系统中添加滚动事件支持）
+    texture->setOnScroll([&,texture](float scrollX, float scrollY) {
+        std::cout << "滚动: (" << scrollX << ", " << scrollY << ")" << std::endl;
+        scalex += scrollY*0.15;
+        scaley += scrollY*0.15; 
+        std::cout << "缩放: (" << scalex << ", " << scaley << ")" << std::endl;
+        if (scalex >= 10.0f) {
+
+            scalex = 10.0f;
+            scaley = 10.0f; 
+        }
+        else if (scalex <= 0.2f) {
+            scalex = 0.2f;
+            scaley = 0.2f; 
+        }
+
+
+        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
+
+    });
+
+    // 设置按键回调
+    texture->setOnKeyPress([](int keyCode, int modifiers) {
+        std::cout << "按键: " << keyCode << ", 修饰键: " << modifiers << std::endl;
+    });
+
+    // 设置拖拽时滚轮回调
+    texture->setOnDragScroll([](float scrollX, float scrollY) {
+        std::cout << "拖拽时滚轮: (" << scrollX << ", " << scrollY << ")" << std::endl;
+    });
+
+    // 设置双击回调
+    texture->setOnDoubleClick([](int mouseButton) {
+        if (mouseButton == 0) {
+            std::cout << "左键双击" << std::endl;
+        } else if (mouseButton == 1) {
+            std::cout << "右键双击" << std::endl;
+        }
+    });
+
+    // 设置中键点击回调
+    texture->setOnMiddleClick([&,texture](float mouseX, float mouseY) {
+        std::cout << "Middle mouse button clicked at (" << mouseX << ", " << mouseY << ")" << std::endl;
+        scalex = 1.0f;
+        scaley = 1.0f; 
+        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
+    });
+
+    // 启用所有事件
+    texture->setDragEnabled(true);
+    texture->setScrollEnabled(true);
+    texture->setDoubleClickEnabled(true);
+    texture->setDragScrollEnabled(true);
+    texture->setMiddleClickEnabled(true);
+    
+
     auto exitButton = std::make_shared<UIButton>(0, 0, 120, 40, "Exit");
     exitButton->setOnClick([&window, exitButton]() {
         std::cout << "Exit button clicked!" << std::endl;
@@ -481,29 +510,32 @@ int main() {
     rightPanel1->addChild(texture);
     rightPanel1->addChild(label);
     // 添加子面板到主面板
-    // mainPanel->addChild(leftPanel);
+    mainPanel->addChild(leftPanel);
     mainPanel->addChild(rightPanel1);
     mainPanel->addChild(rightPanel);
  
     printImagePath();
 
     // 设置鼠标事件回调
+    // 设置鼠标事件回调
     window.setMouseButtonCallback([mainPanel](int button, int action, int mods) {
-        if (button == 0) { // 左键
-            double xpos, ypos;
-            glfwGetCursorPos(glfwGetCurrentContext(), &xpos, &ypos);
-            
-            UIEvent event;
-            event.type = (action == 1) ? UIEvent::MOUSE_PRESS : UIEvent::MOUSE_RELEASE;
-            event.mouseX = static_cast<float>(xpos);
-            event.mouseY = static_cast<float>(ypos);
-            event.mouseButton = button;
-            
-            // 添加时间戳用于双击检测
-            event.clickTime = glfwGetTime();
-            
-            mainPanel->handleEvent(event);
-        }
+        // 处理所有鼠标按键，不只是左键
+        double xpos, ypos;
+        glfwGetCursorPos(glfwGetCurrentContext(), &xpos, &ypos);
+        
+        UIEvent event;
+        event.type = (action == GLFW_PRESS) ? UIEvent::MOUSE_PRESS : UIEvent::MOUSE_RELEASE;
+        event.mouseX = static_cast<float>(xpos);
+        event.mouseY = static_cast<float>(ypos);
+        event.mouseButton = button;  // 直接传递button值
+        
+        // 添加时间戳用于双击检测
+        event.clickTime = glfwGetTime();
+        
+        // 添加调试输出
+        std::cout << "Mouse button " << button << " action " << action << std::endl;
+        
+        mainPanel->handleEvent(event);
     });
     
     window.setCursorPosCallback([mainPanel](double xpos, double ypos) {
@@ -575,10 +607,10 @@ int main() {
         UIAnimationManager::getInstance().update(deltaTime);
         
         window.beginFrame();
-        window.clearBackground(1.0f, 1.0f, 1.0f, 0.95f);
+        window.clearBackground(1.0f, 1.0f, 1.0f, 0.90f);
         
         // 渲染主面板（会递归渲染所有子组件）
-        // mainPanel->updateLayout();
+        mainPanel->updateLayout();
         mainPanel->render(window.getNVGContext());
         // texture->render(window.getNVGContext());
         window.endFrame();

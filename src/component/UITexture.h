@@ -60,6 +60,7 @@ public:
     using KeyCallback = std::function<void(int keyCode, int modifiers)>;
     using DoubleClickCallback = std::function<void(int mouseButton)>;
     using DragScrollCallback = std::function<void(float scrollX, float scrollY)>; // 拖拽时滚轮
+    using MiddleClickCallback = std::function<void(float mouseX, float mouseY)>; // 中键点击回调
     
     // 设置事件回调
     void setOnDrag(const DragCallback& callback) { m_onDrag = callback; }
@@ -67,6 +68,7 @@ public:
     void setOnKeyPress(const KeyCallback& callback) { m_onKeyPress = callback; }
     void setOnDoubleClick(const DoubleClickCallback& callback) { m_onDoubleClick = callback; }
     void setOnDragScroll(const DragScrollCallback& callback) { m_onDragScroll = callback; }
+    void setOnMiddleClick(const MiddleClickCallback& callback) { m_onMiddleClick = callback; }
     
     // 启用/禁用特定事件
     void setDragEnabled(bool enabled) { m_dragEnabled = enabled; }
@@ -74,6 +76,7 @@ public:
     void setKeyEventsEnabled(bool enabled) { m_keyEventsEnabled = enabled; }
     void setDoubleClickEnabled(bool enabled) { m_doubleClickEnabled = enabled; }
     void setDragScrollEnabled(bool enabled) { m_dragScrollEnabled = enabled; }
+    void setMiddleClickEnabled(bool enabled) { m_middleClickEnabled = enabled; }
     
     // 获取拖拽状态
     bool isDragging() const { return m_isDragging; }
@@ -101,6 +104,7 @@ private:
     bool m_keyEventsEnabled = true;
     bool m_doubleClickEnabled = true;
     bool m_dragScrollEnabled = true;
+    bool m_middleClickEnabled = true;
     
     // 双击检测
     double m_lastClickTime = 0.0;
@@ -113,6 +117,7 @@ private:
     KeyCallback m_onKeyPress;
     DoubleClickCallback m_onDoubleClick;
     DragScrollCallback m_onDragScroll;
+    MiddleClickCallback m_onMiddleClick;
     
     // 静态实例管理
     static std::vector<UITexture*> s_instances;

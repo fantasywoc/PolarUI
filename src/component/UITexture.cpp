@@ -132,7 +132,9 @@ bool UITexture::handleEvent(const UIEvent& event) {
     
     switch (event.type) {
         case UIEvent::MOUSE_PRESS:
-            if (event.mouseButton == 0 && m_dragEnabled) { // 左键
+            std::cout << "UITexture received mouse button: " << event.mouseButton << std::endl;
+            if (event.mouseButton == 0) { // 左键点击
+                // 检测双击
                 if (contains(event.mouseX, event.mouseY)) {
                     // 检测双击
                     if (m_doubleClickEnabled && 
@@ -145,7 +147,7 @@ bool UITexture::handleEvent(const UIEvent& event) {
                         handled = true;
                     } else {
                         // 只记录鼠标按下位置，不立即进入拖拽状态
-                        m_mousePressed = true;  // 需要添加这个成员变量
+                        m_mousePressed = true;
                         m_lastMouseX = event.mouseX;
                         m_lastMouseY = event.mouseY;
                         handled = true;
@@ -154,6 +156,16 @@ bool UITexture::handleEvent(const UIEvent& event) {
                     // 记录点击信息用于双击检测
                     m_lastClickTime = event.clickTime;
                     m_lastClickButton = event.mouseButton;
+                }
+            } else if (event.mouseButton == 2 && m_middleClickEnabled) { // 中键点击
+                std::cout << "Middle click detected!" << std::endl;
+                if (contains(event.mouseX, event.mouseY)) {
+                    std::cout << "Middle click inside texture bounds" << std::endl;
+                    if (m_onMiddleClick) {
+                        std::cout << "Calling middle click callback" << std::endl;
+                        m_onMiddleClick(event.mouseX, event.mouseY);
+                    }
+                    handled = true;
                 }
             }
             break;
@@ -185,7 +197,7 @@ bool UITexture::handleEvent(const UIEvent& event) {
                 float deltaY = event.mouseY - m_lastMouseY;
                 
                 // 更新位置
-                setPosition(m_x + deltaX, m_y + deltaY);
+                // setPosition(m_x + deltaX, m_y + deltaY);
                 
                 // 调用回调函数
                 if (m_onDrag) {
