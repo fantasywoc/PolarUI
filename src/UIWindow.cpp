@@ -64,7 +64,7 @@ bool UIWindow::initialize() {
 
     // 配置窗口图标
     GLFWimage icon;
-    icon.pixels = stbi_load("src/icons/logo32.png", &icon.width, &icon.height, nullptr, 4); // 强制 RGBA
+    icon.pixels = stbi_load("src/icons/logo.png", &icon.width, &icon.height, nullptr, 4); // 强制 RGBA
     if (icon.pixels) {
         glfwSetWindowIcon(window, 1, &icon); // 设置系统图标
         stbi_image_free(icon.pixels); // 立即释放内存
