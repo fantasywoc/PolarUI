@@ -127,7 +127,93 @@ bool UITexture::handleEvent(const UIEvent& event) {
     if (!m_visible || !m_enabled) {
         return false;
     }
-    return false;
+    
+    bool handled = false;
+    
+    switch (event.type) {
+        case UIEvent::MOUSE_PRESS:
+            if (event.mouseButton == 0 && m_dragEnabled) { // 左键
+                if (contains(event.mouseX, event.mouseY)) {
+                    m_isDragging = true;
+                    m_lastMouseX = event.mouseX;
+                    m_lastMouseY = event.mouseY;
+                    handled = true;
+                }
+            }
+            break;
+            
+        case UIEvent::MOUSE_RELEASE:
+            if (event.mouseButton == 0 && m_isDragging) { // 左键释放
+                m_isDragging = false;
+                handled = true;
+            }
+            break;
+            
+        case UIEvent::MOUSE_MOVE:
+            if (m_isDragging && m_dragEnabled) {
+                float deltaX = event.mouseX - m_lastMouseX;
+                float deltaY = event.mouseY - m_lastMouseY;
+                
+                // 更新位置
+                setPosition(m_x + deltaX, m_y + deltaY);
+                
+                // 调用回调函数
+                if (m_onDrag) {
+                    m_onDrag(deltaX, deltaY);
+                }
+                
+                m_lastMouseX = event.mouseX;
+                m_lastMouseY = event.mouseY;
+                handled = true;
+            }
+            break;
+            
+        case UIEvent::KEY_PRESS:
+            if (m_keyEventsEnabled && contains(m_lastMouseX, m_lastMouseY)) {
+                // 处理特定按键
+                switch (event.keyCode) {
+                    case 262: // 右箭头键
+                        setPosition(m_x + 10, m_y);
+                        handled = true;
+                        break;
+                    case 263: // 左箭头键
+                        setPosition(m_x - 10, m_y);
+                        handled = true;
+                        break;
+                    case 264: // 下箭头键
+                        setPosition(m_x, m_y + 10);
+                        handled = true;
+                        break;
+                    case 265: // 上箭头键
+                        setPosition(m_x, m_y - 10);
+                        handled = true;
+                        break;
+                    case 82:  // R键 - 重置位置
+                        setPosition(0, 0);
+                        handled = true;
+                        break;
+                    case 70:  // F键 - 适应窗口
+                        setScaleMode(ScaleMode::KEEP_ASPECT);
+                        handled = true;
+                        break;
+                    case 79:  // O键 - 原始尺寸
+                        setScaleMode(ScaleMode::ORIGINAL_SIZE);
+                        handled = true;
+                        break;
+                }
+                
+                // 调用按键回调
+                if (m_onKeyPress) {
+                    m_onKeyPress(event.keyCode, event.modifiers);
+                }
+            }
+            break;
+            
+        default:
+            break;
+    }
+    
+    return handled;
 }
 
 bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {

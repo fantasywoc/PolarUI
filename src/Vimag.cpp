@@ -302,7 +302,20 @@ int main() {
     texture->setCornerRadius(10.0f);
     // texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
     // texture->setBorderWidth(2.0f);
-    
+    // 事件处理   设置拖拽回调
+    texture->setOnDrag([](float deltaX, float deltaY) {
+        std::cout << "拖拽偏移: (" << deltaX << ", " << deltaY << ")" << std::endl;
+    });
+
+    // 设置滚动回调（需要在事件系统中添加滚动事件支持）
+    texture->setOnScroll([](float scrollX, float scrollY) {
+        std::cout << "滚动: (" << scrollX << ", " << scrollY << ")" << std::endl;
+    });
+
+    // 设置按键回调
+    texture->setOnKeyPress([](int keyCode, int modifiers) {
+        std::cout << "按键: " << keyCode << ", 修饰键: " << modifiers << std::endl;
+    });
     
     
     float scalex{}, scaley{};
