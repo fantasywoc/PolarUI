@@ -90,7 +90,7 @@ private:
     ScaleMode m_scaleMode;
     float m_alpha;
     bool m_needsLoad;        // 添加标志位
-    float m_OriginWidth = 900;   // 添加默认值，防止窗口切换图片导致texture控件无限缩小
+    int m_OriginWidth ;   // 添加默认值，防止窗口切换图片导致texture控件无限缩小
     bool m_mousePressed = false;  // 鼠标是否按下但未开始拖拽
     
     // 拖拽相关

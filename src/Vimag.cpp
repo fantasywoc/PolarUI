@@ -23,44 +23,80 @@
 
 namespace fs = std::filesystem;
 
-// 查找指定目录下的图片文件路径
-std::vector<fs::path> find_image_files(const fs::path& directory) {
-    // 支持的图片扩展名（统一小写）
+#include <filesystem>
+#include <vector>
+#include <set>
+#include <algorithm>
+#include <iostream>
+
+namespace fs = std::filesystem;
+
+// 查找指定目录下的图片文件路径和文件名
+void find_image_files(
+    const fs::path& directory, 
+    std::vector<fs::path>& image_paths,
+    std::vector<std::string>& image_names
+) {
+    // 清空结果容器确保每次调用都是全新结果
+    image_paths.clear();
+    image_names.clear();
+
+    // 支持的图片扩展名（统一小写）[9](@ref)
     static const std::set<std::string> image_extensions = {
-        ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff"
+        ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff", ".webp"
     };
-    
-    std::vector<fs::path> image_paths;
-    // 验证目录有效性
-    if (!fs::exists(directory) || !fs::is_directory(directory)) {
-        std::cerr << "错误：路径不存在或不是目录 - " << directory << std::endl;
-        return image_paths; // 返回空结果
+
+    // 验证目录有效性 [6,8](@ref)
+    if (!fs::exists(directory)) {
+        std::cerr << "错误：路径不存在 - " << directory << std::endl;
+        return;
+    }
+    if (!fs::is_directory(directory)) {
+        std::cerr << "错误：目标不是目录 - " << directory << std::endl;
+        return;
     }
 
     try {
-        // 创建递归迭代器（跳过权限错误）
+        // 创建递归迭代器（跳过权限错误）[7,8](@ref)
         auto options = fs::directory_options::skip_permission_denied;
         fs::recursive_directory_iterator dir_iter(directory, options);
-        
-        for (const auto& entry : dir_iter) {
-            if (!entry.is_regular_file()) continue; // 跳过非文件
-            
-            // 获取小写扩展名以统一比较
-            std::string ext = entry.path().extension().string();
-            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-            
-            // 检查是否为图片格式
-            if (image_extensions.find(ext) != image_extensions.end()) {
-                image_paths.push_back(entry.path()); // 添加路径
+        fs::recursive_directory_iterator end_iter;
+
+        while (dir_iter != end_iter) {
+            try {
+                const auto& entry = *dir_iter;
+                
+                // 跳过非常规文件（目录/符号链接等）[9](@ref)
+                if (entry.is_regular_file()) {
+                    // 获取小写扩展名以统一比较
+                    std::string ext = entry.path().extension().string();
+                    std::transform(ext.begin(), ext.end(), ext.begin(), 
+                                  [](unsigned char c) { return std::tolower(c); });
+                    
+                    // 检查是否为图片格式 [9](@ref)
+                    if (image_extensions.find(ext) != image_extensions.end()) {
+                        image_paths.push_back(entry.path());
+                        image_names.push_back(entry.path().filename().string());
+                    }
+                }
+                ++dir_iter;
+            } 
+            // 捕获单个文件处理中的异常（不影响整体遍历）
+            catch (const fs::filesystem_error& e) {
+                std::cerr << "跳过无法访问的文件: " << e.what() << std::endl;
+                dir_iter.disable_recursion_pending();  // 继续遍历其他文件 [7](@ref)
+                ++dir_iter;
             }
         }
-    } catch (const fs::filesystem_error& e) {
+    } 
+    // 捕获全局性异常（如目录打开失败）
+    catch (const fs::filesystem_error& e) {
         std::cerr << "文件系统错误: " << e.what() << std::endl;
     }
-    
-    return image_paths;
+    catch (const std::exception& e) {
+        std::cerr << "未知错误: " << e.what() << std::endl;
+    }
 }
-
 
  
 void printComponentInfo(const std::string& name, std::shared_ptr<UIComponent> component) {
@@ -93,19 +129,19 @@ void printAllComponentsInfo(std::shared_ptr<UIPanel> mainPanel,
 }
 
 
-void printImagePath(){
+// void printImagePath(){
 
-    std::vector<fs::path> image_paths;
-    image_paths = find_image_files("D:/Picture/Saved Pictures/");
-    if (image_paths.empty()){  // 修改：is_empty() -> empty()
-        std::cout<<"image_paths is empty!"<<std::endl;
-        return ;
-    }
+//     std::vector<fs::path> image_paths;
+//     image_paths = find_image_files("D:/Picture/Saved Pictures/");
+//     if (image_paths.empty()){  // 修改：is_empty() -> empty()
+//         std::cout<<"image_paths is empty!"<<std::endl;
+//         return ;
+//     }
     
-    for (const auto& path : image_paths) {
-        std::cout << "Image Path: " << path.string() << std::endl;
-    }
-}
+//     for (const auto& path : image_paths) {
+//         std::cout << "Image Path: " << path.string() << std::endl;
+//     }
+// }
 
 
 
@@ -137,23 +173,15 @@ int main() {
 
     int centerX = fbWidth / 2.0f;
     int centerY = fbHeight / 2.0f;
-
+    int windowWidth{1600},windowHeight{900};
     // 创建主面板
-    auto mainPanel = std::make_shared<UIPanel>(0, 0, 1600, 900);
+    auto mainPanel = std::make_shared<UIPanel>(0, 0, windowWidth, windowHeight);
     mainPanel->setHorizontalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 0.0f, 0.0f);
     mainPanel->setBackgroundColor(nvgRGBA(100, 200, 100, 10));
     mainPanel->setBorderColor(nvgRGBA(255, 255, 255,200));
     mainPanel->setBorderWidth(1.0f);
     mainPanel->setCornerRadius(10.0f);
 
-   // 方法2: 设置窗口大小变化监听
-   window.setWindowSizeCallback([&,mainPanel](int width, int height) {
-    std::cout << "窗口大小实时更新: " << width << "x" << height << std::endl;
-    int centerX = (width - mainPanel->getWidth()) / 2.0f;
-    int centerY = (height - mainPanel->getHeight())/ 2.0f;
-
-    mainPanel->setPosition(centerX, centerY);
-});
 
 
     // 创建左面板 - 使用具体坐标（由布局系统自动计算）
@@ -162,14 +190,56 @@ int main() {
     leftPanel->setBackgroundColor(nvgRGB(100, 150, 255));
     
     // 创建右面板
-    auto rightPanel = std::make_shared<UIPanel>(0, 0, 300, 480);
+    auto rightPanel = std::make_shared<UIPanel>(0, 0, windowWidth, windowHeight);
     rightPanel->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
-    rightPanel->setBackgroundColor(nvgRGB(255, 100, 100));
+    rightPanel->setBackgroundColor(nvgRGBA(255, 255, 255,200));
     
     // 创建右图像面板
-    auto rightPanel1 = std::make_shared<UIPanel>(0, 0, 900, 700);
+    auto rightPanel1 = std::make_shared<UIPanel>(0, 0,  windowWidth, windowHeight);
     rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
-    rightPanel1->setBackgroundColor(nvgRGBA(255, 100, 100, 50));
+    rightPanel1->setBackgroundColor(nvgRGBA(255, 255, 255,200));
+
+    // 获取图片文件
+    const fs::path directory = "D:/Picture/Saved Pictures/";
+    std::vector<fs::path> image_paths;
+    std::vector<std::string> image_names;
+    find_image_files(directory,image_paths,image_names);
+
+    int current_index =15;
+    size_t limit_index =image_paths.size(); 
+    std::string imagPath =image_paths[current_index].generic_string();
+    int change_speed = 0;
+    EXIF exif(imagPath);
+    exif.printAllInfo();
+
+
+    // 先创建纹理组件
+    // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
+    auto texture = std::make_shared<UITexture>(0, 0, windowHeight*0.7f, windowHeight*0.7, imagPath);
+
+    texture->setScaleMode(UITexture::ScaleMode::KEEP_ASPECT);
+    texture->setAlpha(1.0f);
+    texture->setCornerRadius(10.0f);
+    // texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
+    // texture->setBorderWidth(2.0f);
+
+
+
+// 方法2: 设置窗口大小变化监听
+   window.setWindowSizeCallback([&,mainPanel,rightPanel1](int width, int height) {
+    std::cout << "窗口大小实时更新: " << width << "x" << height << std::endl;
+    // int centerX = (width - mainPanel->getWidth()/2.0f);
+    // int centerY = (height - mainPanel->getHeight()/2.0f);
+    // mainPanel->setPosition(centerX, centerY);
+    mainPanel->setSize(width,height);
+    rightPanel1->setSize(width,height);
+    
+    texture->setSize(width*0.8,height*0.8);
+    texture->setOriginWidth(height*0.7);
+    
+});
+
+
 
     // 添加标签到左面板 - 修改宽度为150px
     auto label = std::make_shared<UILabel>(0, 0, 150, 30, "Left Panel Label");
@@ -282,26 +352,7 @@ int main() {
     leftPanel->addChild(inputBox);
     
 
-    // 获取图片文件
-    std::vector<fs::path> image_paths;
-    image_paths = find_image_files("D:/Picture/JEPG/");
-    int current_index =15;
-    size_t limit_index =image_paths.size(); 
-    std::string imagPath =image_paths[current_index].generic_string();
-    
-    EXIF exif(imagPath);
-    exif.printAllInfo();
-
-
-    // 先创建纹理组件
-    // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
-    auto texture = std::make_shared<UITexture>(0, 0, 600, 600, imagPath);
-
-    texture->setScaleMode(UITexture::ScaleMode::KEEP_ASPECT);
-    texture->setAlpha(1.0f);
-    texture->setCornerRadius(10.0f);
-    // texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
-    // texture->setBorderWidth(2.0f);
+  
   
     float scalex{1}, scaley{1};
     // 右面板的按钮，添加动画效果
@@ -389,10 +440,25 @@ int main() {
 
     // 事件处理 /////////////////////////////////////////////////////////////
     // // 设置拖拽回调
-    texture->setOnDrag([](float deltaX, float deltaY) {
+    static float initialX = rightPanel1->getX();
+    static float initialY = rightPanel1->getY();
+    static float totalDeltaX = 0.0f;
+    static float totalDeltaY = 0.0f;
+    
+    texture->setOnDrag([&,rightPanel1,texture](float deltaX, float deltaY) {
         std::cout << "拖拽偏移: (" << deltaX << ", " << deltaY << ")" << std::endl;
+        
+        totalDeltaX += deltaX ;
+        totalDeltaY += deltaY ;
+        
+        // texture->moveTo(initialX + totalDeltaX, initialY + totalDeltaY, 0.0f);
+        // UIAnimationManager::getInstance().moveTo(texture.get(), initialX + totalDeltaX, initialY + totalDeltaY, 0.0f, UIAnimation::EASE_OUT);
+        // mainPanel->updateLayout();
+        rightPanel1->moveTo(totalDeltaX , totalDeltaY, 0.2f);
+        // mainPanel->updateLayout();
+        rightPanel1->updateLayout ();
     });
-
+  
     // 设置滚动回调（需要在事件系统中添加滚动事件支持）
     texture->setOnScroll([&,texture](float scrollX, float scrollY) {
         std::cout << "滚动: (" << scrollX << ", " << scrollY << ")" << std::endl;
@@ -409,7 +475,6 @@ int main() {
             scaley = 0.2f; 
         }
 
-
         UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
 
     });
@@ -420,8 +485,32 @@ int main() {
     });
 
     // 设置拖拽时滚轮回调
-    texture->setOnDragScroll([](float scrollX, float scrollY) {
+    texture->setOnDragScroll([&, texture, rightPanel1, mainPanel, rightPanel](float scrollX, float scrollY) {
         std::cout << "拖拽时滚轮: (" << scrollX << ", " << scrollY << ")" << std::endl;
+
+        change_speed += scrollY;
+        if (change_speed%2 != 0){
+            return ;
+        }
+
+        current_index += change_speed / 2;
+        change_speed = 0;
+
+        if (current_index <= 0){
+            current_index = 0;
+            return;
+        }
+        if (current_index >= limit_index-1){
+            current_index = limit_index-1;
+            return;
+        }
+        
+        imagPath =image_paths[current_index].generic_string();
+        std::cout<< "last imagPath:" << imagPath <<std::endl;
+        texture->setImagePath(window.getNVGContext(), imagPath);
+        // mainPanel->updateLayout();
+        rightPanel1->updateLayout ();
+        
     });
 
     // 设置双击回调
@@ -448,7 +537,6 @@ int main() {
     texture->setDragScrollEnabled(true);
     texture->setMiddleClickEnabled(true);
     
-
     auto exitButton = std::make_shared<UIButton>(0, 0, 120, 40, "Exit");
     exitButton->setOnClick([&window, exitButton]() {
         std::cout << "Exit button clicked!" << std::endl;
@@ -488,14 +576,10 @@ int main() {
     });
     //last 图片切换
     auto lastButton = std::make_shared<UIButton>(0, 0, 70, 40, "Last");
+    
     lastButton->setOnClick([&, nextButton,texture, lastButton, rightPanel1, mainPanel, rightPanel]() {
-        if (current_index == 0){
-            return;
-        }
-        if (current_index > 0)    { current_index--; }
-        imagPath =image_paths[current_index].generic_string();
-        std::cout<< "last imagPath:" << imagPath <<std::endl;
-        texture->setImagePath(window.getNVGContext(), imagPath);
+        
+        rightPanel1->moveTo(100 , 100, 0.35f);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
     });
@@ -510,11 +594,11 @@ int main() {
     rightPanel1->addChild(texture);
     rightPanel1->addChild(label);
     // 添加子面板到主面板
-    mainPanel->addChild(leftPanel);
+    // mainPanel->addChild(leftPanel);
     mainPanel->addChild(rightPanel1);
-    mainPanel->addChild(rightPanel);
+    // mainPanel->addChild(rightPanel);
  
-    printImagePath();
+    // printImagePath();
 
     // 设置鼠标事件回调
     // 设置鼠标事件回调

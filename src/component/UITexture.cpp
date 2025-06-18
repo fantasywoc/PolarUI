@@ -18,6 +18,7 @@ UITexture::UITexture(float x, float y, float width, float height, const std::str
     , m_imageHeight(0)
     , m_scaleMode(ScaleMode::STRETCH)
     , m_alpha(1.0f)
+    , m_OriginWidth(height)
     , m_needsLoad(!imagePath.empty()) {
     // 不在构造函数中加载图像，延迟到render时加载
     s_instances.push_back(this);
@@ -43,19 +44,16 @@ void UITexture::render(NVGcontext* vg) {
         return;
     }
 
-
     // 如果需要加载图像且还未加载
     if (m_needsLoad && m_nvgImage == -1 && !m_imagePath.empty()) {
         loadImage(vg, m_imagePath);
         m_needsLoad = false;
     }
-    
     if (m_nvgImage == -1) {
         return;
     }
     
 
-  
     // 缩放变换（以中心为原点）#支持中心动画缩放   放在这个位置可以缩放整个texture
     if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
         // 计算全局中心点（世界坐标）
@@ -67,8 +65,21 @@ void UITexture::render(NVGcontext* vg) {
         nvgScale(vg, m_animationScaleX, m_animationScaleY);
         nvgTranslate(vg, -centerX, -centerY); 
     }
+    // // 平移
+    // if (m_animationOffsetX != 0.0f || m_animationOffsetY != 0.0f){
 
+    //     float tragetX = m_x + m_animationOffsetX  ;
+    //     float tragetY = m_y + m_animationOffsetY  ;
 
+    //     nvgTranslate(vg, tragetX, tragetY);
+
+    // }
+
+    // 应用动画偏移
+    if (m_animationOffsetX != 0.0f || m_animationOffsetY != 0.0f) {
+        std::cerr << "texture 偏移 m_animationOffsetX: " << m_animationOffsetX << " m_animationOffsetY: " << m_animationOffsetY << std::endl;
+        nvgTranslate(vg, m_animationOffsetX, m_animationOffsetY);
+    }
   // 绘制背景（如果设置了）
   if (m_backgroundColor.a >= 0) {
     nvgBeginPath(vg);
@@ -311,16 +322,17 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     float imageAspect = (float)m_imageWidth / (float)m_imageHeight;
     // 计算当前容器宽高比
     float containerAspect = getWidth() / getHeight();
-    
-    if (imageAspect >=1) {
-        // 图片比容器更宽，以宽度为准调整高度
-        float newHeight = getOriginWidth() / imageAspect;
-        setSize(getOriginWidth(), newHeight);
-    } else {
-        // 图片比容器更高，以高度为准调整宽度
-        float newWidth = getOriginWidth() * imageAspect;
-        setSize(newWidth, getOriginWidth());
-    }
+    float newWidth = getOriginWidth() * imageAspect;
+    setSize(newWidth, getOriginWidth());
+    // if (imageAspect >=1) {
+    //     // 图片比容器更宽，以宽度为准调整高度
+    //     float newHeight = getOriginWidth() / imageAspect;
+    //     setSize(getOriginWidth(), newHeight);
+    // } else {
+    //     // 图片比容器更高，以高度为准调整宽度
+    //     float newWidth = getOriginWidth() * imageAspect;
+    //     setSize(newWidth, getOriginWidth());
+    // }
     // 创建 NanoVG 图像
     m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
     
