@@ -98,7 +98,29 @@ void find_image_files(
     }
 }
 
- 
+void removeZero(std::string& str) {
+    if (str.empty()) return;
+
+    // 使用反向迭代器从末尾开始扫描
+    auto it = str.rbegin();
+    while (it != str.rend()) {
+        if (*it == '0') {
+            // 删除当前字符（将反向迭代器转为正向迭代器）
+            str.erase(std::next(it).base());
+            // 重置迭代器（因删除后原迭代器失效）
+            it = str.rbegin();
+        } else if (*it == '.') {
+            // 删除小数点并终止循环
+            str.erase(std::next(it).base());
+            break;
+        } else {
+            // 遇到非0非.字符，终止处理
+            break;
+        }
+    }
+}
+
+
 void printComponentInfo(const std::string& name, std::shared_ptr<UIComponent> component) {
     std::cout << name << ": Position(" << component->getX() << ", " << component->getY() 
               << "), Size(" << component->getWidth() << " x " << component->getHeight() << ")" << std::endl;
@@ -209,8 +231,7 @@ int main() {
     size_t limit_index =image_paths.size(); 
     std::string imagPath =image_paths[current_index].generic_string();
     int change_speed = 0;
-    EXIF exif(imagPath);
-    exif.printAllInfo();
+
 
 
     // 先创建纹理组件
@@ -240,120 +261,12 @@ int main() {
 });
 
 
-
     // 添加标签到左面板 - 修改宽度为150px
-    auto label = std::make_shared<UILabel>(0, 0, 150, 30, "Left Panel Label");
+    auto label = std::make_shared<UILabel>(0, 0, 200, 30, "Left Panel Label");
     label->setTextAlign(UILabel::TextAlign::CENTER);
-
-    // 创建按钮 - 统一宽度为150px，并添加动画效果
-    auto button1 = std::make_shared<UIButton>(0, 0, 150, 40, "Fade Animation");
-    button1->setCornerRadius(10.0f);
-    button1->setOnClick([button1]() {
-        std::cout << "Button 1 clicked! Playing fade animation..." << std::endl;
-        // 淡出再淡入的动画效果
-        UIAnimationManager::getInstance().fadeOut(button1.get(), 0.3f, UIAnimation::EASE_IN);
-        
-        // 创建延迟淡入动画
-        auto fadeInAnim = std::make_shared<UIAnimation>(UIAnimation::FADE, 0.3f, UIAnimation::EASE_OUT);
-        fadeInAnim->setValues(0.0f, 1.0f);
-        fadeInAnim->setOnUpdate([button1](float value) {
-            button1->setAnimationOpacity(value);
-        });
-
-        // 延迟0.1秒后开始淡入
-        auto delayAnim = std::make_shared<UIAnimation>(UIAnimation::CUSTOM, 0.1f);
-        delayAnim->setOnComplete([fadeInAnim, button1]() {
-            UIAnimationManager::getInstance().addAnimation(fadeInAnim, button1.get());
-        });
-        UIAnimationManager::getInstance().addAnimation(delayAnim, button1.get());
-    });
-    
-    auto button2 = std::make_shared<UIButton>(0, 0, 150, 40, "Scale Animation");
-    button2->setOnClick([button2]() {
-        std::cout << "Button 2 clicked! Playing scale animation..." << std::endl;
-        
-        // 先移除该组件的所有动画，避免冲突
-        UIAnimationManager::getInstance().removeAnimation(button2.get());
-        
-        // 优化后的缩放动画：使用中心坐标作为缩放原点
-        UIAnimationManager::getInstance().scaleTo(button2.get(), 1.05f, 1.05f, 0.1f, UIAnimation::EASE_OUT, UIAnimation::CENTER);
-        
-        // 创建恢复缩放的动画 - 使用 EASE_IN_OUT 实现平滑过渡
-        auto scaleBackAnim = std::make_shared<UIAnimation>(UIAnimation::SCALE, 0.2f, UIAnimation::EASE_IN_OUT);
-        scaleBackAnim->setScaleOrigin(UIAnimation::CENTER); // 设置缩放原点为中心
-        scaleBackAnim->setValues(1.05f, 1.0f);
-        scaleBackAnim->setOnUpdate([button2](float value) {
-            button2->setAnimationScaleX(value);
-            button2->setAnimationScaleY(value);
-        });
-        
-        // 缩短延迟时间，让动画更连贯
-        auto delayAnim = std::make_shared<UIAnimation>(UIAnimation::CUSTOM, 0.05f);
-        delayAnim->setOnComplete([scaleBackAnim, button2]() {
-            UIAnimationManager::getInstance().addAnimation(scaleBackAnim, button2.get());
-        });
-        UIAnimationManager::getInstance().addAnimation(delayAnim, button2.get());
-    });
-    
-    auto button3 = std::make_shared<UIButton>(0, 0, 150, 150, "Rotate Animation");
-    button3->setCornerRadius(75.0f);
-    button3->setOnClick([button3]() {
-        std::cout << "Button 3 clicked! Playing rotation animation..." << std::endl;
-        
-        // 先移除该组件的所有动画，避免冲突
-        UIAnimationManager::getInstance().removeAnimation(button3.get());
-        
-        // 旋转动画：360度旋转
-        UIAnimationManager::getInstance().rotateTo(button3.get(), 360.0f, 1.0f, UIAnimation::EASE_IN_OUT);
-        
-        // 使用更简单的方式处理重置
-        auto resetAnim = std::make_shared<UIAnimation>(UIAnimation::CUSTOM, 1.0f);
-        resetAnim->setOnComplete([button3]() {
-            // 重置旋转角度
-            button3->setAnimationRotation(0.0f);
-        });
-        UIAnimationManager::getInstance().addAnimation(resetAnim, button3.get());
-    });
-    
-    leftPanel->addChild(button1);
-    leftPanel->addChild(button2);
-    leftPanel->addChild(button3);
-    
-    
-    // 添加输入框到左面板
-    auto inputBox = std::make_shared<UITextInput>(0, 0, 200, 30, "Please input text...");
-    inputBox->setTextColor(nvgRGB(255, 255, 255));
-    inputBox->setBackgroundColor(nvgRGB(50, 50, 50));
-    inputBox->setBorderColor(nvgRGB(100, 100, 100));
-    inputBox->setFocusedBorderColor(nvgRGB(100, 150, 200));
-    inputBox->setCornerRadius(4.0f);
-    inputBox->setBorderWidth(1.0f);
-    
-    // 设置输入框的回调函数，添加焦点动画
-    inputBox->setOnTextChanged([](const std::string& text) {
-        std::cout << "Text changed: " << text << std::endl;
-    });
-    
-    inputBox->setOnEnterPressed([](const std::string& text) {
-        std::cout << "Enter pressed with text: " << text << std::endl;
-    });
-    
-    inputBox->setOnFocusChanged([inputBox](bool focused) {
-        std::cout << "Focus changed: " << (focused ? "focused" : "unfocused") << std::endl;
-        if (focused) {
-            // 获得焦点时轻微放大
-            UIAnimationManager::getInstance().scaleTo(inputBox.get(), 1.55f, 1.5f, 0.2f, UIAnimation::EASE_OUT);
-        } else {
-            // 失去焦点时恢复原大小
-            UIAnimationManager::getInstance().scaleTo(inputBox.get(), 1.0f, 1.0f, 0.2f, UIAnimation::EASE_IN);
-        }
-    });
-    
-    leftPanel->addChild(inputBox);
-    
-
-  
-  
+    label->setFontSize(30.0f);
+ 
+ 
     float scalex{1}, scaley{1};
     // 右面板的按钮，添加动画效果
     auto okButton = std::make_shared<UIButton>(0, 0, 120, 50, "SCALE OUT");
@@ -448,8 +361,8 @@ int main() {
     texture->setOnDrag([&,rightPanel1,texture](float deltaX, float deltaY) {
         std::cout << "拖拽偏移: (" << deltaX << ", " << deltaY << ")" << std::endl;
         
-        totalDeltaX += deltaX ;
-        totalDeltaY += deltaY ;
+        totalDeltaX += deltaX * 2 ;
+        totalDeltaY += deltaY * 2;
         
         // texture->moveTo(initialX + totalDeltaX, initialY + totalDeltaY, 0.0f);
         // UIAnimationManager::getInstance().moveTo(texture.get(), initialX + totalDeltaX, initialY + totalDeltaY, 0.0f, UIAnimation::EASE_OUT);
@@ -485,7 +398,7 @@ int main() {
     });
 
     // 设置拖拽时滚轮回调
-    texture->setOnDragScroll([&, texture, rightPanel1, mainPanel, rightPanel](float scrollX, float scrollY) {
+    texture->setOnDragScroll([&, texture, rightPanel1, mainPanel,label, rightPanel](float scrollX, float scrollY) {
         std::cout << "拖拽时滚轮: (" << scrollX << ", " << scrollY << ")" << std::endl;
 
         change_speed += scrollY;
@@ -505,9 +418,22 @@ int main() {
             return;
         }
         
+        // 图片信息获取
         imagPath =image_paths[current_index].generic_string();
-        std::cout<< "last imagPath:" << imagPath <<std::endl;
+        
+        EXIF exif(imagPath);
+        TinyEXIF::EXIFInfo info = exif.getInfo();
+        std::string Fnumber = std::to_string(info.FNumber);
+        std::cout<< "Fnumber =" << Fnumber <<std::endl;
+        removeZero(Fnumber);
+        std::cout<< "Fnumber =" << Fnumber <<std::endl;
+        std::string image_exif = info.Make + "   f/" + Fnumber + "     1/" + std::to_string(1/info.ExposureTime) + "S     ISO" + std::to_string(info.ISOSpeedRatings) ;
+        std::cout<<image_exif <<std::endl;
+        std::string imagName;
+        imagName = image_names[current_index];
         texture->setImagePath(window.getNVGContext(), imagPath);
+        label->setText(image_exif);
+
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
         
@@ -528,6 +454,11 @@ int main() {
         scalex = 1.0f;
         scaley = 1.0f; 
         UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
+        
+        rightPanel1->moveTo(0 , 0, 0.2f);
+        // mainPanel->updateLayout();
+        rightPanel1->updateLayout ();
+    
     });
 
     // 启用所有事件
@@ -537,59 +468,13 @@ int main() {
     texture->setDragScrollEnabled(true);
     texture->setMiddleClickEnabled(true);
     
-    auto exitButton = std::make_shared<UIButton>(0, 0, 120, 40, "Exit");
-    exitButton->setOnClick([&window, exitButton]() {
-        std::cout << "Exit button clicked!" << std::endl;
-        // 退出动画：红色闪烁后关闭
-        auto flashAnim = std::make_shared<UIAnimation>(UIAnimation::CUSTOM, 0.3f, UIAnimation::EASE_IN_OUT);
-        flashAnim->setValues(0.0f, 1.0f);
-        flashAnim->setRepeatCount(3);
-        flashAnim->setReverse(true);
-        flashAnim->setOnUpdate([exitButton](float value) {
-            NVGcolor originalColor = nvgRGB(100, 100, 100);
-            NVGcolor flashColor = nvgRGB(255, 100, 100);
-            NVGcolor currentColor = nvgLerpRGBA(originalColor, flashColor, value);
-            exitButton->setBackgroundColor(currentColor);
-        });
-        flashAnim->setOnComplete([&window]() {
-            glfwSetWindowShouldClose(window.getGLFWWindow(), GLFW_TRUE);
-        });
-        UIAnimationManager::getInstance().addAnimation(flashAnim, exitButton.get());
-    });
-    
-    // next 图片切换
-    auto nextButton = std::make_shared<UIButton>(0, 0, 70, 40, "Next");
-    nextButton->setOnClick([&, nextButton,texture, rightPanel1, mainPanel, rightPanel]() {
 
-        if (current_index == limit_index-1){
-            return;
-        }
+    // rightPanel->addChild(okButton);
+    // rightPanel->addChild(scaleInButton);
+    // rightPanel->addChild(exitButton);
 
-        if (current_index < limit_index-1)    { current_index++; }
-
-        imagPath =image_paths[current_index].generic_string();
-        std::cout<< "next imagPath:" << imagPath <<std::endl;
-        texture->setImagePath(window.getNVGContext(), imagPath);
-        // mainPanel->updateLayout();
-        rightPanel1->updateLayout ();
-
-    });
-    //last 图片切换
-    auto lastButton = std::make_shared<UIButton>(0, 0, 70, 40, "Last");
-    
-    lastButton->setOnClick([&, nextButton,texture, lastButton, rightPanel1, mainPanel, rightPanel]() {
-        
-        rightPanel1->moveTo(100 , 100, 0.35f);
-        // mainPanel->updateLayout();
-        rightPanel1->updateLayout ();
-    });
-
-    rightPanel->addChild(okButton);
-    rightPanel->addChild(scaleInButton);
-    rightPanel->addChild(exitButton);
-
-    rightPanel->addChild(nextButton);
-    rightPanel->addChild(lastButton);
+    // rightPanel->addChild(nextButton);
+    // rightPanel->addChild(lastButton);
 
     rightPanel1->addChild(texture);
     rightPanel1->addChild(label);
@@ -673,7 +558,7 @@ int main() {
     });
     
     // 在渲染前输出所有组件的位置和尺寸信息
-    printAllComponentsInfo(mainPanel, leftPanel, rightPanel, label, button1, button2, button3, okButton, exitButton);
+    // printAllComponentsInfo(mainPanel, leftPanel, rightPanel, label);
     
     // 主渲染循环
     auto lastTime = glfwGetTime();
