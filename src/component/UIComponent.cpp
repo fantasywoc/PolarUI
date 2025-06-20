@@ -27,7 +27,26 @@ bool UIComponent::contains(float px, float py) const {
     // 考虑动画偏移的实际位置
     float actualX = m_x + m_animationOffsetX;
     float actualY = m_y + m_animationOffsetY;
-    return px >= actualX && px <= actualX + m_width && py >= actualY && py <= actualY + m_height;
+    
+    // 考虑缩放变换
+    if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
+        // 计算缩放后的尺寸
+        float scaledWidth = m_width * m_animationScaleX;
+        float scaledHeight = m_height * m_animationScaleY;
+        
+        // 计算缩放后的位置（以中心为缩放原点）
+        float centerX = actualX + m_width / 2.0f;
+        float centerY = actualY + m_height / 2.0f;
+        float scaledX = centerX - scaledWidth / 2.0f;
+        float scaledY = centerY - scaledHeight / 2.0f;
+        
+        return px >= scaledX && px <= scaledX + scaledWidth && 
+               py >= scaledY && py <= scaledY + scaledHeight;
+    }
+    
+    // 原有的平移检测
+    return px >= actualX && px <= actualX + m_width && 
+           py >= actualY && py <= actualY + m_height;
 }
 
 void UIComponent::renderBackground(NVGcontext* vg) {
