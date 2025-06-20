@@ -176,7 +176,8 @@ int main() {
     // 在现有代码中添加
     UIWindow window(1600, 900, "Button Demo with Animations");
     
-    
+    // 启用动态标题栏功能
+    window.enableDynamicTitleBar(true, 15.0); // 鼠标距离顶部15像素时显示
     // 设置透明帧缓冲区
     window.setTransparentFramebuffer(true);
     

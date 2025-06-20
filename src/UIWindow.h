@@ -277,4 +277,43 @@ private:
      * @param yoffset 垂直滚动偏移量
      */
     static void scrollCallbackWrapper(GLFWwindow* window, double xoffset, double yoffset);
+
+public:
+    // ==================== 标题栏控制 ====================
+    
+    /**
+     * @brief 启用动态标题栏功能
+     * @param enable 是否启用动态标题栏
+     * @param threshold 鼠标距离顶部多少像素时显示标题栏，默认10像素
+     */
+    void enableDynamicTitleBar(bool enable, double threshold = 10.0);
+    
+    /**
+     * @brief 显示标题栏
+     */
+    void showTitleBar();
+    
+    /**
+     * @brief 隐藏标题栏
+     */
+    void hideTitleBar();
+    
+    /**
+     * @brief 检查标题栏是否可见
+     * @return bool 标题栏可见返回true
+     */
+    bool isTitleBarVisible() const { return titleBarVisible; }
+
+private:
+    // ==================== 动态标题栏相关 ====================
+    bool dynamicTitleBarEnabled = false;  ///< 是否启用动态标题栏
+    bool titleBarVisible = true;          ///< 标题栏当前是否可见
+    double showThreshold = 10.0;          ///< 显示标题栏的鼠标距离阈值
+    
+    /**
+     * @brief 处理鼠标移动以控制标题栏显示
+     * @param xpos 鼠标X坐标
+     * @param ypos 鼠标Y坐标
+     */
+    void handleTitleBarToggle(double xpos, double ypos);
 };

@@ -7,8 +7,13 @@
 #include "UIWindow.h"
 #include <iostream>
 
+#ifdef _WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#include <windows.h>
+#endif
+
 // 定义NanoVG OpenGL3实现宏并包含实现头文件
-// 注意：这个宏只能在一个源文件中定义，用于包含NanoVG的OpenGL3实现代码
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg_gl.h"
 
@@ -294,9 +299,28 @@ void UIWindow::setMouseButtonCallback(std::function<void(int, int, int)> callbac
  * @brief 设置鼠标移动事件回调函数
  * @param callback 回调函数，接收鼠标位置参数
  */
+// 修改现有的 setCursorPosCallback 方法
 void UIWindow::setCursorPosCallback(std::function<void(double, double)> callback) {
     cursorPosCallback = callback;
-    if (window) glfwSetCursorPosCallback(window, cursorPosCallbackWrapper);
+    if (window) {
+        glfwSetCursorPosCallback(window, cursorPosCallbackWrapper);
+    }
+}
+
+// 修改 cursorPosCallbackWrapper 方法
+void UIWindow::cursorPosCallbackWrapper(GLFWwindow* window, double xpos, double ypos) {
+    UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
+    if (uiWindow) {
+        // 先处理动态标题栏
+        if (uiWindow->dynamicTitleBarEnabled) {
+            uiWindow->handleTitleBarToggle(xpos, ypos);
+        }
+        
+        // 然后调用用户设置的回调
+        if (uiWindow->cursorPosCallback) {
+            uiWindow->cursorPosCallback(xpos, ypos);
+        }
+    }
 }
 
 /**
@@ -339,12 +363,13 @@ void UIWindow::mouseButtonCallbackWrapper(GLFWwindow* window, int button, int ac
  * @brief 鼠标移动事件静态回调包装器
  * @description 从GLFW窗口用户指针获取UIWindow实例，并调用其鼠标移动回调
  */
-void UIWindow::cursorPosCallbackWrapper(GLFWwindow* window, double xpos, double ypos) {
-    UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
-    if (uiWindow && uiWindow->cursorPosCallback) {
-        uiWindow->cursorPosCallback(xpos, ypos);
-    }
-}
+// 删除这个重复的函数定义（第361-367行）
+// void UIWindow::cursorPosCallbackWrapper(GLFWwindow* window, double xpos, double ypos) {
+//     UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
+//     if (uiWindow && uiWindow->cursorPosCallback) {
+//         uiWindow->cursorPosCallback(xpos, ypos);
+//     }
+// }
 
 /**
  * @brief 窗口大小变化事件静态回调包装器
@@ -396,5 +421,71 @@ void UIWindow::scrollCallbackWrapper(GLFWwindow* window, double xoffset, double 
     UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
     if (uiWindow && uiWindow->scrollCallback) {
         uiWindow->scrollCallback(xoffset, yoffset);
+    }
+}
+
+
+// ==================== 动态标题栏功能实现 ====================
+
+void UIWindow::enableDynamicTitleBar(bool enable, double threshold) {
+    dynamicTitleBarEnabled = enable;
+    showThreshold = threshold;
+    
+    if (enable) {
+        // 设置鼠标移动回调来处理标题栏切换
+        glfwSetCursorPosCallback(window, cursorPosCallbackWrapper);
+    }
+}
+
+void UIWindow::showTitleBar() {
+    if (!titleBarVisible) {
+#ifdef _WIN32
+        HWND hwnd = glfwGetWin32Window(window);
+        if (hwnd) {
+            // 获取当前窗口样式
+            LONG style = GetWindowLong(hwnd, GWL_STYLE);
+            // 添加标题栏样式
+            style |= WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+            SetWindowLong(hwnd, GWL_STYLE, style);
+            
+            // 重新设置窗口位置以应用样式变化
+            SetWindowPos(hwnd, NULL, 0, 0, 0, 0, 
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+            
+            titleBarVisible = true;
+        }
+#endif
+    }
+}
+
+void UIWindow::hideTitleBar() {
+    if (titleBarVisible) {
+#ifdef _WIN32
+        HWND hwnd = glfwGetWin32Window(window);
+        if (hwnd) {
+            // 获取当前窗口样式
+            LONG style = GetWindowLong(hwnd, GWL_STYLE);
+            // 移除标题栏样式
+            style &= ~(WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+            SetWindowLong(hwnd, GWL_STYLE, style);
+            
+            // 重新设置窗口位置以应用样式变化
+            SetWindowPos(hwnd, NULL, 0, 0, 0, 0, 
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+            
+            titleBarVisible = false;
+        }
+#endif
+    }
+}
+
+void UIWindow::handleTitleBarToggle(double xpos, double ypos) {
+    if (!dynamicTitleBarEnabled) return;
+    
+    // 如果鼠标在顶部阈值范围内，显示标题栏
+    if (ypos <= showThreshold) {
+        showTitleBar();
+    } else {
+        hideTitleBar();
     }
 }
