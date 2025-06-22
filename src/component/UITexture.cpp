@@ -107,10 +107,14 @@ void UITexture::render(NVGcontext* vg) {
 
     // 创建图像填充模式
     NVGpaint imgPaint = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
-    
+    if (!m_paintValid) {
+        imgPaint_cache = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
+        m_paintValid = true;
+    }
+    // imgPaint_cache = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
     nvgBeginPath(vg);
     nvgRoundedRect(vg, renderX, renderY, renderW, renderH, m_cornerRadius);
-    nvgFillPaint(vg, imgPaint);
+    nvgFillPaint(vg, imgPaint_cache);
     nvgFill(vg);
     
 
@@ -177,8 +181,10 @@ bool UITexture::handleEvent(const UIEvent& event) {
                         m_onMiddleClick(event.mouseX, event.mouseY);
                     }
                     handled = true;
+                    m_paintValid = false;
                 }
             }
+        
             break;
             
         case UIEvent::MOUSE_RELEASE:
@@ -189,6 +195,7 @@ bool UITexture::handleEvent(const UIEvent& event) {
                 m_mousePressed = false;
                 handled = true;
             }
+            
             break;
             
         case UIEvent::MOUSE_MOVE:
@@ -200,6 +207,8 @@ bool UITexture::handleEvent(const UIEvent& event) {
                 
                 if (distance > 3.0f) { // 移动超过3像素才开始拖拽
                     m_isDragging = true;
+
+                    m_paintValid = false;
                 }
             }
             
@@ -218,6 +227,8 @@ bool UITexture::handleEvent(const UIEvent& event) {
                 m_lastMouseX = event.mouseX;
                 m_lastMouseY = event.mouseY;
                 handled = true;
+
+                m_paintValid = false;
             }
             break;
             
@@ -346,7 +357,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     
     m_imagePath = imagePath;
     std::cout << "Loaded image: " << imagePath << " (" << m_imageWidth << "x" << m_imageHeight << ")" << std::endl;
-    
+    m_paintValid = false;
     return true;
 }
 
@@ -368,6 +379,7 @@ void UITexture::setImagePath(NVGcontext* vg, const std::string& imagePath) {
         m_needsLoad = !imagePath.empty();
         loadImage(vg,m_imagePath);
 
+        m_paintValid = false; // 使缓存失效
     }
 }
 

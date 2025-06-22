@@ -86,6 +86,7 @@ public:
     float getAnimationScaleX() const { return m_animationScaleX; }
     float getAnimationScaleY() const { return m_animationScaleY; }
     float getAnimationRotation() const { return m_animationRotation; }
+    bool isAnimating() const{ return m_animationOpacity != 1.0f || m_animationScaleX != 1.0f || m_animationScaleY != 1.0f || m_animationRotation != 0.0f || m_animationOffsetX != 0.0f || m_animationOffsetY != 0.0f;};  
 protected:
     // 基础属性
     float m_x, m_y, m_width, m_height;

@@ -258,6 +258,7 @@ int main() {
     
     texture->setSize(width*0.8,height*0.8);
     texture->setOriginWidth(height*0.7);
+    texture->setPaintValid(false);
     
 });
 
@@ -564,27 +565,32 @@ int main() {
     // 主渲染循环
     auto lastTime = glfwGetTime();
     while (!window.shouldClose()) {
-        window.pollEvents();
+        
         // 每帧获取当前窗口大小
         int currentWidth, currentHeight;
         window.getFramebufferSize(currentWidth, currentHeight);
         // 计算时间差
         auto currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
+
+        if (deltaTime < 1.0/30.0) {continue;}
+
         lastTime = currentTime;
-        
+        window.pollEvents();
         // 更新动画系统
         UIAnimationManager::getInstance().update(deltaTime);
-        
-        window.beginFrame();
-        window.clearBackground(1.0f, 1.0f, 1.0f, 0.90f);
-        
-        // 渲染主面板（会递归渲染所有子组件）
-        mainPanel->updateLayout();
-        mainPanel->render(window.getNVGContext());
-        // texture->render(window.getNVGContext());
-        window.endFrame();
-        window.swapBuffers();
+        if (texture->isAnimating() || mainPanel->isAnimating() || rightPanel1->isAnimating()) {
+           
+            window.beginFrame();
+            window.clearBackground(1.0f, 1.0f, 1.0f, 0.90f);
+            
+            // 渲染主面板（会递归渲染所有子组件）
+            mainPanel->updateLayout();
+            mainPanel->render(window.getNVGContext());
+            // texture->render(window.getNVGContext());
+            window.endFrame();
+            window.swapBuffers();
+        }
     }
     
     // 清理所有纹理资源

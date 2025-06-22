@@ -53,7 +53,7 @@ public:
     
     // 添加静态清理方法
     static void cleanupAll(NVGcontext* vg);
-    
+    void setPaintValid(bool valid) { m_paintValid = valid; }
     // 事件回调函数类型定义
     using DragCallback = std::function<void(float deltaX, float deltaY)>;
     using ScrollCallback = std::function<void(float scrollX, float scrollY)>;
@@ -92,7 +92,9 @@ private:
     bool m_needsLoad;        // 添加标志位
     int m_OriginWidth ;   // 添加默认值，防止窗口切换图片导致texture控件无限缩小
     bool m_mousePressed = false;  // 鼠标是否按下但未开始拖拽
-    
+
+    NVGpaint imgPaint_cache = {};  //NG图像缓存
+    bool m_paintValid = false;
     // 拖拽相关
     bool m_isDragging = false;
     bool m_dragEnabled = true;
