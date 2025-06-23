@@ -12,9 +12,6 @@
 #include "animation/UIAnimation.h"
 #include "TinyEXIF/EXIF.h"
 #include <locale>
-#include <windows.h>  // 添加这行
-#include <io.h>       // 添加这行
-#include <fcntl.h>    // 添加这行
 #include <filesystem>
 
 #include <vector>
@@ -28,6 +25,14 @@ namespace fs = std::filesystem;
 #include <set>
 #include <algorithm>
 #include <iostream>
+
+
+#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+#include <fcntl.h>
+#endif
+
 
 namespace fs = std::filesystem;
 
@@ -126,52 +131,15 @@ void printComponentInfo(const std::string& name, std::shared_ptr<UIComponent> co
               << "), Size(" << component->getWidth() << " x " << component->getHeight() << ")" << std::endl;
 }
 
-void printAllComponentsInfo(std::shared_ptr<UIPanel> mainPanel, 
-                           std::shared_ptr<UIPanel> leftPanel, 
-                           std::shared_ptr<UIPanel> rightPanel,
-                           std::shared_ptr<UILabel> label,
-                           std::shared_ptr<UIButton> button1,
-                           std::shared_ptr<UIButton> button2,
-                           std::shared_ptr<UIButton> button3,
-                           std::shared_ptr<UIButton> okButton,
-                           std::shared_ptr<UIButton> exitButton) {
-    std::cout << "\n=== Component Positions Before Rendering ===" << std::endl;
-    printComponentInfo("Main Panel", mainPanel);
-    printComponentInfo("Left Panel", leftPanel);
-    printComponentInfo("Right Panel", rightPanel);
-    std::cout << "--- Left Panel Children ---" << std::endl;
-    printComponentInfo("Label", label);
-    printComponentInfo("Button 1", button1);
-    printComponentInfo("Button 2", button2);
-    printComponentInfo("Button 3", button3);
-    std::cout << "--- Right Panel Children ---" << std::endl;
-    printComponentInfo("OK Button", okButton);
-    printComponentInfo("Exit Button", exitButton);
-    std::cout << "==========================================\n" << std::endl;
-}
-
-
-// void printImagePath(){
-
-//     std::vector<fs::path> image_paths;
-//     image_paths = find_image_files("D:/Picture/Saved Pictures/");
-//     if (image_paths.empty()){  // 修改：is_empty() -> empty()
-//         std::cout<<"image_paths is empty!"<<std::endl;
-//         return ;
-//     }
-    
-//     for (const auto& path : image_paths) {
-//         std::cout << "Image Path: " << path.string() << std::endl;
-//     }
-// }
-
-
 
 int main() {
 
-    // 设置控制台输出为UTF-8
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
+    #ifdef _WIN32
+        // Windows专用代码
+        SetConsoleOutputCP(CP_UTF8);
+        SetConsoleCP(CP_UTF8);
+        std::cout << "windos UTF-8" << std::endl;
+    #endif
 
     // 在现有代码中添加
     UIWindow window(1600, 900, "Button Demo with Animations");
@@ -205,17 +173,6 @@ int main() {
     mainPanel->setBorderWidth(1.0f);
     mainPanel->setCornerRadius(10.0f);
 
-
-
-    // 创建左面板 - 使用具体坐标（由布局系统自动计算）
-    auto leftPanel = std::make_shared<UIPanel>(0, 0, 320, 480);
-    leftPanel->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_START, 10.0f, 10.0f);
-    leftPanel->setBackgroundColor(nvgRGB(100, 150, 255));
-    
-    // 创建右面板
-    auto rightPanel = std::make_shared<UIPanel>(0, 0, windowWidth, windowHeight);
-    rightPanel->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
-    rightPanel->setBackgroundColor(nvgRGBA(255, 255, 255,200));
     
     // 创建右图像面板
     auto rightPanel1 = std::make_shared<UIPanel>(0, 0,  windowWidth, windowHeight);
@@ -250,9 +207,7 @@ int main() {
 // 方法2: 设置窗口大小变化监听
    window.setWindowSizeCallback([&,mainPanel,rightPanel1](int width, int height) {
     std::cout << "窗口大小实时更新: " << width << "x" << height << std::endl;
-    // int centerX = (width - mainPanel->getWidth()/2.0f);
-    // int centerY = (height - mainPanel->getHeight()/2.0f);
-    // mainPanel->setPosition(centerX, centerY);
+
     mainPanel->setSize(width,height);
     rightPanel1->setSize(width,height);
     
@@ -264,94 +219,13 @@ int main() {
 
 
     // 添加标签到左面板 - 修改宽度为150px
-    auto label = std::make_shared<UILabel>(0, 0, 200, 30, "Left Panel Label");
+    auto label = std::make_shared<UILabel>(0, 0, 200, 30, u8"中文测试");
     label->setTextAlign(UILabel::TextAlign::CENTER);
     label->setFontSize(30.0f);
  
  
     float scalex{1}, scaley{1};
-    // 右面板的按钮，添加动画效果
-    auto okButton = std::make_shared<UIButton>(0, 0, 120, 50, "SCALE OUT");
-    okButton->setOnClick([&,texture,label, okButton, rightPanel1, mainPanel, rightPanel]() {
-        std::cout << "\n=== OK按钮点击事件开始 ===" << std::endl;
-        
-
-
-        if (scalex <= 10.0f) {
-            scalex += 0.2f;
-            scaley += 0.2f;  
-        }
-        else{
-            scalex = 10.0f;
-            scaley = 10.0f; 
-        }
-
-        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
-
-
-        // === 执行布局更新 ===
-        std::cout << "\n--- 开始布局更新 ---" << std::endl;
-        mainPanel->updateLayout();
-        
-        // 使用递归方法重置所有组件的动画偏移
-        // mainPanel->resetAllAnimationOffsets();
-        
-        // 强制同步所有组件的位置信息
-        // 确保事件系统使用最新的位置数据
-        rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
-        okButton->setPosition(okButton->getX(), okButton->getY());
-        
-        // 或者添加一个强制刷新方法
-        // 让所有组件重新计算并同步位置信息
-        std::cout << "强制同步位置信息完成" << std::endl;
-        
-        // 强制更新rightPanel的位置
-        rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
-        
-        std::cout << "\n=== OK按钮点击事件结束 ===\n" << std::endl;
-    });
-    
-    // 右面板的按钮，添加动画效果
-    auto scaleInButton = std::make_shared<UIButton>(0, 0, 110, 50, "SCALE IN");
-    scaleInButton->setOnClick([&,texture,label, scaleInButton, rightPanel1, mainPanel, rightPanel]() {
-       
-       
-       
-        if (scalex > 0.2f) {
-            scalex -= 0.2f;
-            scaley -= 0.2f;  
-        }
-        else{
-            scalex = 0.2f;
-            scaley = 0.2f; 
-        }
-
-        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
-
-
-        // === 执行布局更新 ===
-        std::cout << "\n--- 开始布局更新 ---" << std::endl;
-        mainPanel->updateLayout();
-        
-        // 使用递归方法重置所有组件的动画偏移
-        // mainPanel->resetAllAnimationOffsets();
-        
-        // 强制同步所有组件的位置信息
-        // 确保事件系统使用最新的位置数据
-        rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
-        okButton->setPosition(okButton->getX(), okButton->getY());
-        
-        // 或者添加一个强制刷新方法
-        // 让所有组件重新计算并同步位置信息
-        std::cout << "强制同步位置信息完成" << std::endl;
-        
-        // 强制更新rightPanel的位置
-        rightPanel->setPosition(rightPanel->getX(), rightPanel->getY());
-        
-        std::cout << "\n=== OK按钮点击事件结束 ===\n" << std::endl;
-    });
-
-
+   
 
     // 事件处理 /////////////////////////////////////////////////////////////
     // // 设置拖拽回调
@@ -400,7 +274,7 @@ int main() {
     });
 
     // 设置拖拽时滚轮回调
-    texture->setOnDragScroll([&, texture, rightPanel1, mainPanel,label, rightPanel](float scrollX, float scrollY) {
+    texture->setOnDragScroll([&, texture, rightPanel1, mainPanel,label](float scrollX, float scrollY) {
         std::cout << "拖拽时滚轮: (" << scrollX << ", " << scrollY << ")" << std::endl;
 
         change_speed += scrollY;
@@ -429,7 +303,7 @@ int main() {
         std::cout<< "Fnumber =" << Fnumber <<std::endl;
         removeZero(Fnumber);
         std::cout<< "Fnumber =" << Fnumber <<std::endl;
-        std::string image_exif = info.Make + "   f/" + Fnumber + "     1/" + std::to_string(1/info.ExposureTime) + "S     ISO" + std::to_string(info.ISOSpeedRatings) ;
+        std::string image_exif = info.Make + "  光圈 f/" + Fnumber + "     1/" + std::to_string(1/info.ExposureTime) + "S     ISO" + std::to_string(info.ISOSpeedRatings);
         std::cout<<image_exif <<std::endl;
         std::string imagName;
         imagName = image_names[current_index];
@@ -470,24 +344,10 @@ int main() {
     texture->setDragScrollEnabled(true);
     texture->setMiddleClickEnabled(true);
     
-
-    // rightPanel->addChild(okButton);
-    // rightPanel->addChild(scaleInButton);
-    // rightPanel->addChild(exitButton);
-
-    // rightPanel->addChild(nextButton);
-    // rightPanel->addChild(lastButton);
-
     rightPanel1->addChild(texture);
     rightPanel1->addChild(label);
-    // 添加子面板到主面板
-    // mainPanel->addChild(leftPanel);
     mainPanel->addChild(rightPanel1);
-    // mainPanel->addChild(rightPanel);
- 
-    // printImagePath();
 
-    // 设置鼠标事件回调
     // 设置鼠标事件回调
     window.setMouseButtonCallback([mainPanel](int button, int action, int mods) {
         // 处理所有鼠标按键，不只是左键
@@ -559,8 +419,7 @@ int main() {
         mainPanel->handleEvent(event);
     });
     
-    // 在渲染前输出所有组件的位置和尺寸信息
-    // printAllComponentsInfo(mainPanel, leftPanel, rightPanel, label);
+
     
     // 主渲染循环
     auto lastTime = glfwGetTime();
@@ -573,13 +432,13 @@ int main() {
         auto currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
 
-        if (deltaTime < 1.0/30.0) {continue;}
-
+        if (deltaTime < 1.0/60.0) {continue;}
         lastTime = currentTime;
+
         window.pollEvents();
         // 更新动画系统
         UIAnimationManager::getInstance().update(deltaTime);
-        if (texture->isAnimating() || mainPanel->isAnimating() || rightPanel1->isAnimating()) {
+        if (UIAnimationManager::getInstance().getAnimationCount() > 0 || texture->isPaintValid()==false) {
            
             window.beginFrame();
             window.clearBackground(1.0f, 1.0f, 1.0f, 0.90f);

@@ -54,6 +54,7 @@ public:
     // 添加静态清理方法
     static void cleanupAll(NVGcontext* vg);
     void setPaintValid(bool valid) { m_paintValid = valid; }
+    bool isPaintValid(){ return m_paintValid;}
     // 事件回调函数类型定义
     using DragCallback = std::function<void(float deltaX, float deltaY)>;
     using ScrollCallback = std::function<void(float scrollX, float scrollY)>;

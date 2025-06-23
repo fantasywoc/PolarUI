@@ -7,10 +7,18 @@
 #include "UIWindow.h"
 #include <iostream>
 
-#ifdef _WIN32
+// 平台检测
+#if defined(_WIN32)
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 #include <windows.h>
+
+#elif defined(__linux__)
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
+#elif defined(__APPLE__)
+#include <CoreGraphics/CoreGraphics.h>
 #endif
 
 // 定义NanoVG OpenGL3实现宏并包含实现头文件
@@ -69,7 +77,7 @@ bool UIWindow::initialize() {
 
     // 配置窗口图标
     GLFWimage icon;
-    icon.pixels = stbi_load("src/icons/logo.png", &icon.width, &icon.height, nullptr, 4); // 强制 RGBA
+    icon.pixels = stbi_load("./logo.png", &icon.width, &icon.height, nullptr, 4); // 强制 RGBA
     if (icon.pixels) {
         glfwSetWindowIcon(window, 1, &icon); // 设置系统图标
         stbi_image_free(icon.pixels); // 立即释放内存
@@ -105,14 +113,17 @@ bool UIWindow::initialize() {
     }
     
     // 添加字体加载代码
-    int font = nvgCreateFont(vg, "default", "C:/Windows/Fonts/arial.ttf");
+    int font = nvgCreateFont(vg, "default", "./msyh.ttc");
     if (font == -1) {
+        std::cerr << "Warning: Failed to load  HarmonyOS_Sans_Regular font, text may not display properly" << std::endl;
         // 如果系统字体加载失败，尝试加载其他字体
-        font = nvgCreateFont(vg, "default", "C:/Windows/Fonts/calibri.ttf");
+        font = nvgCreateFont(vg, "default", "C:/Windows/Fonts/msyh.ttc");
         if (font == -1) {
             std::cerr << "Warning: Failed to load font, text may not display properly" << std::endl;
         }
     }
+
+    nvgFontFace(vg, "default");
 
     // 所有组件初始化成功
     initialized = true;

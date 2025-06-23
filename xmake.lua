@@ -94,7 +94,7 @@ target("vimag-demo")
         add_cxflags("/utf-8")
         add_links("opengl32", "gdi32", "user32", "kernel32")
     else
-        add_links("GL", "X11", "pthread", "Xrandr", "Xi", "dl")
+        add_links("GL", "X11", "pthread", "Xrandr", "Xi", "dl","m")
     end
     
     -- 设置运行目录
@@ -136,7 +136,7 @@ task("package")
     on_run(function()
         -- 检查可执行文件是否存在
         local exe_paths = {
-            "build/windows/x64/release/button-demo.exe",
+            "build/windows/x64/release/vimag-demo.exe",
             "button-demo.exe",
             "a.exe"
         }
@@ -175,15 +175,12 @@ task("package")
         for _, pattern in ipairs(dll_patterns) do
             local files = os.files(pattern)
             for _, file in ipairs(files) do
-                local dll_name = path.filename(file)
-                if not copied_dlls[dll_name] then
-                    os.cp(file, "dist")
-                    print("复制: " .. dll_name)
-                    copied_dlls[dll_name] = true
+                if os.isfile(file) then  -- 确保是文件不是目录
+                    -- 复制逻辑
                 end
             end
         end
-        
+            
         print("打包完成，分发文件在 dist 目录")
         print("可以将 dist 目录整体复制给其他用户")
     end)
