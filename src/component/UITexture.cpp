@@ -105,8 +105,8 @@ void UITexture::render(NVGcontext* vg) {
     nvgGlobalAlpha(vg, m_alpha * m_animationOpacity);
 
 
-    // 创建图像填充模式
-    NVGpaint imgPaint = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
+    // // 创建图像填充模式
+    // NVGpaint imgPaint = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
     if (!m_paintValid) {
         imgPaint_cache = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
         m_paintValid = true;

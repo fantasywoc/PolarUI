@@ -211,7 +211,7 @@ int main() {
     mainPanel->setSize(width,height);
     rightPanel1->setSize(width,height);
     
-    texture->setSize(width*0.8,height*0.8);
+    texture->setSize(width*0.9,height*0.9);
     texture->setOriginWidth(height*0.7);
     texture->setPaintValid(false);
     
@@ -425,14 +425,22 @@ int main() {
     auto lastTime = glfwGetTime();
     while (!window.shouldClose()) {
         
-        // 每帧获取当前窗口大小
-        int currentWidth, currentHeight;
-        window.getFramebufferSize(currentWidth, currentHeight);
         // 计算时间差
+        // 在初始化时设置垂直同步
+        glfwSwapInterval(1);  // 已经设置了
+        
+     
         auto currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
-
-        if (deltaTime < 1.0/60.0) {continue;}
+        
+        if (deltaTime < 1.0/30.0) {
+            // 计算需要休眠的时间（毫秒）
+            double sleepTime = (1.0/30.0 - deltaTime) * 1000;
+            if (sleepTime > 1) {  // 只在休眠时间大于1ms时才休眠
+                Sleep(static_cast<DWORD>(sleepTime - 1));  // 预留1ms的误差
+            }
+            continue;
+        }
         lastTime = currentTime;
 
         window.pollEvents();
@@ -444,7 +452,7 @@ int main() {
             window.clearBackground(1.0f, 1.0f, 1.0f, 0.90f);
             
             // 渲染主面板（会递归渲染所有子组件）
-            mainPanel->updateLayout();
+            // mainPanel->updateLayout();
             mainPanel->render(window.getNVGContext());
             // texture->render(window.getNVGContext());
             window.endFrame();
