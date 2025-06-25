@@ -33,7 +33,8 @@ bool getImageInfo(const std::string& filePath, int& w, int& h) {
     }
 
     // 动态计算头部大小（上限2KB）
-    const size_t headerSize = (fileSize > 2048) ? 2048 : static_cast<size_t>(fileSize);
+    // 修改headerSize的计算逻辑
+    const size_t headerSize = (fileSize > 51768) ? 51768 : static_cast<size_t>(fileSize); // 32KB覆盖99%的EXIF偏移
     file.seekg(0, std::ios::beg);
 
     // 读取头部数据到vector（自动内存管理）

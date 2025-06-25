@@ -52,7 +52,7 @@ void UITexture::render(NVGcontext* vg) {
     if (m_nvgImage == -1) {
         return;
     }
-    
+ 
 
     // 缩放变换（以中心为原点）#支持中心动画缩放   放在这个位置可以缩放整个texture
     if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
@@ -339,22 +339,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     }
     updateSize();
     setPaintValid(false);
-    // // 计算图片宽高比
-    // float imageAspect = (float)m_imageWidth / (float)m_imageHeight;
-    // // 计算当前容器宽高比
-    // float containerAspect = getWidth() / getHeight();
-    // // float newWidth = getOriginWidth() * imageAspect;
 
-    // if (imageAspect >= containerAspect) {
-    //     // 图片比容器更宽，以宽度为准调整高度
-    //     float newHeight = getOriginWidth() * imageAspect;
-    //     setSize(getOriginWidth(), newHeight);
-    // }else{
-    //     // 图片比容器更高，以高度为准调整宽度
-    //     float newWidth = getOriginHeight() / imageAspect;
-    //     setSize(newWidth, getOriginWidth());
-    // }
-    // setSize(newWidth, getOriginWidth());
 
     // 创建 NanoVG 图像
     m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);

@@ -184,7 +184,7 @@ int main() {
     
     // 创建右图像面板
     auto rightPanel1 = std::make_shared<UIPanel>(0, 0,  windowWidth, windowHeight);
-    rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 10.0f, 10.0f);
+    rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_START, 10.0f, 10.0f);
     rightPanel1->setBackgroundColor(nvgRGBA(255, 255, 255,200));
 
     // 获取图片文件
@@ -220,7 +220,7 @@ int main() {
 });
 
     // 添加标签到左面板 - 修改宽度为150px
-    auto label = std::make_shared<UILabel>(0, 0, 200, 30, "中文测试");
+    auto label = std::make_shared<UILabel>(0, 0, 200, 50, "VIMAG");
     label->setTextAlign(UILabel::TextAlign::CENTER);
     label->setFontSize(30.0f);
  
@@ -311,13 +311,13 @@ int main() {
         texture->setImagePath(window.getNVGContext(), imagPath);
         label->setText(image_exif);
 
-        // 图片信息
-        int imageWidth,imageHeight;
-        if(getImageInfo(imagPath,imageWidth,imageHeight)){
-            std::cout<< "图片信息：" << imagName << "  " << imageWidth << "x" << imageHeight <<std::endl;
-        }else{
-            std::cout<< "图片信息获取失败" << std::endl;
-        }
+        // // 图片信息
+        // int imageWidth,imageHeight;
+        // if(getImageInfo(imagPath,imageWidth,imageHeight)){
+        //     std::cout<< "图片信息：" << imagName << "  " << imageWidth << "x" << imageHeight <<std::endl;
+        // }else{
+        //     std::cout<< "图片信息获取失败" << std::endl;
+        // }
        
 
         mainPanel->setSize(currentWindowWidth,currentWindowHeight);
@@ -342,7 +342,7 @@ int main() {
             rightPanel1->moveTo(0 , 0, 0.2f);
 
   
-            // texture->setPaintValid(false);
+            texture->setPaintValid(false);
 
             // mainPanel->updateLayout();
             rightPanel1->updateLayout ();
@@ -365,9 +365,6 @@ int main() {
     texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
     texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
     texture->setPaintValid(false);
-
-
-
 
 
     // 启用所有事件
