@@ -118,10 +118,6 @@ void UITexture::render(NVGcontext* vg) {
     nvgFill(vg);
     
 
-
-
-
-
     nvgRestore(vg);
     
     // 绘制边框（如果设置了）
@@ -137,7 +133,23 @@ void UITexture::render(NVGcontext* vg) {
 void UITexture::update(double deltaTime) {
     // 纹理控件通常不需要更新逻辑
 }
-
+void UITexture::updateSize() {
+    // 纹理控件通常不需要更新逻辑
+    if (m_imageWidth > 0 && m_imageHeight > 0) {
+        float aspect = (float)m_imageWidth / (float)m_imageHeight;
+        
+        // 如果初始尺寸为0，则使用图像原始尺寸
+        if (m_OriginWidth <= 0 || m_OriginHeight <= 0) {
+            setSize(m_imageWidth, m_imageHeight);
+        } 
+        // 否则保持宽度或高度不变，按比例调整另一维度
+        else if (aspect >= 1.0f) { // 宽图
+            setSize(m_OriginWidth, m_OriginWidth / aspect);
+        } else { // 高图
+            setSize(m_OriginHeight * aspect, m_OriginHeight);
+        }
+    }
+}
 bool UITexture::handleEvent(const UIEvent& event) {
     if (!m_visible || !m_enabled) {
         return false;
@@ -258,7 +270,6 @@ bool UITexture::handleEvent(const UIEvent& event) {
                 handled = true;
             }
             break;
-            
         case UIEvent::KEY_PRESS:
             if (m_keyEventsEnabled && contains(m_lastMouseX, m_lastMouseY)) {
                 // 处理特定按键
@@ -309,8 +320,6 @@ bool UITexture::handleEvent(const UIEvent& event) {
 
 bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
 
-    
-
     if (!vg) {
         std::cerr << "NVGcontext is null, cannot load image" << std::endl;
         return false;
@@ -328,22 +337,25 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
         std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
         return false;
     }
-    
-    // 计算图片宽高比
-    float imageAspect = (float)m_imageWidth / (float)m_imageHeight;
-    // 计算当前容器宽高比
-    float containerAspect = getWidth() / getHeight();
-    float newWidth = getOriginWidth() * imageAspect;
-    setSize(newWidth, getOriginWidth());
-    // if (imageAspect >=1) {
+    updateSize();
+    setPaintValid(false);
+    // // 计算图片宽高比
+    // float imageAspect = (float)m_imageWidth / (float)m_imageHeight;
+    // // 计算当前容器宽高比
+    // float containerAspect = getWidth() / getHeight();
+    // // float newWidth = getOriginWidth() * imageAspect;
+
+    // if (imageAspect >= containerAspect) {
     //     // 图片比容器更宽，以宽度为准调整高度
-    //     float newHeight = getOriginWidth() / imageAspect;
+    //     float newHeight = getOriginWidth() * imageAspect;
     //     setSize(getOriginWidth(), newHeight);
-    // } else {
+    // }else{
     //     // 图片比容器更高，以高度为准调整宽度
-    //     float newWidth = getOriginWidth() * imageAspect;
+    //     float newWidth = getOriginHeight() / imageAspect;
     //     setSize(newWidth, getOriginWidth());
     // }
+    // setSize(newWidth, getOriginWidth());
+
     // 创建 NanoVG 图像
     m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
     
@@ -377,7 +389,9 @@ void UITexture::setImagePath(NVGcontext* vg, const std::string& imagePath) {
         // 设置新路径
         m_imagePath = imagePath;
         m_needsLoad = !imagePath.empty();
-        loadImage(vg,m_imagePath);
+        if (m_needsLoad) {
+            loadImage(vg, m_imagePath);
+        }
 
         m_paintValid = false; // 使缓存失效
     }
@@ -414,8 +428,11 @@ void UITexture::calculateRenderBounds(float& renderX, float& renderY,
     }
 }
 
-void UITexture::setOriginWidth(float OriginWidth) {
-    if(OriginWidth >0){
+void UITexture::setOriginSize(float OriginWidth, float OriginHeight) {
+    if(OriginWidth >0 && OriginHeight >0){
         m_OriginWidth = OriginWidth;
+        m_OriginHeight = OriginHeight;
+    }else if(OriginWidth >0){
+        std::cout << "OriginHeight must be greater than 0" << std::endl;
     }
 }

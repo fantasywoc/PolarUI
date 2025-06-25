@@ -11,6 +11,8 @@
 #include "animation/UIAnimationManager.h"
 #include "animation/UIAnimation.h"
 #include "TinyEXIF/EXIF.h"
+#include "utils/utils.h"
+
 #include <locale>
 #include <filesystem>
 
@@ -124,7 +126,20 @@ void removeZero(std::string& str) {
         }
     }
 }
-
+//格式化曝光时间
+std::string fomatExposureTime(double& exposureTime) {
+    std::string str;
+    if (exposureTime < 1.0f) {
+        exposureTime = 1/ exposureTime;
+        str = std::to_string(exposureTime);
+        removeZero(str);
+    }else{
+        str = std::to_string(exposureTime);
+        removeZero(str);
+        str += "s";
+    }
+    return str;
+}
 
 void printComponentInfo(const std::string& name, std::shared_ptr<UIComponent> component) {
     std::cout << name << ": Position(" << component->getX() << ", " << component->getY() 
@@ -154,24 +169,17 @@ int main() {
         std::cerr << "Failed to initialize window" << std::endl;
         return -1;
     }
-    // 方法1: 使用现有的帧缓冲区方法
-    int fbWidth, fbHeight ;
-    window.getFramebufferSize(fbWidth, fbHeight);
-    std::cout << "帧缓冲区大小: " << fbWidth << "x" << fbHeight << std::endl;
-    
- 
 
-
-    int centerX = fbWidth / 2.0f;
-    int centerY = fbHeight / 2.0f;
-    int windowWidth{1600},windowHeight{900};
+    int currentWindowWidth, currentWindowHeight;
+    window.getFramebufferSize(currentWindowWidth, currentWindowHeight);
+    int windowWidth{currentWindowWidth},windowHeight{currentWindowHeight};
     // 创建主面板
     auto mainPanel = std::make_shared<UIPanel>(0, 0, windowWidth, windowHeight);
     mainPanel->setHorizontalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 0.0f, 0.0f);
     mainPanel->setBackgroundColor(nvgRGBA(100, 200, 100, 10));
     mainPanel->setBorderColor(nvgRGBA(255, 255, 255,200));
-    mainPanel->setBorderWidth(1.0f);
-    mainPanel->setCornerRadius(10.0f);
+    mainPanel->setBorderWidth(0.0f);
+    mainPanel->setCornerRadius(0.0f);
 
     
     // 创建右图像面板
@@ -190,19 +198,13 @@ int main() {
     std::string imagPath =image_paths[current_index].generic_string();
     int change_speed = 0;
 
-
-
     // 先创建纹理组件
     // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
-    auto texture = std::make_shared<UITexture>(0, 0, windowHeight*0.7f, windowHeight*0.7, imagPath);
+    auto texture = std::make_shared<UITexture>(0, 0, windowHeight*0.9f, windowHeight*0.9, imagPath);
 
     texture->setScaleMode(UITexture::ScaleMode::KEEP_ASPECT);
     texture->setAlpha(1.0f);
     texture->setCornerRadius(10.0f);
-    // texture->setBorderColor(nvgRGBA(255, 255, 255, 100));
-    // texture->setBorderWidth(2.0f);
-
-
 
 // 方法2: 设置窗口大小变化监听
    window.setWindowSizeCallback([&,mainPanel,rightPanel1](int width, int height) {
@@ -210,16 +212,15 @@ int main() {
 
     mainPanel->setSize(width,height);
     rightPanel1->setSize(width,height);
-    
+
     texture->setSize(width*0.9,height*0.9);
-    texture->setOriginWidth(height*0.7);
+    texture->setOriginSize(width*0.9,height*0.9);
     texture->setPaintValid(false);
-    
+    mainPanel->updateLayout();
 });
 
-
     // 添加标签到左面板 - 修改宽度为150px
-    auto label = std::make_shared<UILabel>(0, 0, 200, 30, u8"中文测试");
+    auto label = std::make_shared<UILabel>(0, 0, 200, 30, "中文测试");
     label->setTextAlign(UILabel::TextAlign::CENTER);
     label->setFontSize(30.0f);
  
@@ -240,8 +241,7 @@ int main() {
         totalDeltaX += deltaX * 2 ;
         totalDeltaY += deltaY * 2;
         
-        // texture->moveTo(initialX + totalDeltaX, initialY + totalDeltaY, 0.0f);
-        // UIAnimationManager::getInstance().moveTo(texture.get(), initialX + totalDeltaX, initialY + totalDeltaY, 0.0f, UIAnimation::EASE_OUT);
+    
         // mainPanel->updateLayout();
         rightPanel1->moveTo(totalDeltaX , totalDeltaY, 0.2f);
         // mainPanel->updateLayout();
@@ -254,16 +254,16 @@ int main() {
         scalex += scrollY*0.15;
         scaley += scrollY*0.15; 
         std::cout << "缩放: (" << scalex << ", " << scaley << ")" << std::endl;
-        if (scalex >= 10.0f) {
+        if (scalex >= 13.0f) {
 
-            scalex = 10.0f;
-            scaley = 10.0f; 
+            scalex = 13.0f;
+            scaley = 13.0f; 
         }
         else if (scalex <= 0.2f) {
             scalex = 0.2f;
             scaley = 0.2f; 
         }
-
+       
         UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
 
     });
@@ -297,28 +297,55 @@ int main() {
         // 图片信息获取
         imagPath =image_paths[current_index].generic_string();
         
+
         EXIF exif(imagPath);
         TinyEXIF::EXIFInfo info = exif.getInfo();
         std::string Fnumber = std::to_string(info.FNumber);
         std::cout<< "Fnumber =" << Fnumber <<std::endl;
         removeZero(Fnumber);
         std::cout<< "Fnumber =" << Fnumber <<std::endl;
-        std::string image_exif = info.Make + "  光圈 f/" + Fnumber + "     1/" + std::to_string(1/info.ExposureTime) + "S     ISO" + std::to_string(info.ISOSpeedRatings);
+        std::string image_exif = info.Make + "   f/" + Fnumber + "     1/" + fomatExposureTime(info.ExposureTime) + "    ISO" + std::to_string(info.ISOSpeedRatings);
         std::cout<<image_exif <<std::endl;
         std::string imagName;
         imagName = image_names[current_index];
         texture->setImagePath(window.getNVGContext(), imagPath);
         label->setText(image_exif);
 
+        // 图片信息
+        int imageWidth,imageHeight;
+        if(getImageInfo(imagPath,imageWidth,imageHeight)){
+            std::cout<< "图片信息：" << imagName << "  " << imageWidth << "x" << imageHeight <<std::endl;
+        }else{
+            std::cout<< "图片信息获取失败" << std::endl;
+        }
+       
+
+        mainPanel->setSize(currentWindowWidth,currentWindowHeight);
+        rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
+    
+        texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+        texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+        texture->setPaintValid(false);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
         
     });
 
     // 设置双击回调
-    texture->setOnDoubleClick([](int mouseButton) {
+    texture->setOnDoubleClick([&,texture](int mouseButton) {
         if (mouseButton == 0) {
             std::cout << "左键双击" << std::endl;
+            scalex = 1.0f;
+            scaley = 1.0f; 
+            UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
+            
+            rightPanel1->moveTo(0 , 0, 0.2f);
+
+  
+            // texture->setPaintValid(false);
+
+            // mainPanel->updateLayout();
+            rightPanel1->updateLayout ();
         } else if (mouseButton == 1) {
             std::cout << "右键双击" << std::endl;
         }
@@ -327,15 +354,21 @@ int main() {
     // 设置中键点击回调
     texture->setOnMiddleClick([&,texture](float mouseX, float mouseY) {
         std::cout << "Middle mouse button clicked at (" << mouseX << ", " << mouseY << ")" << std::endl;
-        scalex = 1.0f;
-        scaley = 1.0f; 
-        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
-        
-        rightPanel1->moveTo(0 , 0, 0.2f);
-        // mainPanel->updateLayout();
-        rightPanel1->updateLayout ();
+ 
     
     });
+
+
+    mainPanel->setSize(currentWindowWidth,currentWindowHeight);
+    rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
+
+    texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+    texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+    texture->setPaintValid(false);
+
+
+
+
 
     // 启用所有事件
     texture->setDragEnabled(true);
@@ -419,7 +452,7 @@ int main() {
         mainPanel->handleEvent(event);
     });
     
-
+    mainPanel->updateLayout();
     
     // 主渲染循环
     auto lastTime = glfwGetTime();
@@ -428,8 +461,9 @@ int main() {
         // 计算时间差
         // 在初始化时设置垂直同步
         glfwSwapInterval(1);  // 已经设置了
-        
-     
+
+        window.getFramebufferSize(currentWindowWidth, currentWindowHeight);
+        // std::cout << "窗口大小: " << currentWindowWidth << "x" << currentWindowHeight << std::endl;
         auto currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
         
@@ -452,7 +486,7 @@ int main() {
             window.clearBackground(1.0f, 1.0f, 1.0f, 0.90f);
             
             // 渲染主面板（会递归渲染所有子组件）
-            // mainPanel->updateLayout();
+            mainPanel->updateLayout();
             mainPanel->render(window.getNVGContext());
             // texture->render(window.getNVGContext());
             window.endFrame();

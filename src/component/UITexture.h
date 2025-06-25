@@ -27,7 +27,8 @@ public:
     void setImagePath(const std::string& imagePath);
     const std::string& getImagePath() const { return m_imagePath; }
     float getOriginWidth() { return m_OriginWidth; }
-    void setOriginWidth(float OriginWidth);
+    float getOriginHeight() { return m_OriginHeight; }
+    void setOriginSize(float OriginWidth, float OriginHeight);
     
     // 显示模式
     enum class ScaleMode {
@@ -81,7 +82,7 @@ public:
     
     // 获取拖拽状态
     bool isDragging() const { return m_isDragging; }
-    
+    void updateSize();
 private:
     // 基础纹理属性
     std::string m_imagePath;
@@ -91,7 +92,8 @@ private:
     ScaleMode m_scaleMode;
     float m_alpha;
     bool m_needsLoad;        // 添加标志位
-    int m_OriginWidth ;   // 添加默认值，防止窗口切换图片导致texture控件无限缩小
+    int m_OriginWidth ;   // 防止窗口切换图片导致texture控件无限缩小
+    int m_OriginHeight ;  // 防止窗口切换图片导致texture控件无限缩小
     bool m_mousePressed = false;  // 鼠标是否按下但未开始拖拽
 
     NVGpaint imgPaint_cache = {};  //NG图像缓存
