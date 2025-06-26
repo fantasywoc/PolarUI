@@ -10,6 +10,12 @@
 namespace fs = std::filesystem;
 
 
+// 检查是否是支持的图像文件
+static const std::set<std::string> imageExtensions = {
+    ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff", ".webp"
+};
+
+
 bool getImageInfo(const std::string& filePath, int& w, int& h) {
     int channels;
     // 检查文件是否存在
@@ -67,11 +73,6 @@ void find_image_files(
     image_paths.clear();
     image_names.clear();
 
-    // 支持的图片扩展名（统一小写）
-    static const std::set<std::string> image_extensions = {
-        ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff", ".webp"
-    };
-
     // 验证目录有效性 
     if (!fs::exists(directory)) {
         std::cerr << "错误：路径不存在 - " << directory << std::endl;
@@ -100,7 +101,7 @@ void find_image_files(
                                   [](unsigned char c) { return std::tolower(c); });
                     
                     // 检查是否为图片格式 
-                    if (image_extensions.find(ext) != image_extensions.end()) {
+                    if (imageExtensions.find(ext) != imageExtensions.end()) {
                         image_paths.push_back(entry.path());
                         image_names.push_back(entry.path().filename().string());
                     }
@@ -160,4 +161,40 @@ std::string fomatExposureTime(double& exposureTime) {
         str += "s";
     }
     return str;
+}
+
+
+bool isFile(const std::string& path) {
+    try {
+        return fs::is_regular_file(path);
+    } catch (...) {
+        return false;
+    }
+}
+
+bool isDirectory(const std::string& path) {
+    try {
+        return fs::is_directory(path);
+    } catch (...) {
+        return false;
+    }
+}
+
+std::string getDirectoryFromPath(const std::string& path) {
+    try {
+        if (fs::is_directory(path)) {
+            return path;
+        }
+
+        std::string ext = fs::path(path).extension().string();
+        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+        
+        if (imageExtensions.count(ext) > 0) {
+            return fs::path(path).parent_path().string();
+        }
+        
+        return path; // 如果不是图像文件，返回原路径
+    } catch (...) {
+        return path; // 异常情况下返回原路径
+    }
 }

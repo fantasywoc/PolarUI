@@ -7,6 +7,10 @@ add_requires("glfw 3.3.8", {configs = {shared = true}})
 add_requires("nanovg", {configs = {shared = true}})
 add_requires("glew", {configs = {shared = true}})
 
+-- add_requires("glfw 3.3.8", {configs = {shared = false, runtimes = "MT"}})
+-- add_requires("nanovg", {configs = {shared = false, runtimes = "MT"}})
+-- add_requires("glew", {configs = {shared = false, runtimes = "MT"}})
+
 target("ui")
     set_kind("static")
     add_files("src/UIWindow.cpp")

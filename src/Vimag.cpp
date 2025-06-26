@@ -38,7 +38,24 @@ namespace fs = std::filesystem;
 namespace fs = std::filesystem;
 
 
-int main() {
+int main(int argc, char** argv) {
+
+    // 获取图片文件
+    fs::path directory = "D:/Picture/Saved Pictures/";
+
+    if(argc >1) {
+        std::string filePath = argv[1];
+        if(isDirectory(filePath)){
+            directory = filePath;
+        }
+        std::cout << "Received file path: " << filePath << std::endl;
+        
+        // 这里可以添加文件处理逻辑
+        // 例如: loadAndDisplayImage(filePath);
+    } else {
+        std::cout << "Usage: " << argv[0] << " <file_path>" << std::endl;
+    }
+
 
     #ifdef _WIN32
         // Windows专用代码
@@ -78,8 +95,7 @@ int main() {
     rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_START, 10.0f, 10.0f);
     rightPanel1->setBackgroundColor(nvgRGBA(255, 255, 255,200));
 
-    // 获取图片文件
-    const fs::path directory = "D:/Picture/Saved Pictures/";
+
     std::vector<fs::path> image_paths;
     std::vector<std::string> image_names;
     find_image_files(directory,image_paths,image_names);
@@ -151,8 +167,8 @@ int main() {
             scaley = 13.0f; 
         }
         else if (scalex <= 0.2f) {
-            scalex = 0.2f;
-            scaley = 0.2f; 
+            scalex = 0.3f;
+            scaley = 0.3f; 
         }
        
         UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
