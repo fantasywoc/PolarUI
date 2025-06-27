@@ -46,16 +46,9 @@ int main(int argc, char** argv) {
     size_t current_index = 0;
     if(argc >1) {
         std::string filePath = argv[1];
-        // 默认处理
-        if(isDirectory(filePath)){
-            directory = filePath;
-            find_image_files(directory,image_paths,image_names);
-        }else if(isFile(filePath)){
-            directory = getDirectoryFromPath(filePath);
-            std::cout << "Received file path: " << filePath << std::endl;
-            find_image_files(directory,image_paths,image_names);
-            current_index = findPathIndex(image_paths,filePath );
-        } 
+      
+        getImages(filePath,directory,image_paths,image_names,current_index);
+
         std::cout << "Received file path: " << filePath << std::endl;
         
     } else {
@@ -105,7 +98,7 @@ int main(int argc, char** argv) {
 
     // 先创建纹理组件
     // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
-    auto texture = std::make_shared<UITexture>(0, 0, windowHeight*0.9f, windowHeight*0.9, imagPath);
+    auto texture = std::make_shared<UITexture>(0, 0, windowWidth*0.9f, windowHeight*0.9, imagPath);
 
     texture->setScaleMode(UITexture::ScaleMode::KEEP_ASPECT);
     texture->setAlpha(1.0f);
@@ -259,18 +252,8 @@ int main(int argc, char** argv) {
     // 设置中键点击回调
     texture->setOnMiddleClick([&,texture](float mouseX, float mouseY) {
         std::cout << "Middle mouse button clicked at (" << mouseX << ", " << mouseY << ")" << std::endl;
- 
-    
+
     });
-
-
-    mainPanel->setSize(currentWindowWidth,currentWindowHeight);
-    rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
-
-    texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
-    texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
-    texture->setPaintValid(false);
-
 
     // 启用所有事件
     texture->setDragEnabled(true);
@@ -364,7 +347,9 @@ int main(int argc, char** argv) {
     });
     
 
-    
+    // 创建定时器实例
+    OneTimeTimer timer;
+    timer.start(2);
     // 主渲染循环
     const double targetFrameTime = 1.0 / 60.0;
     auto lastTime = glfwGetTime();
@@ -375,6 +360,14 @@ int main(int argc, char** argv) {
         glfwSwapInterval(1);  // 已经设置了
 
         window.getFramebufferSize(currentWindowWidth, currentWindowHeight);
+        if(timer.check()){
+            mainPanel->setSize(currentWindowWidth,currentWindowHeight);
+            rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
+        
+            texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+            texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+            texture->setPaintValid(false);
+        }
 
         // std::cout << "窗口大小: " << currentWindowWidth << "x" << currentWindowHeight << std::endl;
         auto currentTime = glfwGetTime();
@@ -393,8 +386,7 @@ int main(int argc, char** argv) {
         window.pollEvents();
         // 更新动画系统
         UIAnimationManager::getInstance().update(deltaTime);
-        if (UIAnimationManager::getInstance().getAnimationCount() > 0 || texture->isPaintValid()==false) {
-           
+        if (UIAnimationManager::getInstance().getAnimationCount() > 0 || texture->isPaintValid()== false ) {
             window.beginFrame();
             window.clearBackground(1.0f, 1.0f, 1.0f, 0.90f);
             

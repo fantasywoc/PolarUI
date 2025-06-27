@@ -210,3 +210,72 @@ std::string getDirectoryFromPath(const std::string& path) {
         return path; // 异常情况下返回原路径
     }
 }
+
+
+
+void getImages( const std::string& filePath,fs::path& directory,std::vector<fs::path>& image_paths, std::vector<std::string>& image_names,size_t& current_index ){
+    if(isDirectory(filePath)){
+        directory = filePath;
+        find_image_files(directory,image_paths,image_names);
+    }else if(isFile(filePath)){
+        directory = getDirectoryFromPath(filePath);
+        std::cout << "Received file path: " << filePath << std::endl;
+        find_image_files(directory,image_paths,image_names);
+        current_index = findPathIndex(image_paths,filePath );
+    } 
+}
+
+
+class OneTimeTimer {
+private:
+    std::chrono::steady_clock::time_point start_time;
+    std::chrono::seconds duration;
+    bool is_running;
+
+public:
+    // 构造函数，初始化时不启动定时器
+    OneTimeTimer() : is_running(false) {}
+
+    // 启动定时器，设置持续时间（秒）
+    bool start(int seconds) {
+        if (is_running) return false;
+        
+        duration = std::chrono::seconds(seconds);
+        start_time = std::chrono::steady_clock::now();
+        is_running = true;
+        return true;
+    }
+
+    // 检查定时器状态
+    // 返回true表示定时器正在运行，false表示定时器已结束
+    bool check() {
+        if (!is_running) return false;
+
+        auto current_time = std::chrono::steady_clock::now();
+        auto elapsed = current_time - start_time;
+
+        if (elapsed >= duration) {
+            is_running = false;
+            return false;
+        }
+        return true;
+    }
+
+    // 手动停止定时器
+    void stop() {
+        is_running = false;
+    }
+
+    // 获取剩余时间（秒）
+    double getRemainingTime() {
+        if (!is_running) return 0.0;
+
+        auto current_time = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
+        auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(duration) - elapsed;
+
+        return remaining.count() / 1000.0;
+    }
+};
+
+
