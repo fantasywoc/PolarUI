@@ -3,8 +3,6 @@
 #include "component/UIButton.h"
 #include "component/UILabel.h"
 #include "component/FlexLayout.h"
-#include <iostream>
-#include <memory>
 #include "component/UITexture.h"
 #include "component/UITextInput.h"
 // 添加动画系统头文件
@@ -12,21 +10,15 @@
 #include "animation/UIAnimation.h"
 #include "TinyEXIF/EXIF.h"
 #include "utils/utils.h"
-
+#include <iostream>
 #include <locale>
 #include <filesystem>
-
+#include <memory>
 #include <vector>
 #include <algorithm>
 #include <set>
 
 namespace fs = std::filesystem;
-
-#include <filesystem>
-#include <vector>
-#include <set>
-#include <algorithm>
-#include <iostream>
 
 
 #ifdef _WIN32
@@ -39,30 +31,46 @@ namespace fs = std::filesystem;
 
 
 int main(int argc, char** argv) {
-
-    // 获取图片文件
-    fs::path directory = "D:/Picture/Saved Pictures/";
-
-    if(argc >1) {
-        std::string filePath = argv[1];
-        if(isDirectory(filePath)){
-            directory = filePath;
-        }
-        std::cout << "Received file path: " << filePath << std::endl;
-        
-        // 这里可以添加文件处理逻辑
-        // 例如: loadAndDisplayImage(filePath);
-    } else {
-        std::cout << "Usage: " << argv[0] << " <file_path>" << std::endl;
-    }
-
-
+    // FreeConsole();  //关闭控制台
     #ifdef _WIN32
         // Windows专用代码
         SetConsoleOutputCP(CP_UTF8);
         SetConsoleCP(CP_UTF8);
         std::cout << "windos UTF-8" << std::endl;
     #endif
+
+    // 获取图片文件
+    fs::path directory = "./";
+    std::vector<fs::path> image_paths;
+    std::vector<std::string> image_names;
+    size_t current_index = 0;
+    if(argc >1) {
+        std::string filePath = argv[1];
+        // 默认处理
+        if(isDirectory(filePath)){
+            directory = filePath;
+            find_image_files(directory,image_paths,image_names);
+        }else if(isFile(filePath)){
+            directory = getDirectoryFromPath(filePath);
+            std::cout << "Received file path: " << filePath << std::endl;
+            find_image_files(directory,image_paths,image_names);
+            current_index = findPathIndex(image_paths,filePath );
+        } 
+        std::cout << "Received file path: " << filePath << std::endl;
+        
+    } else {
+        std::cout << "Usage: " << argv[0] << " <file_path>" << std::endl;
+    }
+    if (image_paths.empty()) {
+        image_paths.push_back("Vimag.png");
+        current_index = 0;
+    }
+
+    size_t limit_index = image_paths.size(); 
+    std::string imagPath = image_paths[current_index].generic_string();
+    int change_speed = 3;
+
+    
 
     // 在现有代码中添加
     UIWindow window(1600, 900, "Button Demo with Animations");
@@ -95,16 +103,6 @@ int main(int argc, char** argv) {
     rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_START, 10.0f, 10.0f);
     rightPanel1->setBackgroundColor(nvgRGBA(255, 255, 255,200));
 
-
-    std::vector<fs::path> image_paths;
-    std::vector<std::string> image_names;
-    find_image_files(directory,image_paths,image_names);
-
-    int current_index =15;
-    size_t limit_index =image_paths.size(); 
-    std::string imagPath =image_paths[current_index].generic_string();
-    int change_speed = 0;
-
     // 先创建纹理组件
     // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
     auto texture = std::make_shared<UITexture>(0, 0, windowHeight*0.9f, windowHeight*0.9, imagPath);
@@ -125,7 +123,7 @@ int main(int argc, char** argv) {
     texture->setPaintValid(false);
     mainPanel->updateLayout();
 });
-
+   
     // 添加标签到左面板 - 修改宽度为150px
     auto label = std::make_shared<UILabel>(0, 0, 200, 50, "VIMAG");
     label->setTextAlign(UILabel::TextAlign::CENTER);
@@ -285,6 +283,15 @@ int main(int argc, char** argv) {
     rightPanel1->addChild(label);
     mainPanel->addChild(rightPanel1);
 
+
+    window.setDropCallback([&, mainPanel, rightPanel1](int count, const char** paths) {
+        std::cout << "Drop event: " << count << " files dropped" << std::endl;
+        for (int i = 0; i < count; ++i) {
+            std::cout << "File path: " << paths[i] << std::endl;
+        }
+    });
+
+
     // 设置鼠标事件回调
     window.setMouseButtonCallback([mainPanel](int button, int action, int mods) {
         // 处理所有鼠标按键，不只是左键
@@ -356,9 +363,10 @@ int main(int argc, char** argv) {
         mainPanel->handleEvent(event);
     });
     
-    mainPanel->updateLayout();
+
     
     // 主渲染循环
+    const double targetFrameTime = 1.0 / 60.0;
     auto lastTime = glfwGetTime();
     while (!window.shouldClose()) {
         
@@ -367,13 +375,14 @@ int main(int argc, char** argv) {
         glfwSwapInterval(1);  // 已经设置了
 
         window.getFramebufferSize(currentWindowWidth, currentWindowHeight);
+
         // std::cout << "窗口大小: " << currentWindowWidth << "x" << currentWindowHeight << std::endl;
         auto currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
         
-        if (deltaTime < 1.0/60.0) {
+        if (deltaTime < targetFrameTime) {
             // 计算需要休眠的时间（毫秒）
-            double sleepTime = (1.0/60.0 - deltaTime) * 1000;
+            double sleepTime = (targetFrameTime - deltaTime) * 1000;
             if (sleepTime > 1) {  // 只在休眠时间大于1ms时才休眠
                 Sleep(static_cast<DWORD>(sleepTime - 1));  // 预留1ms的误差
             }

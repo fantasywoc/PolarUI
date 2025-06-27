@@ -51,6 +51,21 @@ UIWindow::~UIWindow() {
  * @return bool 成功返回true，失败返回false
  * @description 按顺序初始化GLFW、创建窗口、初始化GLEW和NanoVG
  */
+void UIWindow::setDropCallback(std::function<void(int, const char**)> callback) {
+    dropCallback = callback;
+    if (window) {
+        glfwSetDropCallback(window, dropCallbackWrapper);
+    }
+}
+
+void UIWindow::dropCallbackWrapper(GLFWwindow* window, int count, const char** paths) {
+    UIWindow* self = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
+    if (self && self->dropCallback) {
+        self->dropCallback(count, paths);
+    }
+}
+
+// 在initialize()方法中添加
 bool UIWindow::initialize() {
     // 防止重复初始化
     if (initialized) return true;
@@ -90,8 +105,10 @@ bool UIWindow::initialize() {
     // 在glfwMakeContextCurrent之后添加
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // 启用垂直同步
-    
-    // 第五步：设置用户指针，用于在静态回调函数中访问UIWindow实例
+    // 在glfwMakeContextCurrent(window)之后添加
+    if (dropCallback) {
+        glfwSetDropCallback(window, dropCallbackWrapper);
+    }
     glfwSetWindowUserPointer(window, this);
 
     // 第六步：初始化GLEW（OpenGL扩展加载库）

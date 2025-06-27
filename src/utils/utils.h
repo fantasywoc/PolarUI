@@ -126,6 +126,18 @@ void find_image_files(
     }
 }
 
+size_t findPathIndex(const std::vector<fs::path>& paths, const fs::path& target) 
+{
+    auto it = std::find(paths.begin(), paths.end(), target);
+    if (it != paths.end()) {
+        return std::distance(paths.begin(), it); // 返回索引
+    }
+    return static_cast<size_t>(-1); // 未找到时返回无效索引
+}
+
+
+
+
 void removeZero(std::string& str) {
     if (str.empty()) return;
 

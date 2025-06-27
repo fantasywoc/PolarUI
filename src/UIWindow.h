@@ -206,6 +206,12 @@ public:
      */
     void setScrollCallback(std::function<void(double, double)> callback);
 
+    /**
+     * @brief 设置文件拖拽回调函数
+     * @param callback 回调函数，参数为(pathCount, paths)
+     */
+    void setDropCallback(std::function<void(int, const char**)> callback);
+
 private:
     // ==================== 私有成员变量 ====================
     
@@ -214,7 +220,9 @@ private:
     int windowWidth, windowHeight; ///< 窗口尺寸
     std::string windowTitle;     ///< 窗口标题
     bool initialized;            ///< 初始化状态标志
-
+    std::function<void(int, const char**)> dropCallback;
+    static void dropCallbackWrapper(GLFWwindow* window, int count, const char** paths);
+    
     // ==================== 回调函数存储 ====================
     
     std::function<void(int, int, int, int)> keyCallback;        ///< 键盘事件回调
