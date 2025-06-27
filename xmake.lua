@@ -50,42 +50,12 @@ target("button-demo")
     
     add_cxxflags("/EHsc")
 
--- 剪切板演示程序
-target("clipboard-demo")
-    set_kind("binary")
-    add_files("src/clipboard_demo.cpp")
-    add_deps("ui")
-    add_packages("glfw", "nanovg", "glew")
-    
-    -- 添加头文件搜索路径
-    add_includedirs("src", "src/component", "src/widget", "src/animation", "src/TinyEXIF")  -- 添加动画系统头文件路径
-
-    
-    -- 添加编码选项
-    if is_plat("windows") then
-        add_cxflags("/utf-8")
-        add_links("opengl32", "gdi32", "user32", "kernel32")
-    else
-        add_links("GL", "X11", "pthread", "Xrandr", "Xi", "dl")
-    end
-    
-    -- 设置运行目录
-    set_rundir("$(projectdir)")
-    
-    -- 添加调试信息
-    if is_mode("debug") then
-        set_symbols("debug")
-        set_optimize("none")
-        add_defines("DEBUG")
-    else
-        set_optimize("fast")
-    end
-    
-    add_cxxflags("/EHsc")
 
 -- 图片查看器演示程序
 target("vimag-demo")
     set_kind("binary")
+ -- 正确设置 RPATH：优先搜索程序同目录
+    add_rpathdirs("$ORIGIN")
     add_files("src/Vimag.cpp","src/TinyEXIF/TinyEXIF.cpp")
     add_deps("ui")
     add_packages("glfw", "nanovg", "glew")
@@ -174,7 +144,11 @@ task("package")
             "**/*glew*.dll",
             "**/*nanovg*.dll"
         }
-        
+	
+  	 -- 复制可执行文件
+        os.cp("build/linux/x86_64/release/button-demo", "dist/")
+ 	 -- 使用find命令复制所有.so库
+        os.exec("find build/ -name '*.so*' -exec cp -t dist/ {} +")
         local copied_dlls = {}
         for _, pattern in ipairs(dll_patterns) do
             local files = os.files(pattern)

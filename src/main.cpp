@@ -12,9 +12,11 @@
 #include "animation/UIAnimation.h"
 
 #include <locale>
-#include <windows.h>  // 添加这行
-#include <io.h>       // 添加这行
-#include <fcntl.h>    // 添加这行
+#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+#include <fcntl.h>
+#endif
 
 void printComponentInfo(const std::string& name, std::shared_ptr<UIComponent> component) {
     std::cout << name << ": Position(" << component->getX() << ", " << component->getY() 
@@ -47,9 +49,13 @@ void printAllComponentsInfo(std::shared_ptr<UIPanel> mainPanel,
 
 int main() {
 
-    // 设置控制台输出为UTF-8
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
+    // FreeConsole();  //关闭控制台
+    #ifdef _WIN32
+        // Windows专用代码
+        SetConsoleOutputCP(CP_UTF8);
+        SetConsoleCP(CP_UTF8);
+        std::cout << "windos UTF-8" << std::endl;
+    #endif
 
     UIWindow window(1300, 900, "Button Demo with Animations");
     

@@ -21,17 +21,23 @@
 namespace fs = std::filesystem;
 
 
-#ifdef _WIN32
-#include <windows.h>
-#include <io.h>
-#include <fcntl.h>
+#if defined(_WIN32)
+    #include <windows.h>
+    #include <io.h>
+    #include <fcntl.h>
+#elif defined(__APPLE__) || defined(__unix__) || defined(__linux__)
+    #include <unistd.h>
+    #include <cstdint>
+
 #endif
+
+
 
 namespace fs = std::filesystem;
 
 
 int main(int argc, char** argv) {
-    // FreeConsole();  //关闭控制台
+    //FreeConsole();  //关闭控制台
     #ifdef _WIN32
         // Windows专用代码
         SetConsoleOutputCP(CP_UTF8);
@@ -377,7 +383,13 @@ int main(int argc, char** argv) {
             // 计算需要休眠的时间（毫秒）
             double sleepTime = (targetFrameTime - deltaTime) * 1000;
             if (sleepTime > 1) {  // 只在休眠时间大于1ms时才休眠
-                Sleep(static_cast<DWORD>(sleepTime - 1));  // 预留1ms的误差
+                //Sleep(static_cast<DWORD>(sleepTime - 1));  // 预留1ms的误差
+		// 修改386行代码：
+		#ifdef _WIN32
+		    Sleep(static_cast<DWORD>(sleepTime - 1));
+		#else
+		    usleep((sleepTime - 1) * 1000); // 毫秒转微秒
+		#endif
             }
             continue;
         }
