@@ -67,12 +67,12 @@ int main(int argc, char** argv) {
 
     size_t limit_index = image_paths.size(); 
     std::string imagPath = image_paths[current_index].generic_string();
-    int change_speed = 3;
+    int change_speed = 0;
 
     
 
     // 在现有代码中添加
-    UIWindow window(1600, 900, "Button Demo with Animations");
+    UIWindow window(1600, 900, "VIMAG");
     
     // 启用动态标题栏功能
     window.enableDynamicTitleBar(true, 15.0); // 鼠标距离顶部15像素时显示
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 });
    
     // 添加标签到左面板 - 修改宽度为150px
-    auto label = std::make_shared<UILabel>(0, 0, 200, 50, "VIMAG");
+    auto label = std::make_shared<UILabel>(0, 0, 200, 50, " ");
     label->setTextAlign(UILabel::TextAlign::CENTER);
     label->setFontSize(30.0f);
  
@@ -142,12 +142,12 @@ int main(int argc, char** argv) {
     texture->setOnDrag([&,rightPanel1,texture](float deltaX, float deltaY) {
         std::cout << "拖拽偏移: (" << deltaX << ", " << deltaY << ")" << std::endl;
         
-        totalDeltaX += deltaX * 2 ;
-        totalDeltaY += deltaY * 2;
+        totalDeltaX += deltaX * 1.5 ;
+        totalDeltaY += deltaY * 1.5;
         
     
         // mainPanel->updateLayout();
-        rightPanel1->moveTo(totalDeltaX , totalDeltaY, 0.2f);
+        rightPanel1->moveTo(totalDeltaX , totalDeltaY, 0.1f);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
     });
@@ -357,7 +357,7 @@ int main(int argc, char** argv) {
     OneTimeTimer timer;
     timer.start(2);
     // 主渲染循环
-    const double targetFrameTime = 1.0 / 60.0;
+    const double targetFrameTime = 1.0 / 120.0;
     auto lastTime = glfwGetTime();
     while (!window.shouldClose()) {
         

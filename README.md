@@ -13,7 +13,9 @@
 编译
 xmake 
 xmake run botton-demo
-xmake package  #打包库文件
+
+xmake build vimag-demo   # 先编译
+xmake pack dist_package  # 执行打包
 
 ## UIWindow 类的主要功能
 

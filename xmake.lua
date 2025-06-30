@@ -1,69 +1,74 @@
-add_rules("mode.debug", "mode.release")
-set_project("LiteUI")
-set_languages("c++17")
-set_version("1.0.0")
+-- -- 全局配置
+-- set_policy("package.install_locally", true) -- 强制将依赖库复制到输出目录
+-- set_policy("build.merge_archive", true)    -- 合并静态库依赖
 
+-- 设置项目基本信息
+add_rules("mode.debug", "mode.release")    -- 添加调试和发布模式
+set_project("LiteUI")                      -- 设置项目名称
+set_languages("c++17")                    -- 设置 C++ 标准
+set_version("1.0.0")                      -- 设置版本号
+
+includes("@builtin/xpack")  -- 引入XPack模块
+
+
+-- 添加第三方库依赖
+-- shared = true 表示使用动态链接库
 add_requires("glfw 3.3.8", {configs = {shared = true}})
 add_requires("nanovg", {configs = {shared = true}})
 add_requires("glew", {configs = {shared = true}})
 
--- add_requires("glfw 3.3.8", {configs = {shared = false, runtimes = "MT"}})
--- add_requires("nanovg", {configs = {shared = false, runtimes = "MT"}})
--- add_requires("glew", {configs = {shared = false, runtimes = "MT"}})
-
+-- 定义 UI 静态库目标
 target("ui")
-    set_kind("static")
-    add_files("src/UIWindow.cpp")
-    add_files("src/component/*.cpp")
-    add_files("src/animation/*.cpp")  -- 添加动画系统源文件
-    add_includedirs("src", "src/component", "src/animation")  -- 添加动画系统头文件路径
-    add_packages("glfw", "nanovg", "glew")
+    set_kind("static")                     -- 设置为静态库
+    add_files("src/UIWindow.cpp")         -- 添加窗口相关源文件
+    add_files("src/component/*.cpp")      -- 添加所有组件源文件
+    add_files("src/animation/*.cpp")      -- 添加动画系统源文件
+    add_includedirs("src", "src/component", "src/animation")  -- 添加头文件搜索路径
+    add_packages("glfw", "nanovg", "glew") -- 添加依赖包
 
+-- 定义按钮演示程序目标
 target("button-demo")
-    set_kind("binary")
-    add_files("src/main.cpp")
-    add_deps("ui")
-    add_packages("glfw", "nanovg", "glew")
+    set_kind("binary")                     -- 设置为可执行文件
+    add_files("src/main.cpp")             -- 添加主程序源文件
+    add_deps("ui")                         -- 添加对 UI 库的依赖
+    add_packages("glfw", "nanovg", "glew") -- 添加第三方依赖包
     
     -- 添加头文件搜索路径
-    add_includedirs("src", "src/component", "src/widget", "src/animation")  -- 添加动画系统头文件路径
+    add_includedirs("src", "src/component", "src/widget", "src/animation")
     
-    -- 添加编码选项
+    -- 根据平台添加不同的编译选项和链接库
     if is_plat("windows") then
-        add_cxflags("/utf-8")
-        add_links("opengl32", "gdi32", "user32", "kernel32")
+        add_cxflags("/utf-8")             -- Windows 下启用 UTF-8 编码
+        add_links("opengl32", "gdi32", "user32", "kernel32")  -- Windows 系统库
     else
-        add_links("GL", "X11", "pthread", "Xrandr", "Xi", "dl")
+        add_links("GL", "X11", "pthread", "Xrandr", "Xi", "dl")  -- Linux 系统库
     end
     
-    -- 设置运行目录
-    set_rundir("$(projectdir)")
+    set_rundir("$(projectdir)")           -- 设置运行目录为项目根目录
     
-    -- 添加调试信息
+    -- 调试模式配置
     if is_mode("debug") then
-        set_symbols("debug")
-        set_optimize("none")
-        add_defines("DEBUG")
+        set_symbols("debug")              -- 启用调试符号
+        set_optimize("none")              -- 禁用优化
+        add_defines("DEBUG")              -- 定义 DEBUG 宏
     else
-        set_optimize("fast")
+        set_optimize("fast")              -- 发布模式启用最快优化
     end
     
-    add_cxxflags("/EHsc")
+    add_cxxflags("/EHsc")                 -- 启用 C++ 异常处理
 
-
--- 图片查看器演示程序
+-- 定义图片查看器演示程序目标
 target("vimag-demo")
-    set_kind("binary")
- -- 正确设置 RPATH：优先搜索程序同目录
-    add_rpathdirs("$ORIGIN")
-    add_files("src/Vimag.cpp","src/TinyEXIF/TinyEXIF.cpp")
-    add_deps("ui")
-    add_packages("glfw", "nanovg", "glew")
+    set_kind("binary")                     -- 设置为可执行文件
+    add_rpathdirs("$ORIGIN")              -- 设置运行时库搜索路径
+    add_files("src/Vimag.cpp","src/TinyEXIF/TinyEXIF.cpp")  -- 添加源文件
+    add_deps("ui")                         -- 添加对 UI 库的依赖
+    add_packages("glfw", "nanovg", "glew") -- 添加第三方依赖包
     
     -- 添加头文件搜索路径
     add_includedirs("src", "src/component", "src/widget", "src/animation", "src/TinyEXIF")
     
-    -- 添加编码选项
+    -- 平台相关配置
     if is_plat("windows") then
         add_cxflags("/utf-8")
         add_links("opengl32", "gdi32", "user32", "kernel32")
@@ -71,10 +76,9 @@ target("vimag-demo")
         add_links("GL", "X11", "pthread", "Xrandr", "Xi", "dl","m")
     end
     
-    -- 设置运行目录
     set_rundir("$(projectdir)")
     
-    -- 添加调试信息
+    -- 调试/发布模式配置
     if is_mode("debug") then
         set_symbols("debug")
         set_optimize("none")
@@ -85,7 +89,7 @@ target("vimag-demo")
     
     add_cxxflags("/EHsc")
 
--- 开发阶段自动复制（保持现有的 after_build）
+-- 构建后自动复制依赖 DLL 到目标目录
 after_build(function (target)
     local targetdir = path.directory(target:targetfile())
     for _, pkg in ipairs(target:pkgs()) do
@@ -98,68 +102,43 @@ after_build(function (target)
             end
         end
     end
-end)
+ end)
 
--- 发布打包任务（新增）
--- 简化版打包任务
-task("package")
-    set_menu {
-        usage = "xmake package",
-        description = "Package application for distribution"
-    }
-    on_run(function()
-        -- 检查可执行文件是否存在
-        local exe_paths = {
-            "build/windows/x64/release/vimag-demo.exe",
-            "button-demo.exe",
-            "a.exe"
-        }
-        
-        local exe_file = nil
-        for _, path in ipairs(exe_paths) do
-            if os.isfile(path) then
-                exe_file = path
-                break
-            end
+
+
+target("dist_package")
+    set_kind("phony")
+    add_deps("button-demo", "vimag-demo")
+    on_build(function (target)
+        -- 1. 复制可执行文件
+        if is_plat("windows") then
+            os.cp("build/windows/x64/release/*.exe", "dist")
+        else
+            os.cp("build/linux/x86_64/release/button-demo", "dist")
+            os.cp("build/linux/x86_64/release/vimag-demo", "dist")
         end
-        
-        if not exe_file then
-            print("错误: 请先运行 'xmake build button-demo' 构建项目")
-            return
-        end
-        
-        -- 创建分发目录
-        os.mkdir("dist")
-        
-        -- 复制可执行文件
-        os.cp(exe_file, "dist/button-demo.exe")
-        print("复制: " .. path.filename(exe_file))
-        
-        -- 查找并复制 DLL 文件（避免重复）
-        local dll_patterns = {
-            "build/**/glfw*.dll",
-            "build/**/glew*.dll", 
-            "build/**/nanovg*.dll",
-            "**/*glfw*.dll",
-            "**/*glew*.dll",
-            "**/*nanovg*.dll"
-        }
-	
-  	 -- 复制可执行文件
-        os.cp("build/linux/x86_64/release/button-demo", "dist/")
- 	 -- 使用find命令复制所有.so库
-        os.exec("find build/ -name '*.so*' -exec cp -t dist/ {} +")
-        local copied_dlls = {}
-        for _, pattern in ipairs(dll_patterns) do
-            local files = os.files(pattern)
-            for _, file in ipairs(files) do
-                if os.isfile(file) then  -- 确保是文件不是目录
-                    -- 复制逻辑
+
+        -- 2. 修复依赖库复制逻辑
+        local packages = {"glfw", "nanovg", "glew"}
+        for _, pkg_name in ipairs(packages) do
+            -- ✅ 正确方式：通过 Xmake 包管理接口获取依赖
+            local pkg = import("package.manager").find_package(pkg_name)
+            if pkg then
+                -- 获取库安装目录
+                local libdir = pkg:installdir() .. "/lib"
+                if is_plat("windows") then
+                    os.cp(path.join(libdir, "*.dll"), "dist")  -- Windows 复制 DLL
+                else
+                    os.cp(path.join(libdir, "*.so*"), "dist")   -- Linux 复制 SO
                 end
+                print("✅ 已复制依赖库: " .. pkg_name)
+            else
+                print("⚠️ 警告: 依赖包未找到 - " .. pkg_name)
             end
         end
-            
-        print("打包完成，分发文件在 dist 目录")
-        print("可以将 dist 目录整体复制给其他用户")
-    end)
 
+        -- 3. 复制资源文件
+        os.cp("res/fonts/*.ttf", "dist")
+        os.cp("res/images/*.png", "dist")
+        print("🚀 打包完成！所有文件已复制到 dist 目录")
+    end)
