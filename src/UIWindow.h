@@ -324,4 +324,29 @@ private:
      * @param ypos 鼠标Y坐标
      */
     void handleTitleBarToggle(double xpos, double ypos);
+    // 在 UIWindow 类的 public 部分添加
+    public:
+    // 切换全屏状态
+    void toggleFullscreen();
+    // 设置全屏状态
+    void setFullscreen(bool fullscreen);
+    // 检查是否全屏
+    bool isFullscreen() const { return fullscreenMode; }
+    
+    private:
+    // 在私有成员变量部分添加
+    bool fullscreenMode = false;
+    // 存储窗口恢复所需的信息
+    struct {
+        int x, y, width, height;
+    } windowedModeInfo;
+    
+    /**
+     * @brief 处理鼠标移动以控制标题栏显示
+     * @param xpos 鼠标X坐标
+     * @param ypos 鼠标Y坐标
+     */
+    // private:
+    //     // 只保留这一个声明
+    //     void handleTitleBarToggle(double xpos, double ypos);
 };

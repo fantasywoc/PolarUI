@@ -369,11 +369,17 @@ void UIWindow::setWindowSizeCallback(std::function<void(int, int)> callback) {
  * @description 从GLFW窗口用户指针获取UIWindow实例，并调用其键盘回调
  */
 void UIWindow::keyCallbackWrapper(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    // 从窗口用户指针获取UIWindow实例
     UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
-    // 如果实例和回调函数都存在，则调用回调
-    if (uiWindow && uiWindow->keyCallback) {
-        uiWindow->keyCallback(key, scancode, action, mods);
+    if (uiWindow) {
+        // 处理 F11 全屏切换
+        if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
+            uiWindow->toggleFullscreen();
+        }
+        
+        // 调用用户设置的回调
+        if (uiWindow->keyCallback) {
+            uiWindow->keyCallback(key, scancode, action, mods);
+        }
     }
 }
 
@@ -541,4 +547,43 @@ void UIWindow::handleTitleBarToggle(double xpos, double ypos) {
     } else {
         hideTitleBar();
     }
+}
+
+void UIWindow::toggleFullscreen() {
+    setFullscreen(!fullscreenMode);
+}
+
+void UIWindow::setFullscreen(bool fullscreen) {
+    if (fullscreenMode == fullscreen) return;
+    
+    if (fullscreen) {
+        // 保存当前窗口信息以便恢复
+        glfwGetWindowPos(window, &windowedModeInfo.x, &windowedModeInfo.y);
+        glfwGetWindowSize(window, &windowedModeInfo.width, &windowedModeInfo.height);
+        
+        // 获取主显示器
+        GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+        if (primaryMonitor) {
+            // 获取显示器视频模式
+            const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+            // 设置全屏
+            glfwSetWindowMonitor(window, primaryMonitor, 0, 0,
+                                mode->width, mode->height,
+                                mode->refreshRate);
+            // 自动隐藏标题栏
+            hideTitleBar();
+        }
+    } else {
+        // 恢复窗口模式
+        glfwSetWindowMonitor(window, nullptr,
+                            windowedModeInfo.x, windowedModeInfo.y,
+                            windowedModeInfo.width, windowedModeInfo.height,
+                            GLFW_DONT_CARE);
+        // 如果启用了动态标题栏，让它自动处理显示/隐藏
+        if (!dynamicTitleBarEnabled) {
+            showTitleBar();
+        }
+    }
+    
+    fullscreenMode = fullscreen;
 }
