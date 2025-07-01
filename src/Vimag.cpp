@@ -37,11 +37,13 @@ namespace fs = std::filesystem;
 
 
 int main(int argc, char** argv) {
+ 
     //FreeConsole();  //关闭控制台
     #ifdef _WIN32
         // Windows专用代码
         SetConsoleOutputCP(CP_UTF8);
         SetConsoleCP(CP_UTF8);
+      
         std::cout << "windos UTF-8" << std::endl;
     #endif
 
@@ -67,8 +69,10 @@ int main(int argc, char** argv) {
 
     size_t limit_index = image_paths.size(); 
     std::string imagPath = image_paths[current_index].generic_string();
+    // std::string imagPath =image_paths[current_index].u8string();
     int change_speed = 0;
 
+ 
     
 
     // 在现有代码中添加
@@ -142,12 +146,12 @@ int main(int argc, char** argv) {
     texture->setOnDrag([&,rightPanel1,texture](float deltaX, float deltaY) {
         std::cout << "拖拽偏移: (" << deltaX << ", " << deltaY << ")" << std::endl;
         
-        totalDeltaX += deltaX * 1.5 ;
-        totalDeltaY += deltaY * 1.5;
+        totalDeltaX += deltaX * 2 ;
+        totalDeltaY += deltaY * 2;
         
     
         // mainPanel->updateLayout();
-        rightPanel1->moveTo(totalDeltaX , totalDeltaY, 0.1f);
+        rightPanel1->moveTo(totalDeltaX , totalDeltaY, 0.3f);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
     });
@@ -181,7 +185,7 @@ int main(int argc, char** argv) {
     texture->setOnDragScroll([&, texture, rightPanel1, mainPanel,label](float scrollX, float scrollY) {
         std::cout << "拖拽时滚轮: (" << scrollX << ", " << scrollY << ")" << std::endl;
 
-        change_speed += scrollY;
+        change_speed += -scrollY;
         if (change_speed%2 != 0){
             return ;
         }
@@ -197,10 +201,10 @@ int main(int argc, char** argv) {
             current_index = limit_index-1;
             return;
         }
-        
+
         // 图片信息获取
         imagPath =image_paths[current_index].generic_string();
-        
+
 
         EXIF exif(imagPath);
         TinyEXIF::EXIFInfo info = exif.getInfo();
@@ -208,25 +212,17 @@ int main(int argc, char** argv) {
         std::cout<< "Fnumber =" << Fnumber <<std::endl;
         removeZero(Fnumber);
         std::cout<< "Fnumber =" << Fnumber <<std::endl;
-        std::string image_exif = info.Make + "   f/" + Fnumber + "     1/" + fomatExposureTime(info.ExposureTime) + "    ISO" + std::to_string(info.ISOSpeedRatings);
+        std::string image_exif = "["+ std::to_string(current_index)+"/"+  std::to_string(limit_index) +"]    "+ info.Make + "   f/" + Fnumber + "     1/" + fomatExposureTime(info.ExposureTime) + "    ISO" + std::to_string(info.ISOSpeedRatings);
         std::cout<<image_exif <<std::endl;
         std::string imagName;
         imagName = image_names[current_index];
         texture->setImagePath(window.getNVGContext(), imagPath);
         label->setText(image_exif);
 
-        // // 图片信息
-        // int imageWidth,imageHeight;
-        // if(getImageInfo(imagPath,imageWidth,imageHeight)){
-        //     std::cout<< "图片信息：" << imagName << "  " << imageWidth << "x" << imageHeight <<std::endl;
-        // }else{
-        //     std::cout<< "图片信息获取失败" << std::endl;
-        // }
-       
 
         mainPanel->setSize(currentWindowWidth,currentWindowHeight);
         rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
-    
+
         texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
         texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
         texture->setPaintValid(false);
@@ -313,13 +309,81 @@ int main(int argc, char** argv) {
     });
     
     // 在设置鼠标事件回调后添加键盘事件处理
-    window.setKeyCallback([mainPanel](int key, int scancode, int action, int mods) {
+    window.setKeyCallback([&, texture, rightPanel1, mainPanel,label](int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             UIEvent event;
             event.type = UIEvent::KEY_PRESS;
             event.keyCode = key;
             event.modifiers = mods;
             
+            // 添加方向键检查
+            if (key == GLFW_KEY_LEFT) {
+                // 左方向键处理
+                event.keyCode = GLFW_KEY_LEFT;
+                std::cout << "Left key pressed   "<<event.keyCode  << std::endl;
+                change_speed = -1 ;
+            } 
+            else if (key == GLFW_KEY_RIGHT) {
+                // 右方向键处理
+                event.keyCode = GLFW_KEY_RIGHT;
+                std::cout << "Right key pressed  "<<event.keyCode << std::endl;
+                change_speed =1;
+            }
+            
+/////////////////////////////////////////////
+ 
+
+        current_index += change_speed ;
+        change_speed = 0;
+
+        if (current_index <= 0){
+            current_index = 0;
+            return;
+        }
+        if (current_index >= limit_index-1){
+            current_index = limit_index-1;
+            return;
+        }
+
+        // 图片信息获取
+        imagPath =image_paths[current_index].generic_string();
+
+
+        EXIF exif(imagPath);
+        TinyEXIF::EXIFInfo info = exif.getInfo();
+        std::string Fnumber = std::to_string(info.FNumber);
+        std::cout<< "Fnumber =" << Fnumber <<std::endl;
+        removeZero(Fnumber);
+        std::cout<< "Fnumber =" << Fnumber <<std::endl;
+        std::string image_exif = "["+ std::to_string(current_index)+"/"+  std::to_string(limit_index) +"]    "+ info.Make + "   f/" + Fnumber + "     1/" + fomatExposureTime(info.ExposureTime) + "    ISO" + std::to_string(info.ISOSpeedRatings);
+        std::cout<<image_exif <<std::endl;
+        std::string imagName;
+        imagName = image_names[current_index];
+        texture->setImagePath(window.getNVGContext(), imagPath);
+        label->setText(image_exif);
+
+
+        mainPanel->setSize(currentWindowWidth,currentWindowHeight);
+        rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
+
+        texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+        texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+        texture->setPaintValid(false);
+        // mainPanel->updateLayout();
+        rightPanel1->updateLayout ();
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////
             mainPanel->handleEvent(event);
         }
     });

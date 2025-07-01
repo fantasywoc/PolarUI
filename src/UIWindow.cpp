@@ -372,7 +372,7 @@ void UIWindow::keyCallbackWrapper(GLFWwindow* window, int key, int scancode, int
     UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
     if (uiWindow) {
         // 处理 F11 全屏切换
-        if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
+        if (key == GLFW_KEY_F && action == GLFW_PRESS) {
             uiWindow->toggleFullscreen();
         }
         
@@ -502,39 +502,39 @@ void UIWindow::showTitleBar() {
 
 void UIWindow::hideTitleBar() {
     if (titleBarVisible) {
-#ifdef _WIN32
-        HWND hwnd = glfwGetWin32Window(window);
-        if (hwnd) {
-            // 获取当前窗口样式
-            LONG style = GetWindowLong(hwnd, GWL_STYLE);
-            // 移除标题栏样式
-            style &= ~(WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
-            SetWindowLong(hwnd, GWL_STYLE, style);
-            
-            // 重新设置窗口位置以应用样式变化
-            SetWindowPos(hwnd, NULL, 0, 0, 0, 0, 
-                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-            
-            titleBarVisible = false;
-        }
-#elif defined(__linux__)
-        GLFWwindow* window = getGLFWWindow();
-        if (window) {
-            // 设置窗口为无装饰
-            glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
-            
-            // 在 Linux 下，我们可以通过 NanoVG 绘制圆角
-            // 在每次渲染时，在背景层绘制圆角矩形
-            if (vg) {
-                nvgBeginPath(vg);
-                nvgRoundedRect(vg, 0, 0, windowWidth, windowHeight, 15);
-                nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
-                nvgFill(vg);
+    #ifdef _WIN32
+            HWND hwnd = glfwGetWin32Window(window);
+            if (hwnd) {
+                // 获取当前窗口样式
+                LONG style = GetWindowLong(hwnd, GWL_STYLE);
+                // 移除标题栏样式
+                style &= ~(WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+                SetWindowLong(hwnd, GWL_STYLE, style);
+                
+                // 重新设置窗口位置以应用样式变化
+                SetWindowPos(hwnd, NULL, 0, 0, 0, 0, 
+                            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+                
+                titleBarVisible = false;
             }
-            
-            titleBarVisible = false;
-        }
-#endif
+    #elif defined(__linux__)
+            GLFWwindow* window = getGLFWWindow();
+            if (window) {
+                // 设置窗口为无装饰
+                glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
+                
+                // 在 Linux 下，我们可以通过 NanoVG 绘制圆角
+                // 在每次渲染时，在背景层绘制圆角矩形
+                if (vg) {
+                    nvgBeginPath(vg);
+                    nvgRoundedRect(vg, 0, 0, windowWidth, windowHeight, 15);
+                    nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
+                    nvgFill(vg);
+                }
+                
+                titleBarVisible = false;
+            }
+    #endif
     }
 }
 

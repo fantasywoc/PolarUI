@@ -325,7 +325,7 @@ private:
      */
     void handleTitleBarToggle(double xpos, double ypos);
     // 在 UIWindow 类的 public 部分添加
-    public:
+public:
     // 切换全屏状态
     void toggleFullscreen();
     // 设置全屏状态

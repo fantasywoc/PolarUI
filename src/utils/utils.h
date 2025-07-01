@@ -101,9 +101,19 @@ void find_image_files(
                                   [](unsigned char c) { return std::tolower(c); });
                     
                     // 检查是否为图片格式 
-                    if (imageExtensions.find(ext) != imageExtensions.end()) {
-                        image_paths.push_back(entry.path());
-                        image_names.push_back(entry.path().filename().string());
+                    if (imageExtensions.find(ext) != imageExtensions.end() && std::filesystem::exists(entry.path())) {
+                        try{
+                            std::string filePath = entry.path().generic_string();
+                            image_paths.push_back(entry.path());
+                            image_names.push_back(entry.path().filename().string());
+
+                        }
+                        catch (const std::exception& e) {
+                            std::cerr << entry.path() <<"  -------: " << e.what() << std::endl;
+                     
+                        }
+                        
+
                     }
                 }
                 ++dir_iter;

@@ -1,0 +1,31 @@
+{
+    files = {
+        [[build\.objs\vimag-demo\windows\x64\debug\src\Vimag.cpp.obj]],
+        [[build\.objs\vimag-demo\windows\x64\debug\src\TinyEXIF\TinyEXIF.cpp.obj]],
+        [[build\windows\x64\debug\ui.lib]]
+    },
+    values = {
+        [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\link.exe]],
+        {
+            "-nologo",
+            "-dynamicbase",
+            "-nxcompat",
+            "-machine:x64",
+            [[-libpath:build\windows\x64\debug]],
+            [[-libpath:C:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\ce3adedbd00d42b988a2d62591b81f66\lib]],
+            [[-libpath:C:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\48fecc1a193b43699967a28a519cf22a\lib]],
+            [[-libpath:C:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\ad6c447bd59b4757b15aad85faee67f2\lib]],
+            "-debug",
+            [[-pdb:build\windows\x64\debug\vimag-demo.pdb]],
+            "kernel32.lib",
+            "ui.lib",
+            "glfw3dll.lib",
+            "nanovg.lib",
+            "glew32.lib",
+            "user32.lib",
+            "shell32.lib",
+            "gdi32.lib",
+            "opengl32.lib"
+        }
+    }
+}
