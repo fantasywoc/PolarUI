@@ -47,6 +47,16 @@ int main(int argc, char** argv) {
         std::cout << "windos UTF-8" << std::endl;
     #endif
 
+//gif test
+   fs::path gifPath = "C:\\Users\\CK\\Desktop\\GIF.gif";
+    GifImage gif;
+    gif = loadGif(gifPath.generic_string());
+
+
+
+
+
+
     // 获取图片文件
     fs::path directory = "./";
     std::vector<fs::path> image_paths;
@@ -73,7 +83,6 @@ int main(int argc, char** argv) {
     int change_speed = 0;
 
  
-    
 
     // 在现有代码中添加
     UIWindow window(1600, 900, "VIMAG");

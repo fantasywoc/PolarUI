@@ -3,11 +3,6 @@
 #include <algorithm>
 
 
-#define STBI_MAX_DIMENSIONS 32768  // 扩展到 32768x32768 ,默认最大支持尺寸为 ​16,777,216 像素
-// 需要包含 stb_image
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 std::vector<UITexture*> UITexture::s_instances;
 
 UITexture::UITexture(float x, float y, float width, float height, const std::string& imagePath)
@@ -330,11 +325,11 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     
     // 使用 stb_image 加载图像
     int channels;
-    unsigned char* data = stbi_load(imagePath.c_str(), &m_imageWidth, &m_imageHeight, &channels, 4);
+    unsigned char* data = LoadImage(imagePath.c_str(), m_imageWidth, m_imageHeight);
     
-    if (!data) {
+    if (!data){
         std::cerr << "Failed to load image: " << imagePath << std::endl;
-        std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
+        // std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
         return false;
     }
     updateSize();
@@ -345,7 +340,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
     
     // 释放 stb_image 分配的内存
-    stbi_image_free(data);
+    FreeImage(data);
     
     if (m_nvgImage == -1) {
         std::cerr << "Failed to create NanoVG image from: " << imagePath << std::endl;
@@ -356,7 +351,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     std::cout << "Loaded image: " << imagePath << " (" << m_imageWidth << "x" << m_imageHeight << ")" << std::endl;
     m_paintValid = false;
     return true;
-}
+} 
 
 void UITexture::unloadImage(NVGcontext* vg) {
     if (m_nvgImage != -1 && vg) {

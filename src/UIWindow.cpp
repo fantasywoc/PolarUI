@@ -25,6 +25,9 @@
 // 定义NanoVG OpenGL3实现宏并包含实现头文件
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg_gl.h"
+#include "./utils/utils.h"
+#include "stb_image.h"
+
 
 /**
  * @brief UIWindow构造函数

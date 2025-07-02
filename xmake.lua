@@ -23,7 +23,8 @@ target("ui")
     add_files("src/UIWindow.cpp")         -- 添加窗口相关源文件
     add_files("src/component/*.cpp")      -- 添加所有组件源文件
     add_files("src/animation/*.cpp")      -- 添加动画系统源文件
-    add_includedirs("src", "src/component", "src/animation")  -- 添加头文件搜索路径
+    add_files("src/utils/*.cpp")         -- 添加图像处理文件
+    add_includedirs("src", "src/component", "src/animation","src/utils")  -- 添加头文件搜索路径
     add_packages("glfw", "nanovg", "glew") -- 添加依赖包
 
 -- 定义按钮演示程序目标
