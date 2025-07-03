@@ -333,3 +333,36 @@ GifImage loadGif(const std::string& path) {
     return gif;
 }
 
+std::string getExifInfo(const std::string& imagPath){
+    EXIF exif(imagPath);
+    TinyEXIF::EXIFInfo info = exif.getInfo();
+    std::string Fnumber = std::to_string(info.FNumber);
+    std::cout<< "Fnumber =" << Fnumber <<std::endl;
+    removeZero(Fnumber);
+    std::cout<< "Fnumber =" << Fnumber <<std::endl;
+    std::string image_exif =  info.Make + "   f/" + Fnumber + "     1/" + fomatExposureTime(info.ExposureTime) + "    ISO" + std::to_string(info.ISOSpeedRatings);
+  
+    return image_exif;
+}
+
+
+void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle){
+    if(is_cycle){
+        if (current_index > limit_index) {
+            current_index = limit_index - 1;
+            // return;
+        }else if (current_index==limit_index) {
+            current_index = 0;
+            // return;
+        }
+    }else{
+        if (current_index > limit_index) {
+            current_index = 0;
+            return;
+        }else if (current_index==limit_index) {
+            current_index = limit_index - 1;
+            return;
+        }
+    }
+
+}

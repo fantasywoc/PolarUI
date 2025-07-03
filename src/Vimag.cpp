@@ -8,8 +8,8 @@
 // 添加动画系统头文件
 #include "animation/UIAnimationManager.h"
 #include "animation/UIAnimation.h"
-#include "TinyEXIF/EXIF.h"
 #include "utils/utils.h"
+#include "TinyEXIF/EXIF.h"
 #include <iostream>
 #include <locale>
 #include <filesystem>
@@ -31,9 +31,11 @@ namespace fs = std::filesystem;
 
 #endif
 
-
-
 namespace fs = std::filesystem;
+
+
+
+bool is_cycle = false; // 是否循环播放;
 
 
 int main(int argc, char** argv) {
@@ -47,10 +49,13 @@ int main(int argc, char** argv) {
         std::cout << "windos UTF-8" << std::endl;
     #endif
 
-//gif test
-   fs::path gifPath = "C:\\Users\\CK\\Desktop\\GIF.gif";
-    GifImage gif;
-    gif = loadGif(gifPath.generic_string());
+// gif test
+{
+    fs::path gifPath = "C:\\Users\\CK\\Desktop\\GIF.gif";
+    GifImage gif = loadGif(gifPath.generic_string());
+
+}
+
 
 
 
@@ -202,29 +207,13 @@ int main(int argc, char** argv) {
         current_index += change_speed / 2;
         change_speed = 0;
 
-        if (current_index <= 0){
-            current_index = 0;
-            return;
-        }
-        if (current_index >= limit_index-1){
-            current_index = limit_index-1;
-            return;
-        }
-
+        enableImageCycle(current_index,limit_index,is_cycle);
         // 图片信息获取
         imagPath =image_paths[current_index].generic_string();
-
-
-        EXIF exif(imagPath);
-        TinyEXIF::EXIFInfo info = exif.getInfo();
-        std::string Fnumber = std::to_string(info.FNumber);
-        std::cout<< "Fnumber =" << Fnumber <<std::endl;
-        removeZero(Fnumber);
-        std::cout<< "Fnumber =" << Fnumber <<std::endl;
-        std::string image_exif = "["+ std::to_string(current_index)+"/"+  std::to_string(limit_index) +"]    "+ info.Make + "   f/" + Fnumber + "     1/" + fomatExposureTime(info.ExposureTime) + "    ISO" + std::to_string(info.ISOSpeedRatings);
-        std::cout<<image_exif <<std::endl;
-        std::string imagName;
-        imagName = image_names[current_index];
+        
+        std::string indexString = "["+ std::to_string(current_index+1)+"/"+  std::to_string(limit_index) +"]    " ;
+        std::string image_exif = indexString + getExifInfo(imagPath);
+        std::string imagName = image_names[current_index];
         texture->setImagePath(window.getNVGContext(), imagPath);
         label->setText(image_exif);
 
@@ -341,33 +330,16 @@ int main(int argc, char** argv) {
             
 /////////////////////////////////////////////
  
-
         current_index += change_speed ;
         change_speed = 0;
 
-        if (current_index <= 0){
-            current_index = 0;
-            return;
-        }
-        if (current_index >= limit_index-1){
-            current_index = limit_index-1;
-            return;
-        }
-
+        enableImageCycle(current_index,limit_index,is_cycle);
         // 图片信息获取
         imagPath =image_paths[current_index].generic_string();
 
-
-        EXIF exif(imagPath);
-        TinyEXIF::EXIFInfo info = exif.getInfo();
-        std::string Fnumber = std::to_string(info.FNumber);
-        std::cout<< "Fnumber =" << Fnumber <<std::endl;
-        removeZero(Fnumber);
-        std::cout<< "Fnumber =" << Fnumber <<std::endl;
-        std::string image_exif = "["+ std::to_string(current_index)+"/"+  std::to_string(limit_index) +"]    "+ info.Make + "   f/" + Fnumber + "     1/" + fomatExposureTime(info.ExposureTime) + "    ISO" + std::to_string(info.ISOSpeedRatings);
-        std::cout<<image_exif <<std::endl;
-        std::string imagName;
-        imagName = image_names[current_index];
+        std::string indexString = "["+ std::to_string(current_index+1)+"/"+  std::to_string(limit_index) +"]    " ;
+        std::string image_exif = indexString + getExifInfo(imagPath);
+        std::string imagName = image_names[current_index];
         texture->setImagePath(window.getNVGContext(), imagPath);
         label->setText(image_exif);
 
@@ -380,16 +352,6 @@ int main(int argc, char** argv) {
         texture->setPaintValid(false);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
-
-
-
-
-
-
-
-
-
-
 
 
 //////////////////////////////////////////////////
@@ -428,9 +390,9 @@ int main(int argc, char** argv) {
 
     // 创建定时器实例
     OneTimeTimer timer;
-    timer.start(2);
+    timer.start(1.5);
     // 主渲染循环
-    const double targetFrameTime = 1.0 / 120.0;
+    const double targetFrameTime = 1.0 / 60.0;
     auto lastTime = glfwGetTime();
     while (!window.shouldClose()) {
         
@@ -457,23 +419,25 @@ int main(int argc, char** argv) {
             double sleepTime = (targetFrameTime - deltaTime) * 1000;
             if (sleepTime > 1) {  // 只在休眠时间大于1ms时才休眠
                 //Sleep(static_cast<DWORD>(sleepTime - 1));  // 预留1ms的误差
-		// 修改386行代码：
-		#ifdef _WIN32
-		    Sleep(static_cast<DWORD>(sleepTime - 1));
-		#else
-		    usleep((sleepTime - 1) * 1000); // 毫秒转微秒
-		#endif
+ 
+                #ifdef _WIN32
+                    Sleep(static_cast<DWORD>(sleepTime - 1));
+                #else
+                    usleep((sleepTime - 1) * 1000); // 毫秒转微秒
+                #endif
             }
             continue;
         }
         lastTime = currentTime;
 
         window.pollEvents();
+        std::cout<<"UIAnimationManager::getInstance().getAnimationCount():"<<UIAnimationManager::getInstance().getAnimationCount() <<std::endl;
+        std::cout<<"texture->isPaintValid():"<<texture->isPaintValid() <<std::endl;
         // 更新动画系统
         UIAnimationManager::getInstance().update(deltaTime);
-        if (UIAnimationManager::getInstance().getAnimationCount() > 0 || texture->isPaintValid()== false ) {
+        if (UIAnimationManager::getInstance().getAnimationCount() != 0 || texture->isPaintValid()== false ) {
             window.beginFrame();
-            window.clearBackground(1.0f, 1.0f, 1.0f, 0.90f);
+            window.clearBackground(1.0f, 1.0f, 1.0f, 1.0f);
             
             // 渲染主面板（会递归渲染所有子组件）
             mainPanel->updateLayout();

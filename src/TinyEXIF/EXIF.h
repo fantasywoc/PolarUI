@@ -63,17 +63,17 @@ EXIF(const std::string& imagePath) : m_imageWidth(0), m_imageHeight(0), m_isVali
     // 输出EXIF元数据 - 只使用存在的成员变量
     const TinyEXIF::EXIFInfo& printAllInfo() {
 
-        if (info.RelatedImageWidth || info.RelatedImageHeight){
-		    std::cout << "RelatedImageResolution " << info.RelatedImageWidth << "x" << info.RelatedImageHeight << " pixels" << "\n";
-        }// 检查基础字段是否存在
+        // if (info.RelatedImageWidth || info.RelatedImageHeight){
+		//     std::cout << "RelatedImageResolution " << info.RelatedImageWidth << "x" << info.RelatedImageHeight << " pixels" << "\n";
+        // }// 检查基础字段是否存在
 
-        if (info.ImageWidth == 0) {
-            
-            std::cerr << "警告：ImageWidth 未解析到有效值" << std::endl;
-        }
+        // // if (info.ImageWidth == 0) {
+        // //     std::cerr << "警告: ImageWidth未解析到有效值" << std::endl;
+        // // }
 
         if (info.ImageWidth || info.ImageHeight){
-		    std::cout << "ImageResolution " << info.ImageWidth << "x" << info.ImageHeight << " pixels" << "\n";}
+		    std::cout << "ImageResolution " << info.ImageWidth << "x" << info.ImageHeight << " pixels" << "\n";
+        }
         std::cout << "Make: " << info.Make << std::endl;
         std::cout << "Model: " << info.Model << std::endl;
         std::cout << "Software: " << info.Software << std::endl;

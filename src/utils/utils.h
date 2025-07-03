@@ -6,7 +6,8 @@
 #include <set>
 #include <cstdlib>
 #include <iostream> // \以包含 std::cout 和 std::cerr
-
+#include <cstring> // 包含 std::strerror 函数的头文件
+#include "../TinyEXIF/EXIF.h" 
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -92,7 +93,7 @@ public:
 
 
 
-///////////////////////////////////image///////////////////////////////
+///////////////////////////////////   image   ///////////////////////////////
     /**
      * @brief 加载图像文件
      * @param path 图像文件路径
@@ -122,3 +123,7 @@ struct GifImage {
 // 确保所有在utils.cpp中实现的函数都在这里声明
 bool loadGifImage(const std::string& path, GifImage* out_gif);
 GifImage loadGif(const std::string& path);
+
+
+void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle);
+std::string getExifInfo(const std::string& imagPath);
