@@ -10,12 +10,23 @@
 
 
 
-编译
+
+
+# Debug模式
+xmake build -m debug
+xmake run
+
+# Release模式
+xmake build -m release
+xmake run
+
+# 清理构建
+xmake clean
+
+# 编译
 xmake 
 xmake run botton-demo
 
-xmake build vimag-demo   # 先编译
-xmake pack dist_package  # 执行打包
 
 ## UIWindow 类的主要功能
 
