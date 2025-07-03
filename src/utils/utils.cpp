@@ -235,9 +235,9 @@ void getImages( const std::string& filePath,fs::path& directory,std::vector<fs::
 
 
 ////////////////////////////////   image   ///////////////////////////////
-unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight, int desiredChannels ) {
+unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight,int& channels ,int desiredChannels ) {
     
-    int channels;
+    
     
     // 检查文件是否存在
     if (!std::filesystem::exists(path)) {
@@ -246,9 +246,16 @@ unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight
     }
     std::cout << "Loading image: " << path << std::endl;
     // 加载图像
-    unsigned char* outData  = stbi_load(path.c_str(), &outWidth, &outHeight, &channels, desiredChannels);
+    unsigned char* outData  = nullptr;
+    try {
+         outData  = stbi_load(path.c_str(), &outWidth, &outHeight, &channels, desiredChannels);
+    }catch (const std::exception& e) {
+        std::cerr << "Error: Failed to load image: " << e.what() << std::endl;
+        return nullptr;
+    }
+    
 
-    if (!*outData) {
+    if (!outData) {
         std::cerr << "Failed to load image: " << path << std::endl;
         std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
         return nullptr;

@@ -83,6 +83,7 @@ public:
     // 获取拖拽状态
     bool isDragging() const { return m_isDragging; }
     void updateSize();
+    bool isLoadError(){return m_isLoadError;}
 private:
     // 基础纹理属性
     std::string m_imagePath;
@@ -115,7 +116,9 @@ private:
     double m_lastClickTime = 0.0;
     int m_lastClickButton = -1;
     static constexpr double DOUBLE_CLICK_TIME = 0.5; // 双击时间间隔（秒）
-    
+    //图片加载失败
+    bool m_isLoadError = false;
+
     // 事件回调
     DragCallback m_onDrag;
     ScrollCallback m_onScroll;

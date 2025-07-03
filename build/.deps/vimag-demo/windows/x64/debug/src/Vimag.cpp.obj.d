@@ -1,4 +1,7 @@
 {
+    files = {
+        [[src\Vimag.cpp]]
+    },
     depfiles = "{\
     \"Version\": \"1.2\",\
     \"Data\": {\
@@ -96,7 +99,6 @@
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\iosfwd\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\cctype\",\
             \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\ucrt\\\\ctype.h\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\stb_image.h\",\
             \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\uipanel.h\",\
             \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\uicomponent.h\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\memory\",\
@@ -135,30 +137,29 @@
             \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\uibutton.h\",\
             \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\uilabel.h\",\
             \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\uitexture.h\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\uitextinput.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\chrono\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_chrono.hpp\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\ratio\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xfilesystem_abi.h\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\animation\\\\uianimationmanager.h\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\tinyexif\\\\exif.h\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\tinyexif\\\\tinyexif.h\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\utils\\\\utils.h\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\fstream\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_filebuf.hpp\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\utils\\\\utils.h\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\set\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xtree\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\stb_image.h\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\tinyexif\\\\exif.h\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\tinyexif\\\\tinyexif.h\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\filesystem\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\algorithm\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_heap_algorithms.hpp\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_minmax.hpp\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\chrono\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_chrono.hpp\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\ratio\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xfilesystem_abi.h\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\iomanip\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xlocmon\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xloctime\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\locale\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xlocbuf\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xlocmes\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\uitextinput.h\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\animation\\\\uianimationmanager.h\",\
             \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\um\\\\windows.h\",\
             \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\shared\\\\winapifamily.h\",\
             \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\shared\\\\winpackagefamily.h\",\
@@ -379,9 +380,7 @@
         \"ImportedHeaderUnits\": []\
     }\
 }",
-    files = {
-        [[src\Vimag.cpp]]
-    },
+    depfiles_format = "cl_json",
     values = {
         [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
         {
@@ -409,6 +408,5 @@
             "/EHsc",
             "/utf-8"
         }
-    },
-    depfiles_format = "cl_json"
+    }
 }

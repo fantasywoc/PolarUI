@@ -322,16 +322,25 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     
     // 先卸载之前的图像
     unloadImage(vg);
-    
+    unsigned char* data = nullptr;
     // 使用 stb_image 加载图像
     int channels;
-    unsigned char* data = LoadImage(imagePath.c_str(), m_imageWidth, m_imageHeight);
+    try {
+        data = LoadImage(imagePath.c_str(), m_imageWidth,m_imageHeight,  channels);
+    }catch (const std::exception& e) {
+        std::cerr << "Failed to load image: " << imagePath << " error: " << e.what() << std::endl;
+        m_isLoadError = true;
+       return false;
+    }
     
     if (!data){
         std::cerr << "Failed to load image: " << imagePath << std::endl;
         // std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
+        m_isLoadError = true;
         return false;
     }
+    m_isLoadError = false;
+
     updateSize();
     setPaintValid(false);
 
@@ -348,7 +357,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     }
     
     m_imagePath = imagePath;
-    std::cout << "Loaded image: " << imagePath << " (" << m_imageWidth << "x" << m_imageHeight << ")" << std::endl;
+    std::cout << "Loaded image: " << imagePath << " (" << m_imageWidth << "x" << m_imageHeight << ")" <<"  channels:"<<channels<< std::endl;
     m_paintValid = false;
     return true;
 } 

@@ -25,7 +25,7 @@ namespace fs = std::filesystem;
     #include <windows.h>
     #include <io.h>
     #include <fcntl.h>
-#elif defined(__APPLE__) || defined(__unix__) || defined(__linux__)
+#elif defined(__APPLE__) || defined(__unix__) 
     #include <unistd.h>
     #include <cstdint>
 
@@ -35,7 +35,7 @@ namespace fs = std::filesystem;
 
 
 
-bool is_cycle = false; // 是否循环播放;
+bool is_cycle = true; // 是否循环播放;
 
 
 int main(int argc, char** argv) {
@@ -55,12 +55,6 @@ int main(int argc, char** argv) {
     GifImage gif = loadGif(gifPath.generic_string());
 
 }
-
-
-
-
-
-
 
     // 获取图片文件
     fs::path directory = "./";
@@ -186,7 +180,7 @@ int main(int argc, char** argv) {
             scaley = 0.3f; 
         }
        
-        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.35f, UIAnimation::EASE_OUT);
+        UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.2f, UIAnimation::EASE_OUT);
 
     });
 
@@ -211,12 +205,15 @@ int main(int argc, char** argv) {
         // 图片信息获取
         imagPath =image_paths[current_index].generic_string();
         
-        std::string indexString = "["+ std::to_string(current_index+1)+"/"+  std::to_string(limit_index) +"]    " ;
+        std::string indexString = "["+ std::to_string(current_index+1)+"/"+  std::to_string(limit_index) +"]" ;
         std::string image_exif = indexString + getExifInfo(imagPath);
         std::string imagName = image_names[current_index];
         texture->setImagePath(window.getNVGContext(), imagPath);
-        label->setText(image_exif);
-
+        if(texture->isLoadError()){
+            label->setText(indexString + imagName+" LOAD FAIL!");
+        }else{
+            label->setText(indexString + imagName);
+        }
 
         mainPanel->setSize(currentWindowWidth,currentWindowHeight);
         rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
@@ -337,11 +334,16 @@ int main(int argc, char** argv) {
         // 图片信息获取
         imagPath =image_paths[current_index].generic_string();
 
-        std::string indexString = "["+ std::to_string(current_index+1)+"/"+  std::to_string(limit_index) +"]    " ;
+        std::string indexString = "["+ std::to_string(current_index+1)+"/"+  std::to_string(limit_index) +"]" ;
         std::string image_exif = indexString + getExifInfo(imagPath);
         std::string imagName = image_names[current_index];
         texture->setImagePath(window.getNVGContext(), imagPath);
-        label->setText(image_exif);
+        if(texture->isLoadError()){
+            label->setText(indexString + imagName+" LOAD FAIL!");
+        }else{
+            label->setText(indexString + imagName);
+        }
+        
 
 
         mainPanel->setSize(currentWindowWidth,currentWindowHeight);
@@ -431,8 +433,8 @@ int main(int argc, char** argv) {
         lastTime = currentTime;
 
         window.pollEvents();
-        std::cout<<"UIAnimationManager::getInstance().getAnimationCount():"<<UIAnimationManager::getInstance().getAnimationCount() <<std::endl;
-        std::cout<<"texture->isPaintValid():"<<texture->isPaintValid() <<std::endl;
+        // std::cout<<"UIAnimationManager::getInstance().getAnimationCount():"<<UIAnimationManager::getInstance().getAnimationCount() <<std::endl;
+        // std::cout<<"texture->isPaintValid():"<<texture->isPaintValid() <<std::endl;
         // 更新动画系统
         UIAnimationManager::getInstance().update(deltaTime);
         if (UIAnimationManager::getInstance().getAnimationCount() != 0 || texture->isPaintValid()== false ) {

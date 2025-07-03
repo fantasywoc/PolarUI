@@ -129,27 +129,17 @@
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\ostream\",\
             \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\uievent.h\",\
             \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\animation\\\\uianimation.h\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\utils\\\\utils.h\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\fstream\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_filebuf.hpp\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\set\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xtree\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\tinyexif\\\\exif.h\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\tinyexif\\\\tinyexif.h\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\filesystem\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\algorithm\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_heap_algorithms.hpp\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_minmax.hpp\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\stb_image.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\stdarg.h\",\
-            \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\ucrt\\\\math.h\",\
-            \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\ucrt\\\\assert.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\emmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xmmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\mmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\intrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\setjmp.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\immintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\wmmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\nmmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\smmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\tmmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\pmmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\zmmintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\ammintrin.h\",\
-            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\filesystem\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\chrono\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_chrono.hpp\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\ratio\",\
@@ -179,6 +169,8 @@
             "-Isrc",
             [[-Isrc\component]],
             [[-Isrc\animation]],
+            [[-Isrc\utils]],
+            [[-Isrc\TinyEXIF]],
             "-DGLFW_INCLUDE_NONE",
             "-DGLEW_NO_GLU",
             "/EHsc",

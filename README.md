@@ -13,19 +13,17 @@
 
 
 # Debug模式
-xmake build -m debug
-xmake run
+xmake config -m debug
 
 # Release模式
-xmake build -m release
-xmake run
+xmake config -m release
 
 # 清理构建
 xmake clean
 
 # 编译
 xmake 
-xmake run botton-demo
+xmake run vimag-demo
 
 
 ## UIWindow 类的主要功能

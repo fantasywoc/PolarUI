@@ -1,31 +1,6 @@
 {
-    depfiles_format = "cl_json",
     files = {
         [[src\UIWindow.cpp]]
-    },
-    values = {
-        [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
-        {
-            "-nologo",
-            "-MDd",
-            "-Zi",
-            "-FS",
-            [[-Fdbuild\windows\x64\debug\ui.pdb]],
-            "-Od",
-            "-std:c++17",
-            "-Isrc",
-            [[-Isrc\component]],
-            [[-Isrc\animation]],
-            "-DGLFW_INCLUDE_NONE",
-            "-DGLEW_NO_GLU",
-            "/EHsc",
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\ce3adedbd00d42b988a2d62591b81f66\include]],
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\48fecc1a193b43699967a28a519cf22a\include]],
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\ad6c447bd59b4757b15aad85faee67f2\include]]
-        }
     },
     depfiles = "{\
     \"Version\": \"1.2\",\
@@ -124,7 +99,6 @@
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\iosfwd\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\cctype\",\
             \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\ucrt\\\\ctype.h\",\
-            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\component\\\\stb_image.h\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\iostream\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\istream\",\
             \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_ostream.hpp\",\
@@ -368,10 +342,59 @@
             \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\um\\\\imm.h\",\
             \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\um\\\\ime_cmodes.h\",\
             \"c:\\\\users\\\\ck\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\n\\\\nanovg\\\\2023.8.27\\\\48fecc1a193b43699967a28a519cf22a\\\\include\\\\nanovg_gl.h\",\
-            \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\ucrt\\\\math.h\"\
+            \"e:\\\\windows kits\\\\10\\\\include\\\\10.0.22621.0\\\\ucrt\\\\math.h\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\utils\\\\utils.h\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\fstream\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_filebuf.hpp\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\set\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xtree\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\tinyexif\\\\exif.h\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\tinyexif\\\\tinyexif.h\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\filesystem\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\algorithm\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_heap_algorithms.hpp\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_minmax.hpp\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\chrono\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\__msvc_chrono.hpp\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\ratio\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xfilesystem_abi.h\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\iomanip\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xlocmon\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xloctime\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\locale\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xlocbuf\",\
+            \"e:\\\\program\\\\vs2022\\\\vs\\\\vc\\\\tools\\\\msvc\\\\14.43.34808\\\\include\\\\xlocmes\",\
+            \"e:\\\\program\\\\learning-progect\\\\ui\\\\src\\\\utils\\\\stb_image.h\"\
         ],\
         \"ImportedModules\": [],\
         \"ImportedHeaderUnits\": []\
     }\
-}"
+}",
+    depfiles_format = "cl_json",
+    values = {
+        [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
+        {
+            "-nologo",
+            "-MDd",
+            "-Zi",
+            "-FS",
+            [[-Fdbuild\windows\x64\debug\ui.pdb]],
+            "-Od",
+            "-std:c++17",
+            "-Isrc",
+            [[-Isrc\component]],
+            [[-Isrc\animation]],
+            [[-Isrc\utils]],
+            [[-Isrc\TinyEXIF]],
+            "-DGLFW_INCLUDE_NONE",
+            "-DGLEW_NO_GLU",
+            "/EHsc",
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\ce3adedbd00d42b988a2d62591b81f66\include]],
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\48fecc1a193b43699967a28a519cf22a\include]],
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\ad6c447bd59b4757b15aad85faee67f2\include]]
+        }
+    }
 }

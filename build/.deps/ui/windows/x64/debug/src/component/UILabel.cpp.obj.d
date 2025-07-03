@@ -1,31 +1,6 @@
 {
-    depfiles_format = "cl_json",
     files = {
         [[src\component\UILabel.cpp]]
-    },
-    values = {
-        [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
-        {
-            "-nologo",
-            "-MDd",
-            "-Zi",
-            "-FS",
-            [[-Fdbuild\windows\x64\debug\ui.pdb]],
-            "-Od",
-            "-std:c++17",
-            "-Isrc",
-            [[-Isrc\component]],
-            [[-Isrc\animation]],
-            "-DGLFW_INCLUDE_NONE",
-            "-DGLEW_NO_GLU",
-            "/EHsc",
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\ce3adedbd00d42b988a2d62591b81f66\include]],
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\48fecc1a193b43699967a28a519cf22a\include]],
-            "-external:W0",
-            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\ad6c447bd59b4757b15aad85faee67f2\include]]
-        }
     },
     depfiles = "{\
     \"Version\": \"1.2\",\
@@ -158,5 +133,32 @@
         \"ImportedModules\": [],\
         \"ImportedHeaderUnits\": []\
     }\
-}"
+}",
+    depfiles_format = "cl_json",
+    values = {
+        [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\cl.exe]],
+        {
+            "-nologo",
+            "-MDd",
+            "-Zi",
+            "-FS",
+            [[-Fdbuild\windows\x64\debug\ui.pdb]],
+            "-Od",
+            "-std:c++17",
+            "-Isrc",
+            [[-Isrc\component]],
+            [[-Isrc\animation]],
+            [[-Isrc\utils]],
+            [[-Isrc\TinyEXIF]],
+            "-DGLFW_INCLUDE_NONE",
+            "-DGLEW_NO_GLU",
+            "/EHsc",
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glfw\3.3.8\ce3adedbd00d42b988a2d62591b81f66\include]],
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\n\nanovg\2023.8.27\48fecc1a193b43699967a28a519cf22a\include]],
+            "-external:W0",
+            [[-external:IC:\Users\CK\AppData\Local\.xmake\packages\g\glew\2.2.0\ad6c447bd59b4757b15aad85faee67f2\include]]
+        }
+    }
 }

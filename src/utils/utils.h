@@ -104,7 +104,7 @@ public:
      * @return 是否加载成功
      */
 // bool LoadImage(const std::string& path, unsigned char** outData,  int* outWidth,  int* outHeight);
-unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight, int desiredChannels = 4); 
+unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight, int& channels ,int desiredChannels = 4); 
   /**
      * @brief 安全释放由LoadImage加载的图像数据
      * @param data 图像数据指针（会被置为nullptr）

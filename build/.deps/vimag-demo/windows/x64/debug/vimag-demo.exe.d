@@ -1,9 +1,4 @@
 {
-    files = {
-        [[build\.objs\vimag-demo\windows\x64\debug\src\Vimag.cpp.obj]],
-        [[build\.objs\vimag-demo\windows\x64\debug\src\TinyEXIF\TinyEXIF.cpp.obj]],
-        [[build\windows\x64\debug\ui.lib]]
-    },
     values = {
         [[E:\Program\VS2022\VS\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64\link.exe]],
         {
@@ -27,5 +22,10 @@
             "gdi32.lib",
             "opengl32.lib"
         }
+    },
+    files = {
+        [[build\.objs\vimag-demo\windows\x64\debug\src\Vimag.cpp.obj]],
+        [[build\.objs\vimag-demo\windows\x64\debug\src\TinyEXIF\TinyEXIF.cpp.obj]],
+        [[build\windows\x64\debug\ui.lib]]
     }
 }
