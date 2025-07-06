@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 
 // 检查是否是支持的图像文件
 static const std::set<std::string> imageExtensions = {
-    ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tga","hdr"
+    ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tga","hdr",".psd"
 };
 
 

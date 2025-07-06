@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
     auto mainPanel = std::make_shared<UIPanel>(0, 0, windowWidth, windowHeight);
     mainPanel->setHorizontalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_CENTER, 0.0f, 0.0f);
     mainPanel->setBackgroundColor(nvgRGBA(100, 200, 100, 10));
-    mainPanel->setBorderColor(nvgRGBA(255, 255, 255,200));
+    mainPanel->setBorderColor(nvgRGBA(255, 255, 255, 230));
     mainPanel->setBorderWidth(0.0f);
     mainPanel->setCornerRadius(0.0f);
 
@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
     // 创建右图像面板
     auto rightPanel1 = std::make_shared<UIPanel>(0, 0,  windowWidth, windowHeight);
     rightPanel1->setVerticalLayoutWithAlignment(FlexLayout::X_CENTER, FlexLayout::Y_START, 10.0f, 10.0f);
-    rightPanel1->setBackgroundColor(nvgRGBA(255, 255, 255,200));
+    rightPanel1->setBackgroundColor(nvgRGBA(255, 255, 255, 230));
 
     // 先创建纹理组件
     // auto texture = std::make_shared<UITexture>(0, 0, 400, 600, "D:\\Picture\\JEPG\\20250216\\20250216-P1013191-.jpg");
@@ -160,6 +160,7 @@ int main(int argc, char** argv) {
     
         // mainPanel->updateLayout();
         rightPanel1->moveTo(totalDeltaX , totalDeltaY, 0.3f);
+        // texture->setPaintValid(false);
         // mainPanel->updateLayout();
         rightPanel1->updateLayout ();
     });
@@ -181,7 +182,8 @@ int main(int argc, char** argv) {
         }
        
         UIAnimationManager::getInstance().scaleTo(texture.get(), 1.0f * scalex, 1.0f *scaley, 0.2f, UIAnimation::EASE_OUT);
-
+        // texture->setPaintValid(false);
+        // mainPanel->updateLayout();
     });
 
     // 设置按键回调
@@ -273,7 +275,7 @@ int main(int argc, char** argv) {
 
 
     // 设置鼠标事件回调
-    window.setMouseButtonCallback([mainPanel](int button, int action, int mods) {
+    window.setMouseButtonCallback([&,rightPanel1,texture,mainPanel](int button, int action, int mods) {
         // 处理所有鼠标按键，不只是左键
         double xpos, ypos;
         glfwGetCursorPos(glfwGetCurrentContext(), &xpos, &ypos);
@@ -290,6 +292,20 @@ int main(int argc, char** argv) {
         // 添加调试输出
         std::cout << "Mouse button " << button << " action " << action << std::endl;
         
+        if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+
+            window.toggleFullscreen();
+            window.getFramebufferSize(currentWindowWidth, currentWindowHeight);
+            mainPanel->setSize(currentWindowWidth,currentWindowHeight);
+            rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
+        
+            texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+            texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+            texture->setPaintValid(false);
+
+        }
+
+
         mainPanel->handleEvent(event);
     });
     
@@ -333,7 +349,9 @@ int main(int argc, char** argv) {
                 texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
                 texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
                 texture->setPaintValid(false);
-              
+                rightPanel1->updateLayout();
+                mainPanel->handleEvent(event);
+                return;
             }
             
 /////////////////////////////////////////////
@@ -355,8 +373,6 @@ int main(int argc, char** argv) {
             label->setText(indexString + imagName);
         }
         
-
-
         mainPanel->setSize(currentWindowWidth,currentWindowHeight);
         rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
 
@@ -368,7 +384,7 @@ int main(int argc, char** argv) {
 
 
 //////////////////////////////////////////////////
-            mainPanel->handleEvent(event);
+        mainPanel->handleEvent(event);
         }
     });
 
@@ -450,7 +466,7 @@ int main(int argc, char** argv) {
         UIAnimationManager::getInstance().update(deltaTime);
         if (UIAnimationManager::getInstance().getAnimationCount() != 0 || texture->isPaintValid()== false ) {
             window.beginFrame();
-            window.clearBackground(1.0f, 1.0f, 1.0f, 1.0f);
+            window.clearBackground(1.0f, 1.0f, 1.0f, 0.9f);
             
             // 渲染主面板（会递归渲染所有子组件）
             mainPanel->updateLayout();
