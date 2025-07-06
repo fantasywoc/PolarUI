@@ -318,11 +318,22 @@ int main(int argc, char** argv) {
                 std::cout << "Left key pressed   "<<event.keyCode  << std::endl;
                 change_speed = -1 ;
             } 
-            else if (key == GLFW_KEY_RIGHT) {
+            else if (key == GLFW_KEY_RIGHT ) {
                 // 右方向键处理
                 event.keyCode = GLFW_KEY_RIGHT;
                 std::cout << "Right key pressed  "<<event.keyCode << std::endl;
                 change_speed =1;
+            }else if(key == GLFW_KEY_F ){
+                event.keyCode = GLFW_KEY_F;
+                window.toggleFullscreen();
+                window.getFramebufferSize(currentWindowWidth, currentWindowHeight);
+                mainPanel->setSize(currentWindowWidth,currentWindowHeight);
+                rightPanel1->setSize(currentWindowWidth,currentWindowHeight);
+            
+                texture->setSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+                texture->setOriginSize(currentWindowWidth*0.9,currentWindowHeight*0.9);
+                texture->setPaintValid(false);
+              
             }
             
 /////////////////////////////////////////////
@@ -371,7 +382,7 @@ int main(int argc, char** argv) {
     });
     
     // 添加滚轮事件处理
-    window.setScrollCallback([mainPanel](double xoffset, double yoffset) {
+    window.setScrollCallback([&,mainPanel](double xoffset, double yoffset) {
         UIEvent event;
         event.type = UIEvent::MOUSE_SCROLL;
         

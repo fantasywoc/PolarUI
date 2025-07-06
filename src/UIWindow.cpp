@@ -375,9 +375,9 @@ void UIWindow::keyCallbackWrapper(GLFWwindow* window, int key, int scancode, int
     UIWindow* uiWindow = static_cast<UIWindow*>(glfwGetWindowUserPointer(window));
     if (uiWindow) {
         // 处理 F 全屏切换
-        if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-            uiWindow->toggleFullscreen();
-        }
+        // if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+        //     uiWindow->toggleFullscreen();
+        // }
         
         // 调用用户设置的回调
         if (uiWindow->keyCallback) {
