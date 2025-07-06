@@ -73,6 +73,7 @@ int main(int argc, char** argv) {
     }
     if (image_paths.empty()) {
         image_paths.push_back("Vimag.png");
+        image_names.push_back("Vimag.png");
         current_index = 0;
     }
 

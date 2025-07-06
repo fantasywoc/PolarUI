@@ -212,7 +212,7 @@ bool UITexture::handleEvent(const UIEvent& event) {
                 float deltaY = event.mouseY - m_lastMouseY;
                 float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
                 
-                if (distance > 3.0f) { // 移动超过3像素才开始拖拽
+                if (distance > 2.0f) { // 移动超过3像素才开始拖拽
                     m_isDragging = true;
 
                     m_paintValid = false;

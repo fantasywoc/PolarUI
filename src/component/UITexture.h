@@ -115,7 +115,7 @@ private:
     // 双击检测
     double m_lastClickTime = 0.0;
     int m_lastClickButton = -1;
-    static constexpr double DOUBLE_CLICK_TIME = 0.5; // 双击时间间隔（秒）
+    static constexpr double DOUBLE_CLICK_TIME = 0.25; // 双击时间间隔（秒）
     //图片加载失败
     bool m_isLoadError = false;
 

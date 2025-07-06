@@ -354,6 +354,10 @@ std::string getExifInfo(const std::string& imagPath){
 
 
 void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle){
+    if (limit_index==1) {
+        current_index = 0;
+        return;
+    }
     if(is_cycle){
         if (current_index > limit_index) {
             current_index = limit_index - 1;

@@ -141,7 +141,11 @@ bool UIWindow::initialize() {
         font = nvgCreateFont(vg, "default", "C:/Windows/Fonts/msyh.ttc");
         if (font == -1) {
             std::cerr << "Warning: Failed to load font, text may not display properly" << std::endl;
+        }else{
+            std::cout << "Successfully loaded font  C:/Windows/Fonts/msyh.ttc" << std::endl;
         }
+    }else{
+        std::cout << "Successfully loaded font  ./msyh.ttc" << std::endl;
     }
 
     nvgFontFace(vg, "default");
