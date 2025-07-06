@@ -102,7 +102,7 @@ void find_image_files(
                         try{
                             std::string filePath = entry.path().generic_string();
                             image_paths.push_back(entry.path());
-                            image_names.push_back(entry.path().filename().string());
+                            image_names.push_back(entry.path().filename().u8string());
 
                         }
                         catch (const std::exception& e) {
