@@ -52,7 +52,8 @@ int main(int argc, char** argv) {
 // gif test
 {
     fs::path gifPath = "C:\\Users\\CK\\Desktop\\GIF.gif";
-    GifImage gif = loadGif(gifPath.generic_string());
+    int width, height, frame_count;
+    GifImage gif = loadGif(gifPath.generic_string(), width, height, frame_count);
 
 }
 

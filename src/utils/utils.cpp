@@ -190,6 +190,10 @@ bool isFile(const std::string& path) {
     }
 }
 
+bool isGifPath(const std::string& path) {
+    return fs::path(path).extension() == ".gif";
+}
+
 bool isDirectory(const std::string& path) {
     try {
         return fs::is_directory(path);
@@ -231,51 +235,11 @@ void getImages( const std::string& filePath,fs::path& directory,std::vector<fs::
     } 
 }
 
-
-
-
-////////////////////////////////   image   ///////////////////////////////
-unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight,int& channels ,int desiredChannels ) {
-    
-    
-    
-    // 检查文件是否存在
-    if (!std::filesystem::exists(path)) {
-        std::cerr << "Error: Image file not found: " << path << std::endl;
-        return false;
-    }
-    std::cout << "Loading image: " << path << std::endl;
-    // 加载图像
-    unsigned char* outData  = nullptr;
-    try {
-         outData  = stbi_load(path.c_str(), &outWidth, &outHeight, &channels, desiredChannels);
-    }catch (const std::exception& e) {
-        std::cerr << "Error: Failed to load image: " << e.what() << std::endl;
-        return nullptr;
-    }
-    
-
-    if (!outData) {
-        std::cerr << "Failed to load image: " << path << std::endl;
-        std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
-        return nullptr;
-    }
-
-    return outData;
-}
-
-void FreeImage(unsigned char*& data) {
-    if (data) {
-        stbi_image_free(data);
-        data = nullptr; // 避免悬空指针
-    }
-}
-
- bool loadGifImage(const std::string& path, GifImage* out_gif) {
+bool loadGifImage(const std::string& path, GifImage* out_gif) {
     // 1. 读取文件到内存
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (!file.is_open()) {
-        std::cout << "Loading image: " << path << std::endl;
+        std::cerr << "Failed to open GIF: " << path << std::endl;
         return false;
     }
     
@@ -284,55 +248,136 @@ void FreeImage(unsigned char*& data) {
     std::vector<char> buffer(size);
     file.read(buffer.data(), size);
     
-    // 2. 使用 stb_image 加载 GIF
+    // 2. 使用stb_image加载GIF
     int* delays = nullptr;
     int width, height, frames, channels;
     unsigned char* data = stbi_load_gif_from_memory(
-        reinterpret_cast<unsigned char*>(buffer.data()), 
-        static_cast<int>(size), 
+        reinterpret_cast<unsigned char*>(buffer.data()),
+        static_cast<int>(size),
         &delays, &width, &height, &frames, &channels, 0);
+
+    std::cout << "GIF width: " << width << ", height: " << height << ", frames: " << frames << ", channels: " << channels << std::endl;
     
     if (!data) {
         std::cerr << "Failed to load GIF: " << stbi_failure_reason() << std::endl;
-        return false; // 或者根据函数声明返回适当的值
+        return false;
     }
     
-    // 转换原始指针为智能指针
-    std::unique_ptr<std::unique_ptr<unsigned char[]>[]> framePtrs(
-        new std::unique_ptr<unsigned char[]>[frames]);
-    std::unique_ptr<int[]> delayPtrs(new int[frames]);
-    
-    // 复制延迟数据
-    std::copy(delays, delays + frames, delayPtrs.get());
-    free(delays);
-    
-    // 正确处理帧数据
+    // 3. 计算总帧数据大小并分配连续内存
     size_t frameSize = width * height * channels;
-    for (int i = 0; i < frames; ++i) {
-        framePtrs[i] = std::unique_ptr<unsigned char[]>(new unsigned char[frameSize]);
-        std::copy(data + (i * frameSize), data + ((i + 1) * frameSize), framePtrs[i].get());
-    }
-    free(data);
-
-    // 填充输出结构
-    out_gif->width = width;
-    out_gif->height = height;
-    out_gif->frame_count = frames;
-    out_gif->channels = channels;
-    out_gif->frames = std::move(framePtrs);
-    out_gif->delays = std::move(delayPtrs);
+    size_t totalSize = frameSize * frames;
     
-    return true;
+    try {
+        // 分配连续内存存储所有帧数据
+        out_gif->frames.reset(new unsigned char[totalSize]);
+        
+        // 复制帧数据到连续内存
+        for (int i = 0; i < frames; ++i) {
+            memcpy(out_gif->frames.get() + i * frameSize, 
+                  data + i * frameSize, 
+                  frameSize);
+        }
+        
+        // 复制延迟数据
+        out_gif->delays.reset(new int[frames]);
+        memcpy(out_gif->delays.get(), delays, frames * sizeof(int));
+        
+        // 设置其他属性
+        out_gif->width = width;
+        out_gif->height = height;
+        out_gif->frame_count = frames;
+        out_gif->channels = channels;
+        
+        // 释放原始数据
+        free(delays);
+        stbi_image_free(data);
+        
+        return true;
+    } catch (const std::bad_alloc& e) {
+        std::cerr << "Memory allocation failed: " << e.what() << std::endl;
+        free(delays);
+        stbi_image_free(data);
+        return false;
+    }
 }
 
 
-GifImage loadGif(const std::string& path) {
+////////////////////////////////   image   ///////////////////////////////
+unsigned char* LoadImage(const std::string& path, int& outWidth, int& outHeight, int& channels, int desiredChannels) {
+    // 检查文件是否存在
+    if (!std::filesystem::exists(path)) {
+        std::cerr << "Error: Image file not found: " << path << std::endl;
+        return nullptr;
+    }
+    
+    // 先尝试获取图像信息
+    if (!stbi_info(path.c_str(), &outWidth, &outHeight, &channels)) {
+        std::cerr << "Failed to get image info: " << path << std::endl;
+        std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
+        return nullptr;
+    }
+    
+    std::cout << "Loading image: " << path << std::endl;
+    unsigned char* outData = nullptr;
+
+    if (!isGifPath(path)) {
+        try {
+            outData = stbi_load(path.c_str(), &outWidth, &outHeight, &channels, desiredChannels);
+            if (!outData) {
+                std::cerr << "Failed to load image: " << path << std::endl;
+                std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
+                return nullptr;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error: Failed to load image: " << e.what() << std::endl;
+            return nullptr;
+        }
+    } else {
+        try {
+            int frame_count;
+            GifImage gif = loadGif(path, outWidth, outHeight, frame_count);
+            if (gif.frame_count > 0 && gif.frames) {
+                size_t frameSize = gif.width * gif.height * 4;
+                outData = new unsigned char[frameSize];
+                memcpy(outData, gif.frames.get(), frameSize);
+            } else {
+                std::cerr << "Failed to load GIF: " << path << std::endl;
+                return nullptr;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error: Failed to load GIF: " << e.what() << std::endl;
+            return nullptr;
+        }
+    }
+
+    return outData;
+}
+
+// 修改函数定义
+void FreeImage(unsigned char*& data, const std::string& path) {
+    if (!data) return;
+    
+    if (isGifPath(path)) {
+        // GIF内存由unique_ptr自动管理，只需重置指针
+        data = nullptr;
+    } else {
+        // 普通图像使用STB释放
+        stbi_image_free(data);
+        data = nullptr;
+    }
+}
+
+
+
+
+GifImage loadGif(const std::string& path,  int& outWidth, int& outHeight,int& frame_count) {
     GifImage gif;
     
     if (!loadGifImage(path, &gif)) {
         std::cerr << "加载GIF失败: " << path << std::endl;
         return {};
     }
+
     std::cout << "GIF加载成功: " << path << std::endl;
     std::cout<<"width: " << gif.width << std::endl;
     std::cout<<"height: " << gif.height << std::endl;
@@ -352,7 +397,7 @@ std::string getExifInfo(const std::string& imagPath){
     return image_exif;
 }
 
-
+//图片切换循环
 void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle){
     if (limit_index==1) {
         current_index = 0;

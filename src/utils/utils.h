@@ -13,7 +13,6 @@
 namespace fs = std::filesystem;
 
 
-
 // 检查是否是支持的图像文件
 static const std::set<std::string> imageExtensions = {
     ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tga","hdr",".psd"
@@ -31,6 +30,7 @@ void removeZero(std::string& str);
 //格式化曝光时间
 std::string fomatExposureTime(double& exposureTime) ;
 bool isFile(const std::string& path) ;
+bool isGifPath(const std::string& path);
 bool isDirectory(const std::string& path) ;
 std::string getDirectoryFromPath(const std::string& path) ;
 
@@ -109,20 +109,21 @@ unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight
      * @brief 安全释放由LoadImage加载的图像数据
      * @param data 图像数据指针（会被置为nullptr）
      */
-void FreeImage(unsigned char*& data);
+// 修改函数声明
+void FreeImage(unsigned char*& data, const std::string& path);
 // 需要添加以下声明
 struct GifImage {
     int width;
     int height;
     int frame_count;
-    std::unique_ptr<std::unique_ptr<unsigned char[]>[]> frames;
+    std::unique_ptr<unsigned char[]> frames; 
     std::unique_ptr<int[]> delays;
     int channels;
 };
 
 // 确保所有在utils.cpp中实现的函数都在这里声明
 bool loadGifImage(const std::string& path, GifImage* out_gif);
-GifImage loadGif(const std::string& path);
+GifImage loadGif(const std::string& path,  int& outWidth, int& outHeight,int& frame_count);
 
 
 void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle);

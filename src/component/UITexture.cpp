@@ -60,15 +60,6 @@ void UITexture::render(NVGcontext* vg) {
         nvgScale(vg, m_animationScaleX, m_animationScaleY);
         nvgTranslate(vg, -centerX, -centerY); 
     }
-    // // 平移
-    // if (m_animationOffsetX != 0.0f || m_animationOffsetY != 0.0f){
-
-    //     float tragetX = m_x + m_animationOffsetX  ;
-    //     float tragetY = m_y + m_animationOffsetY  ;
-
-    //     nvgTranslate(vg, tragetX, tragetY);
-
-    // }
 
     // 应用动画偏移
     if (m_animationOffsetX != 0.0f || m_animationOffsetY != 0.0f) {
@@ -83,25 +74,17 @@ void UITexture::render(NVGcontext* vg) {
     nvgFillColor(vg, nvgRGBA(0, 0, 0, 1)); // 全透明黑色
     nvgFill(vg);
 }
-    
-
-
-
 
     // 计算图像渲染区域
     float renderX, renderY, renderW, renderH;
     calculateRenderBounds(renderX, renderY, renderW, renderH);
-    
+
     // 绘制图像
     nvgSave(vg);
   
-
     // 设置透明度（考虑动画透明度）
     nvgGlobalAlpha(vg, m_alpha * m_animationOpacity);
 
-
-    // // 创建图像填充模式
-    // NVGpaint imgPaint = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
     if (!m_paintValid) {
         imgPaint_cache = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
         m_paintValid = true;
@@ -349,7 +332,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
     
     // 释放 stb_image 分配的内存
-    FreeImage(data);
+    FreeImage(data,imagePath);
     
     if (m_nvgImage == -1) {
         std::cerr << "Failed to create NanoVG image from: " << imagePath << std::endl;
