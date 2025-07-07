@@ -84,6 +84,19 @@ public:
     bool isDragging() const { return m_isDragging; }
     void updateSize();
     bool isLoadError(){return m_isLoadError;}
+
+
+    // GIF动画相关方法
+    bool isGif() const { return m_isGif; }
+    // bool loadGifImage(NVGcontext* vg, const std::string& path);
+    void updateGifFrame(NVGcontext* vg); 
+    // GIF播放控制
+    void playGif() { m_gifPlaying = true; }
+    void pauseGif() { m_gifPlaying = false; }
+    void toggleGifPlayback() { m_gifPlaying = !m_gifPlaying; }
+    bool isGifPlaying() const { return m_gifPlaying; }
+
+
 private:
     // 基础纹理属性
     std::string m_imagePath;
@@ -118,6 +131,15 @@ private:
     static constexpr double DOUBLE_CLICK_TIME = 0.25; // 双击时间间隔（秒）
     //图片加载失败
     bool m_isLoadError = false;
+
+
+    // GIF动画相关属性
+    bool m_isGif = false;
+    int m_currentFrame = 0;
+    int m_gifFramesCount = 0;
+    double m_frameTime = 0.0;
+    bool m_gifPlaying = true;
+
 
     // 事件回调
     DragCallback m_onDrag;

@@ -5,6 +5,7 @@
 #include "component/FlexLayout.h"
 #include "component/UITexture.h"
 #include "component/UITextInput.h"
+#include "component/TextureCache.h"
 // 添加动画系统头文件
 #include "animation/UIAnimationManager.h"
 #include "animation/UIAnimation.h"
@@ -17,6 +18,7 @@
 #include <vector>
 #include <algorithm>
 #include <set>
+
 
 namespace fs = std::filesystem;
 
@@ -49,13 +51,13 @@ int main(int argc, char** argv) {
         std::cout << "windos UTF-8" << std::endl;
     #endif
 
-// gif test
-{
-    fs::path gifPath = "C:\\Users\\CK\\Desktop\\GIF.gif";
-    int width, height, frame_count;
-    GifImage gif = loadGif(gifPath.generic_string(), width, height, frame_count);
+// // gif test
+// {
+//     fs::path gifPath = "C:\\Users\\CK\\Desktop\\GIF.gif";
+//     int width, height, frame_count;
+//     GifImage gif = loadGif(gifPath.generic_string(), width, height, frame_count);
 
-}
+// }
 
     // 获取图片文件
     fs::path directory = "./";
@@ -84,6 +86,11 @@ int main(int argc, char** argv) {
     int change_speed = 0;
 
  
+
+    TextureCache::processMainThreadTasks();
+
+
+
 
     // 在现有代码中添加
     UIWindow window(1600, 900, "VIMAG");
@@ -194,10 +201,21 @@ int main(int argc, char** argv) {
     });
 
     // 设置拖拽时滚轮回调
+    // 在图像切换逻辑中添加预加载
     texture->setOnDragScroll([&, texture, rightPanel1, mainPanel,label](float scrollX, float scrollY) {
-        std::cout << "拖拽时滚轮: (" << scrollX << ", " << scrollY << ")" << std::endl;
-
-        change_speed += -scrollY;
+        // ... existing code ...
+    
+    // 预加载相邻图像
+    if (current_index > 0) {
+        std::string prevPath = image_paths[current_index - 1].generic_string();
+        TextureCache::preloadTexture(window.getNVGContext(), prevPath);
+    }
+    if (current_index < limit_index - 1) {
+        std::string nextPath = image_paths[current_index + 1].generic_string();
+        TextureCache::preloadTexture(window.getNVGContext(), nextPath);
+    }
+    
+    change_speed += -scrollY;
         if (change_speed%2 != 0){
             return ;
         }
@@ -427,6 +445,9 @@ int main(int argc, char** argv) {
     auto lastTime = glfwGetTime();
     while (!window.shouldClose()) {
         
+        // 处理纹理缓存的主线程任务
+        TextureCache::processMainThreadTasks();
+        
         // 计算时间差
         // 在初始化时设置垂直同步
         glfwSwapInterval(1);  // 已经设置了
@@ -460,13 +481,13 @@ int main(int argc, char** argv) {
             continue;
         }
         lastTime = currentTime;
-
+        texture->update(deltaTime);
         window.pollEvents();
         // std::cout<<"UIAnimationManager::getInstance().getAnimationCount():"<<UIAnimationManager::getInstance().getAnimationCount() <<std::endl;
         // std::cout<<"texture->isPaintValid():"<<texture->isPaintValid() <<std::endl;
         // 更新动画系统
         UIAnimationManager::getInstance().update(deltaTime);
-        if (UIAnimationManager::getInstance().getAnimationCount() != 0 || texture->isPaintValid()== false ) {
+        if (UIAnimationManager::getInstance().getAnimationCount() != 0 || texture->isPaintValid()== false || true) {
             window.beginFrame();
             window.clearBackground(1.0f, 1.0f, 1.0f, 0.9f);
             

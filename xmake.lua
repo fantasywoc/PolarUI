@@ -63,7 +63,7 @@ target("button-demo")
 target("vimag-demo")
     set_kind("binary")                     -- 设置为可执行文件
     add_rpathdirs("$ORIGIN")              -- 设置运行时库搜索路径
-    add_files("src/Vimag.cpp","src/TinyEXIF/TinyEXIF.cpp")  -- 添加源文件
+    add_files("src/Vimag.cpp","src/TinyEXIF/TinyEXIF.cpp","src/component/TextureCache.cpp")  -- 添加源文件
     add_deps("ui")                         -- 添加对 UI 库的依赖
     add_packages("glfw", "nanovg", "glew") -- 添加第三方依赖包
     

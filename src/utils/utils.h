@@ -111,19 +111,19 @@ unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight
      */
 // 修改函数声明
 void FreeImage(unsigned char*& data, const std::string& path);
-// 需要添加以下声明
-struct GifImage {
-    int width;
-    int height;
-    int frame_count;
-    std::unique_ptr<unsigned char[]> frames; 
-    std::unique_ptr<int[]> delays;
-    int channels;
-};
+// // 需要添加以下声明
+// struct GifImage {
+//     int width;
+//     int height;
+//     int frame_count;
+//     std::unique_ptr<unsigned char[]> frames; 
+//     std::unique_ptr<int[]> delays;
+//     int channels;
+// };
 
 // 确保所有在utils.cpp中实现的函数都在这里声明
-bool loadGifImage(const std::string& path, GifImage* out_gif);
-GifImage loadGif(const std::string& path,  int& outWidth, int& outHeight,int& frame_count);
+unsigned char* loadGifImage(const std::string& path, int& outWidth, int& outHeight, int& channels, int& frames) ;
+// GifImage loadGif(const std::string& path,  int& outWidth, int& outHeight,int& frame_count);
 
 
 void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle);

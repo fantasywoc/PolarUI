@@ -14,7 +14,11 @@ UITexture::UITexture(float x, float y, float width, float height, const std::str
     , m_scaleMode(ScaleMode::STRETCH)
     , m_alpha(1.0f)
     , m_OriginWidth(height)
-    , m_needsLoad(!imagePath.empty()) {
+    , m_needsLoad(!imagePath.empty())
+    , m_isGif(false)
+    , m_currentFrame(0)
+    , m_frameTime(0.0)
+    , m_gifPlaying(true) {
     // 不在构造函数中加载图像，延迟到render时加载
     s_instances.push_back(this);
 }
@@ -309,7 +313,16 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     // 使用 stb_image 加载图像
     int channels;
     try {
-        data = LoadImage(imagePath.c_str(), m_imageWidth,m_imageHeight,  channels);
+
+        if(isGifPath(m_imagePath)){
+            m_isGif = true;
+            data = loadGifImage(m_imagePath,m_imageWidth, m_imageHeight , channels, m_gifFramesCount) ;
+
+        }else{
+            m_isGif = false;
+            data = LoadImage(imagePath.c_str(), m_imageWidth,m_imageHeight,  channels); 
+        }
+
     }catch (const std::exception& e) {
         std::cerr << "Failed to load image: " << imagePath << " error: " << e.what() << std::endl;
         m_isLoadError = true;
