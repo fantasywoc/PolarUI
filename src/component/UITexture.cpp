@@ -329,6 +329,13 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
             //////////////////////////////////    GIF     ///////////////////////////////
             m_isGif = true;
             data = loadGifImage(m_imagePath,m_imageWidth, m_imageHeight , channels, m_gifFramesCount) ;
+            if (!data){
+                std::cerr << "Failed to load image: " << imagePath << std::endl;
+                // std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
+                m_isLoadError = true;
+                return false;
+            }
+           
             try {
                 // 为每一帧创建纹理
                 for (int i = 0; i < m_gifFramesCount; i++) {
@@ -347,7 +354,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
                     }
                     
                     m_frameTextures.push_back(textureId);
-                    std::cout << "Preloaded frame " << i << " with texture ID: " << textureId << std::endl;
+                    // std::cout << "Preloaded frame " << i << " with texture ID: " << textureId << std::endl;
                 }
                 
                 std::cout << "Successfully preloaded " << m_frameTextures.size() << " frames" << std::endl;
@@ -368,13 +375,19 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
             try {
                 m_isGif = false;
                 data = LoadImage(imagePath.c_str(), m_imageWidth,m_imageHeight,  channels);
+                    if (!data){
+                        std::cerr << "Failed to load image: " << imagePath << std::endl;
+                        // std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
+                        m_isLoadError = true;
+                        return false;
+                    }
                 // 创建 NanoVG 图像
                 m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
                 
                 // 释放 stb_image 分配的内存
                 FreeImage(data,imagePath); 
             }catch (const std::exception& e) {
-                std::cerr << "Failed to load image: " << imagePath << " error: " << e.what() << std::endl;
+                std::cerr << "Failed to load image:sssss   " << imagePath << " error: " << e.what() << std::endl;
                 m_isLoadError = true;
             return false;
          }
@@ -382,12 +395,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
 
    
     
-    if (!data){
-        std::cerr << "Failed to load image: " << imagePath << std::endl;
-        // std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
-        m_isLoadError = true;
-        return false;
-    }
+
     m_isLoadError = false;
 
     updateSize();
@@ -445,6 +453,9 @@ void UITexture::setImagePath(NVGcontext* vg, const std::string& imagePath) {
         if (m_needsLoad) {
             if(loadImage(vg, m_imagePath)){
                 m_needsLoad = false;
+                m_isLoadError = false;
+            }else{
+                 m_isLoadError = true;
             }
             
         }
