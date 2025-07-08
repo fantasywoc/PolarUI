@@ -21,6 +21,7 @@ UITexture::UITexture(float x, float y, float width, float height, const std::str
     , m_gifPlaying(true) {
     // 不在构造函数中加载图像，延迟到render时加载
     s_instances.push_back(this);
+    m_frameTextures.resize(0);
 }
 
 UITexture::~UITexture() {
@@ -45,6 +46,7 @@ void UITexture::render(NVGcontext* vg) {
 
     // 如果需要加载图像且还未加载
     if (m_needsLoad && m_nvgImage == -1 && !m_imagePath.empty()) {
+        std::cout<< "Render loadImage!"<<std::endl;
         loadImage(vg, m_imagePath);
         m_needsLoad = false;
     }
@@ -89,7 +91,15 @@ void UITexture::render(NVGcontext* vg) {
     // 设置透明度（考虑动画透明度）
     nvgGlobalAlpha(vg, m_alpha * m_animationOpacity);
 
-    if (!m_paintValid) {
+    if(m_isGif){
+        bool is_cycle = true;
+        playGif(m_currentFrame,m_gifFramesCount, is_cycle);
+        m_nvgImage = m_frameTextures[m_currentFrame];
+        m_paintValid= false;
+   
+    }
+    if (!m_paintValid ) {
+
         imgPaint_cache = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
         m_paintValid = true;
     }
@@ -111,6 +121,7 @@ void UITexture::render(NVGcontext* vg) {
     //     nvgStroke(vg);
     // }
 }
+
 
 void UITexture::update(double deltaTime) {
     // 纹理控件通常不需要更新逻辑
@@ -312,22 +323,64 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     unsigned char* data = nullptr;
     // 使用 stb_image 加载图像
     int channels;
-    try {
+    
 
         if(isGifPath(m_imagePath)){
+            //////////////////////////////////    GIF     ///////////////////////////////
             m_isGif = true;
             data = loadGifImage(m_imagePath,m_imageWidth, m_imageHeight , channels, m_gifFramesCount) ;
+            try {
+                // 为每一帧创建纹理
+                for (int i = 0; i < m_gifFramesCount; i++) {
+                    // 计算当前帧的数据指针
+                    size_t frameSize = m_imageWidth * m_imageHeight * channels;
+                    unsigned char* frameData = data + (i * frameSize);
+                    
+                    // 创建当前帧的NanoVG纹理
+                    int textureId = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, frameData);
+                    
+                    if (textureId == -1) {
+                        std::cerr << "Failed to create texture for frame " << i << std::endl;
+                        // 清理已创建的纹理
+                        // clearFrameTextures(vg);
+                        
+                    }
+                    
+                    m_frameTextures.push_back(textureId);
+                    std::cout << "Preloaded frame " << i << " with texture ID: " << textureId << std::endl;
+                }
+                
+                std::cout << "Successfully preloaded " << m_frameTextures.size() << " frames" << std::endl;
+                m_currentFrame = 0;
+                m_nvgImage = m_frameTextures[m_currentFrame];
+                // 释放 stb_image 分配的内存
+                FreeImage(data,imagePath); 
 
+
+                return true;
+            } catch (const std::exception& e) {
+                std::cerr << "Exception during frame preloading: " << e.what() << std::endl;
+                // clearFrameTextures(vg);
+                return false;
+            }
         }else{
-            m_isGif = false;
-            data = LoadImage(imagePath.c_str(), m_imageWidth,m_imageHeight,  channels); 
+            /////////////////////////////     NO GIF    ///////////////////////////////////////////
+            try {
+                m_isGif = false;
+                data = LoadImage(imagePath.c_str(), m_imageWidth,m_imageHeight,  channels);
+                // 创建 NanoVG 图像
+                m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
+                
+                // 释放 stb_image 分配的内存
+                FreeImage(data,imagePath); 
+            }catch (const std::exception& e) {
+                std::cerr << "Failed to load image: " << imagePath << " error: " << e.what() << std::endl;
+                m_isLoadError = true;
+            return false;
+         }
         }
 
-    }catch (const std::exception& e) {
-        std::cerr << "Failed to load image: " << imagePath << " error: " << e.what() << std::endl;
-        m_isLoadError = true;
-       return false;
-    }
+   
     
     if (!data){
         std::cerr << "Failed to load image: " << imagePath << std::endl;
@@ -341,11 +394,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     setPaintValid(false);
 
 
-    // 创建 NanoVG 图像
-    m_nvgImage = nvgCreateImageRGBA(vg, m_imageWidth, m_imageHeight, 0, data);
-    
-    // 释放 stb_image 分配的内存
-    FreeImage(data,imagePath);
+
     
     if (m_nvgImage == -1) {
         std::cerr << "Failed to create NanoVG image from: " << imagePath << std::endl;
@@ -358,8 +407,27 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     return true;
 } 
 
+// 添加清理GIF帧纹理的实现
+void UITexture::clearFrameTextures(NVGcontext* vg) {
+    if (vg) {
+        for (int textureId : m_frameTextures) {
+            if (textureId != -1) {
+                nvgDeleteImage(vg, textureId);
+                std::cout << "Deleted frame texture ID: " << textureId << std::endl;
+            }
+        }
+    }
+    m_frameTextures.clear();
+}
+
+
+
+
+
 void UITexture::unloadImage(NVGcontext* vg) {
+    
     if (m_nvgImage != -1 && vg) {
+        clearFrameTextures(vg);
         nvgDeleteImage(vg, m_nvgImage);
         m_nvgImage = -1;
     }
@@ -375,7 +443,10 @@ void UITexture::setImagePath(NVGcontext* vg, const std::string& imagePath) {
         m_imagePath = imagePath;
         m_needsLoad = !imagePath.empty();
         if (m_needsLoad) {
-            loadImage(vg, m_imagePath);
+            if(loadImage(vg, m_imagePath)){
+                m_needsLoad = false;
+            }
+            
         }
 
         m_paintValid = false; // 使缓存失效

@@ -128,3 +128,4 @@ unsigned char* loadGifImage(const std::string& path, int& outWidth, int& outHeig
 
 void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle);
 std::string getExifInfo(const std::string& imagPath);
+void playGif(int& currentFrame, int& gifFramesCount, bool& is_cycle);

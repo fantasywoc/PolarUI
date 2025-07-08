@@ -405,3 +405,28 @@ void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle)
     }
 
 }
+void playGif(int& currentFrame, int& gifFramesCount, bool& is_cycle){
+    currentFrame++;
+    if (gifFramesCount==1) {
+        currentFrame = 0;
+        return;
+    }
+    if(is_cycle){
+        if (currentFrame > gifFramesCount) {
+            currentFrame = gifFramesCount - 1;
+            // return;
+        }else if (currentFrame==gifFramesCount) {
+            currentFrame = 0;
+            // return;
+        }
+    }else{
+        if (currentFrame > gifFramesCount) {
+            currentFrame = 0;
+            return;
+        }else if (currentFrame==gifFramesCount) {
+            currentFrame = gifFramesCount - 1;
+            return;
+        }
+    }
+
+}

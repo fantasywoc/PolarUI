@@ -91,8 +91,8 @@ public:
     // bool loadGifImage(NVGcontext* vg, const std::string& path);
     void updateGifFrame(NVGcontext* vg); 
     // GIF播放控制
-    void playGif() { m_gifPlaying = true; }
-    void pauseGif() { m_gifPlaying = false; }
+    // void playGif() { m_gifPlaying = true; }
+    // void pauseGif() { m_gifPlaying = false; }
     void toggleGifPlayback() { m_gifPlaying = !m_gifPlaying; }
     bool isGifPlaying() const { return m_gifPlaying; }
 
@@ -139,8 +139,10 @@ private:
     int m_gifFramesCount = 0;
     double m_frameTime = 0.0;
     bool m_gifPlaying = true;
-
-
+    //存储每一帧的NanoVG纹理ID
+    std::vector<int> m_frameTextures;  // 每帧的纹理数组
+    // 添加清理GIF帧纹理
+    void clearFrameTextures(NVGcontext* vg);
     // 事件回调
     DragCallback m_onDrag;
     ScrollCallback m_onScroll;
