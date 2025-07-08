@@ -42,7 +42,7 @@ public:
     
 private:
     std::string m_text;
-    NVGcolor m_textColor = nvgRGB(0, 0, 0);
+    NVGcolor m_textColor = nvgRGBA(0, 0, 0, 200);
     float m_fontSize = 18.0f;
     TextAlign m_textAlign = LEFT;
     VerticalAlign m_verticalAlign = MIDDLE;

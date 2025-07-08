@@ -42,7 +42,7 @@ bool is_cycle = true; // 是否循环播放;
 
 int main(int argc, char** argv) {
  
-    //FreeConsole();  //关闭控制台
+    // FreeConsole();  //关闭控制台
     #ifdef _WIN32
         // Windows专用代码
         SetConsoleOutputCP(CP_UTF8);
@@ -85,14 +85,8 @@ int main(int argc, char** argv) {
     // std::string imagPath =image_paths[current_index].u8string();
     int change_speed = 0;
 
- 
+    // TextureCache::getInstance().processMainThreadTasks();
 
-    TextureCache::processMainThreadTasks();
-
-
-
-
-    // 在现有代码中添加
     UIWindow window(1600, 900, "VIMAG");
     
     // 启用动态标题栏功能
@@ -147,12 +141,12 @@ int main(int argc, char** argv) {
     // 添加标签到左面板 - 修改宽度为150px
     auto label = std::make_shared<UILabel>(0, 0, 200, 50, " ");
     label->setTextAlign(UILabel::TextAlign::CENTER);
-    label->setFontSize(30.0f);
+    label->setTextColor(nvgRGBA(50, 50, 50, 250));
+    label->setFontSize(24.0f);
  
  
     float scalex{1}, scaley{1};
    
-
     // 事件处理 //
     // // 设置拖拽回调
     static float initialX = rightPanel1->getX();
@@ -205,15 +199,15 @@ int main(int argc, char** argv) {
     texture->setOnDragScroll([&, texture, rightPanel1, mainPanel,label](float scrollX, float scrollY) {
         // ... existing code ...
     
-    // 预加载相邻图像
-    if (current_index > 0) {
-        std::string prevPath = image_paths[current_index - 1].generic_string();
-        TextureCache::preloadTexture(window.getNVGContext(), prevPath);
-    }
-    if (current_index < limit_index - 1) {
-        std::string nextPath = image_paths[current_index + 1].generic_string();
-        TextureCache::preloadTexture(window.getNVGContext(), nextPath);
-    }
+    // // 预加载相邻图像
+    // if (current_index > 0) {
+    //     std::string prevPath = image_paths[current_index - 1].generic_string();
+    //     TextureCache::preloadTexture(window.getNVGContext(), prevPath);
+    // }
+    // if (current_index < limit_index - 1) {
+    //     std::string nextPath = image_paths[current_index + 1].generic_string();
+    //     TextureCache::preloadTexture(window.getNVGContext(), nextPath);
+    // }
     
     change_speed += -scrollY;
         if (change_speed%2 != 0){
@@ -446,7 +440,7 @@ int main(int argc, char** argv) {
     while (!window.shouldClose()) {
         
         // 处理纹理缓存的主线程任务
-        TextureCache::processMainThreadTasks();
+        // TextureCache::processMainThreadTasks();
         
         // 计算时间差
         // 在初始化时设置垂直同步
@@ -487,7 +481,7 @@ int main(int argc, char** argv) {
         // std::cout<<"texture->isPaintValid():"<<texture->isPaintValid() <<std::endl;
         // 更新动画系统
         UIAnimationManager::getInstance().update(deltaTime);
-        if (UIAnimationManager::getInstance().getAnimationCount() != 0 || texture->isPaintValid()== false || true) {
+        if (UIAnimationManager::getInstance().getAnimationCount() != 0 || texture->isPaintValid()== false || texture->isGif()) {
             window.beginFrame();
             window.clearBackground(1.0f, 1.0f, 1.0f, 0.9f);
             

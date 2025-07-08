@@ -348,11 +348,7 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
                     
                     if (textureId == -1) {
                         std::cerr << "Failed to create texture for frame " << i << std::endl;
-                        // 清理已创建的纹理
-                        // clearFrameTextures(vg);
-                        
                     }
-                    
                     m_frameTextures.push_back(textureId);
                     // std::cout << "Preloaded frame " << i << " with texture ID: " << textureId << std::endl;
                 }
@@ -362,7 +358,6 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
                 m_nvgImage = m_frameTextures[m_currentFrame];
                 // 释放 stb_image 分配的内存
                 FreeImage(data,imagePath); 
-
 
                 return true;
             } catch (const std::exception& e) {
@@ -393,17 +388,11 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
          }
         }
 
-   
-    
-
     m_isLoadError = false;
 
     updateSize();
     setPaintValid(false);
 
-
-
-    
     if (m_nvgImage == -1) {
         std::cerr << "Failed to create NanoVG image from: " << imagePath << std::endl;
         return false;
@@ -421,16 +410,12 @@ void UITexture::clearFrameTextures(NVGcontext* vg) {
         for (int textureId : m_frameTextures) {
             if (textureId != -1) {
                 nvgDeleteImage(vg, textureId);
-                std::cout << "Deleted frame texture ID: " << textureId << std::endl;
+                // std::cout << "Deleted frame texture ID: " << textureId << std::endl;
             }
         }
     }
     m_frameTextures.clear();
 }
-
-
-
-
 
 void UITexture::unloadImage(NVGcontext* vg) {
     
