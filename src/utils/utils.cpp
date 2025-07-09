@@ -339,6 +339,7 @@ void FreeImage(unsigned char*& data, const std::string& path) {
     if (!data) return;
     
     if (isGifPath(path)) {
+        stbi_image_free(data);
         // GIF内存由unique_ptr自动管理，只需重置指针
         data = nullptr;
     } else {

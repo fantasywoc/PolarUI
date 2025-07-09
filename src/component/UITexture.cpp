@@ -53,7 +53,7 @@ void UITexture::render(NVGcontext* vg) {
     if (m_nvgImage == -1) {
         return;
     }
- 
+    FreeImage(data,m_imagePath); 
 
     // 缩放变换（以中心为原点）#支持中心动画缩放   放在这个位置可以缩放整个texture
     if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
@@ -317,14 +317,13 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
         std::cerr << "NVGcontext is null, cannot load image" << std::endl;
         return false;
     }
-    
+    FreeImage(data,imagePath); 
     // 先卸载之前的图像
     unloadImage(vg);
-    unsigned char* data = nullptr;
+    // unsigned char* data = nullptr;
     // 使用 stb_image 加载图像
     int channels;
     
-
         if(isGifPath(m_imagePath)){
             //////////////////////////////////    GIF     ///////////////////////////////
             m_isGif = true;
@@ -352,17 +351,18 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
                     m_frameTextures.push_back(textureId);
                     // std::cout << "Preloaded frame " << i << " with texture ID: " << textureId << std::endl;
                 }
-                
+                FreeImage(data,imagePath);
                 std::cout << "Successfully preloaded " << m_frameTextures.size() << " frames" << std::endl;
                 m_currentFrame = 0;
                 m_nvgImage = m_frameTextures[m_currentFrame];
                 // 释放 stb_image 分配的内存
-                FreeImage(data,imagePath); 
+                 
 
                 return true;
             } catch (const std::exception& e) {
                 std::cerr << "Exception during frame preloading: " << e.what() << std::endl;
                 // clearFrameTextures(vg);
+                FreeImage(data,imagePath); 
                 return false;
             }
         }else{
@@ -383,13 +383,14 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
                 FreeImage(data,imagePath); 
             }catch (const std::exception& e) {
                 std::cerr << "Failed to load image:sssss   " << imagePath << " error: " << e.what() << std::endl;
+                FreeImage(data,imagePath); 
                 m_isLoadError = true;
             return false;
          }
         }
 
     m_isLoadError = false;
-
+    FreeImage(data,imagePath); 
     updateSize();
     setPaintValid(false);
 
@@ -418,7 +419,7 @@ void UITexture::clearFrameTextures(NVGcontext* vg) {
 }
 
 void UITexture::unloadImage(NVGcontext* vg) {
-    
+
     if (m_nvgImage != -1 && vg) {
         clearFrameTextures(vg);
         nvgDeleteImage(vg, m_nvgImage);

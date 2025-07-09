@@ -5,7 +5,7 @@
 #include "component/FlexLayout.h"
 #include "component/UITexture.h"
 #include "component/UITextInput.h"
-#include "component/TextureCache.h"
+#include "component/TextureCacheData.h"
 // 添加动画系统头文件
 #include "animation/UIAnimationManager.h"
 #include "animation/UIAnimation.h"
@@ -85,10 +85,17 @@ int main(int argc, char** argv) {
     // std::string imagPath =image_paths[current_index].u8string();
     int change_speed = 0;
 
-    // TextureCache::getInstance().processMainThreadTasks();
 
     UIWindow window(1600, 900, "VIMAG");
     
+
+    // //缓存加载
+    // TextureCaches textureCache(window.getNVGContext());
+    // textureCache.preloadImages(image_paths);
+    // 处理主线程任务队列（将图片数据加载到显存）
+    // textureCache.processMainThreadTasks();
+
+
     // 启用动态标题栏功能
     window.enableDynamicTitleBar(true, 15.0); // 鼠标距离顶部15像素时显示
     // 设置透明帧缓冲区
@@ -439,8 +446,7 @@ int main(int argc, char** argv) {
     auto lastTime = glfwGetTime();
     while (!window.shouldClose()) {
         
-        // 处理纹理缓存的主线程任务
-        // TextureCache::processMainThreadTasks();
+
         
         // 计算时间差
         // 在初始化时设置垂直同步

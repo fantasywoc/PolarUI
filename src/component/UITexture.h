@@ -110,6 +110,8 @@ private:
     int m_OriginHeight ;  // 防止窗口切换图片导致texture控件无限缩小
     bool m_mousePressed = false;  // 鼠标是否按下但未开始拖拽
 
+
+    unsigned char* data = nullptr;
     NVGpaint imgPaint_cache = {};  //NG图像缓存
     bool m_paintValid = false;
     // 拖拽相关
