@@ -77,11 +77,11 @@ void UIComponent::fadeOut(float duration, UIAnimation::EasingType easing) {
 
 void UIComponent::moveTo(float x, float y, float duration) {
     UIAnimationManager::getInstance().moveTo(this, x, y, duration, UIAnimation::EASE_OUT);
-    std::cerr << typeid(*this).name()<<" UIComponent::moveTo called with Moveto x: " << x << ", Moveto y: " << y << " easing animation: UIAnimation::EASE_OUT"<< std::endl;
+    // std::cerr << typeid(*this).name()<<" UIComponent::moveTo called with Moveto x: " << x << ", Moveto y: " << y << " easing animation: UIAnimation::EASE_OUT"<< std::endl;
 }
 
 void UIComponent::scaleTo(float scaleX, float scaleY, float duration) {
-    std::cerr << typeid(*this).name()<<" UIComponent::scaleTo called with scaleX: " << scaleX << ", scaleY: " << scaleY << std::endl;
+    // std::cerr << typeid(*this).name()<<" UIComponent::scaleTo called with scaleX: " << scaleX << ", scaleY: " << scaleY << std::endl;
     UIAnimationManager::getInstance().scaleTo(this, scaleX, scaleY, duration, UIAnimation::EASE_OUT);
 }
 void UIComponent::rotateTo(float angle, float duration) {

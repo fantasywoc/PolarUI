@@ -235,7 +235,7 @@ void getImages( const std::string& filePath,fs::path& directory,std::vector<fs::
     } 
 }
 //////////////////////////////  gif   //////////////////////////////////////////
-unsigned char* loadGifImage(const std::string& path, int& outWidth, int& outHeight, int& channels, int& frames) { 
+unsigned char* loadGifImage(const std::string& path, int& outWidth, int& outHeight, int& channels, int& frames,std::vector<int>& outDelays) { 
     // 1. 读取文件到内存 
     std::ifstream file(path, std::ios::binary | std::ios::ate); 
     if (!file.is_open()) { 
@@ -268,11 +268,12 @@ unsigned char* loadGifImage(const std::string& path, int& outWidth, int& outHeig
             return nullptr; 
         } 
         
-        // 清理delays，因为我们不需要它
-        if (delays) {
-            free(delays);
+        // 将C数组复制到vector中
+        if (delays && frames > 0) {
+            outDelays.assign(delays, delays + frames);
+            free(delays); // 释放stbi分配的内存
         }
-        
+
         return data; 
     } catch (const std::bad_alloc& e) { 
         std::cerr << "Memory allocation failed: " << e.what() << std::endl; 
@@ -368,17 +369,40 @@ void FreeImage(unsigned char*& data, const std::string& path) {
 //     std::cout<<"frame_count: " << gif.frame_count << std::endl;
 //     return gif;
 // }
+int get_Orientation(int orientation){
+     if (orientation == -1) {
+        std::cerr << "Failed to parse orientation." << std::endl;
+    } else {
+        switch (orientation) {
+            case 1: return 0; 
+            case 3: return 180; 
+            case 6: return 90; 
+            case 8: return -90; 
+            default: return 0; // 2,4,5,7 较少见
+        }
+    }
+}
 
-std::string getExifInfo(const std::string& imagPath){
+bool getExifInfo(const std::string& imagPath,std::string& image_exif,int& orientation){
+
+
     EXIF exif(imagPath);
+    if (!exif.isValid()) {
+        // std::cerr << "EXIF信息无效: " << imagPath << std::endl;
+        image_exif = "EXIF info is invalid";
+        orientation = 0;
+        return false ;
+    }
     TinyEXIF::EXIFInfo info = exif.getInfo();
     std::string Fnumber = std::to_string(info.FNumber);
-    std::cout<< "Fnumber =" << Fnumber <<std::endl;
+    // std::cout<< "Fnumber =" << Fnumber <<std::endl;
     removeZero(Fnumber);
-    std::cout<< "Fnumber =" << Fnumber <<std::endl;
-    std::string image_exif =  info.Make + "   f/" + Fnumber + "     1/" + fomatExposureTime(info.ExposureTime) + "    ISO" + std::to_string(info.ISOSpeedRatings);
+    // std::cout<< "Fnumber =" << Fnumber <<std::endl;
+    orientation = get_Orientation(info.Orientation);
+    image_exif =  info.Make + "\n光圈 f/" + Fnumber + "\n快门 1/" + fomatExposureTime(info.ExposureTime) + "\nISO " + std::to_string(info.ISOSpeedRatings) +"\n旋转 "+ std::to_string(orientation)+"°"  ;
   
-    return image_exif;
+    return true;
+
 }
 
 //图片切换循环
@@ -406,28 +430,45 @@ void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle)
     }
 
 }
-void playGif(int& currentFrame, int& gifFramesCount, bool& is_cycle){
-    currentFrame++;
-    if (gifFramesCount==1) {
-        currentFrame = 0;
+void playGif(int& currentFrame, int& gifFramesCount,double& m_frameTimeAccumulator,double deltaTime,std::vector<int>& gifDelays, bool& is_cycle){
+     if ( gifFramesCount <= 1 || gifDelays.empty()) {
         return;
     }
-    if(is_cycle){
-        if (currentFrame > gifFramesCount) {
-            currentFrame = gifFramesCount - 1;
-            // return;
-        }else if (currentFrame==gifFramesCount) {
+     // 将deltaTime转换为毫秒并累积
+    m_frameTimeAccumulator += deltaTime * 1000.0;
+    
+    // 获取当前帧的延迟时间（毫秒）
+    int currentFrameDelay = gifDelays[currentFrame];
+    
+    // 如果累积时间超过当前帧的延迟时间，切换到下一帧
+    if (m_frameTimeAccumulator >= currentFrameDelay) {
+         // 减去当前帧的延迟时间，保留多余的时间用于下一帧
+        m_frameTimeAccumulator -= currentFrameDelay;
+        
+        currentFrame++;
+        if (gifFramesCount==1) {
             currentFrame = 0;
-            // return;
+            return;
         }
-    }else{
-        if (currentFrame > gifFramesCount) {
-            currentFrame = 0;
-            return;
-        }else if (currentFrame==gifFramesCount) {
-            currentFrame = gifFramesCount - 1;
-            return;
+        if(is_cycle){
+            if (currentFrame > gifFramesCount) {
+                currentFrame = gifFramesCount - 1;
+                // return;
+            }else if (currentFrame==gifFramesCount) {
+                currentFrame = 0;
+                // return;
+            }
+        }else{
+            if (currentFrame > gifFramesCount) {
+                currentFrame = 0;
+                return;
+            }else if (currentFrame==gifFramesCount) {
+                currentFrame = gifFramesCount - 1;
+                return;
+            }
         }
     }
 
 }
+
+

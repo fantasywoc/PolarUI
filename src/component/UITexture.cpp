@@ -1,7 +1,7 @@
 #include "UITexture.h"
 #include <iostream>
 #include <algorithm>
-
+#include <cmath>
 
 std::vector<UITexture*> UITexture::s_instances;
 
@@ -17,7 +17,7 @@ UITexture::UITexture(float x, float y, float width, float height, const std::str
     , m_needsLoad(!imagePath.empty())
     , m_isGif(false)
     , m_currentFrame(0)
-    , m_frameTime(0.0)
+    // , m_frameTime(0.0)
     , m_gifPlaying(true) {
     // 不在构造函数中加载图像，延迟到render时加载
     s_instances.push_back(this);
@@ -53,7 +53,6 @@ void UITexture::render(NVGcontext* vg) {
     if (m_nvgImage == -1) {
         return;
     }
-    FreeImage(data,m_imagePath); 
 
     // 缩放变换（以中心为原点）#支持中心动画缩放   放在这个位置可以缩放整个texture
     if (m_animationScaleX != 1.0f || m_animationScaleY != 1.0f) {
@@ -72,6 +71,15 @@ void UITexture::render(NVGcontext* vg) {
         std::cerr << "texture 偏移 m_animationOffsetX: " << m_animationOffsetX << " m_animationOffsetY: " << m_animationOffsetY << std::endl;
         nvgTranslate(vg, m_animationOffsetX, m_animationOffsetY);
     }
+
+    // 旋转变换（以中心为原点）
+    if (m_animationRotation != 0.0f) {
+        nvgTranslate(vg, m_width/2, m_height/2);
+        nvgRotate(vg, m_animationRotation);
+        nvgTranslate(vg, -m_width/2, -m_height/2);
+    }
+
+
   // 绘制背景（如果设置了）
   if (m_backgroundColor.a >= 0) {
     nvgBeginPath(vg);
@@ -93,7 +101,7 @@ void UITexture::render(NVGcontext* vg) {
 
     if(m_isGif){
         bool is_cycle = true;
-        playGif(m_currentFrame,m_gifFramesCount, is_cycle);
+        playGif(m_currentFrame,m_gifFramesCount,m_frameTimeAccumulator,m_deltaTime, m_gifDelays, is_cycle);
         m_nvgImage = m_frameTextures[m_currentFrame];
         m_paintValid= false;
    
@@ -101,7 +109,10 @@ void UITexture::render(NVGcontext* vg) {
     if (!m_paintValid ) {
 
         imgPaint_cache = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
-        m_paintValid = true;
+        if(!m_isGif){
+                m_paintValid = true;  
+        }
+
     }
     // imgPaint_cache = nvgImagePattern(vg, renderX, renderY, renderW, renderH, 0, m_nvgImage, 1.0f);
     nvgBeginPath(vg);
@@ -125,6 +136,7 @@ void UITexture::render(NVGcontext* vg) {
 
 void UITexture::update(double deltaTime) {
     // 纹理控件通常不需要更新逻辑
+    m_deltaTime = deltaTime;
 }
 void UITexture::updateSize() {
     // 纹理控件通常不需要更新逻辑
@@ -208,7 +220,7 @@ bool UITexture::handleEvent(const UIEvent& event) {
                 // 检查是否移动了足够的距离才开始拖拽
                 float deltaX = event.mouseX - m_lastMouseX;
                 float deltaY = event.mouseY - m_lastMouseY;
-                float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
+                float distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
                 
                 if (distance > 2.0f) { // 移动超过3像素才开始拖拽
                     m_isDragging = true;
@@ -266,41 +278,41 @@ bool UITexture::handleEvent(const UIEvent& event) {
         case UIEvent::KEY_PRESS:
             if (m_keyEventsEnabled && contains(m_lastMouseX, m_lastMouseY)) {
                 // 处理特定按键
-                switch (event.keyCode) {
-                    case 262: // 右箭头键
-                        setPosition(m_x + 10, m_y);
-                        handled = true;
-                        break;
-                    case 263: // 左箭头键
-                        setPosition(m_x - 10, m_y);
-                        handled = true;
-                        break;
-                    case 264: // 下箭头键
-                        setPosition(m_x, m_y + 10);
-                        handled = true;
-                        break;
-                    case 265: // 上箭头键
-                        setPosition(m_x, m_y - 10);
-                        handled = true;
-                        break;
-                    case 82:  // R键 - 重置位置
-                        setPosition(0, 0);
-                        handled = true;
-                        break;
-                    case 70:  // F键 - 适应窗口
-                        setScaleMode(ScaleMode::KEEP_ASPECT);
-                        handled = true;
-                        break;
-                    case 79:  // O键 - 原始尺寸
-                        setScaleMode(ScaleMode::ORIGINAL_SIZE);
-                        handled = true;
-                        break;
-                }
+                // switch (event.keyCode) {
+                //     case 262: // 右箭头键
+                //         setPosition(m_x , m_y);
+                //         handled = true;
+                //         break;
+                //     case 263: // 左箭头键
+                //         setPosition(m_x , m_y);
+                //         handled = true;
+                //         break;
+                //     case 264: // 下箭头键
+                //         setPosition(m_x, m_y + 10);
+                //         handled = true;
+                //         break;
+                //     case 265: // 上箭头键
+                //         setPosition(m_x, m_y - 10);
+                //         handled = true;
+                //         break;
+                //     case 82:  // R键 - 重置位置
+                //         setPosition(0, 0);
+                //         handled = true;
+                //         break;
+                //     case 70:  // F键 - 适应窗口
+                //         setScaleMode(ScaleMode::KEEP_ASPECT);
+                //         handled = true;
+                //         break;
+                //     case 79:  // O键 - 原始尺寸
+                //         setScaleMode(ScaleMode::ORIGINAL_SIZE);
+                //         handled = true;
+                //         break;
+                // }
                 
-                // 调用按键回调
-                if (m_onKeyPress) {
-                    m_onKeyPress(event.keyCode, event.modifiers);
-                }
+                // // 调用按键回调
+                // if (m_onKeyPress) {
+                //     m_onKeyPress(event.keyCode, event.modifiers);
+                // }
             }
             break;
             
@@ -323,11 +335,12 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     // unsigned char* data = nullptr;
     // 使用 stb_image 加载图像
     int channels;
-    
+    Timer timer;
         if(isGifPath(m_imagePath)){
             //////////////////////////////////    GIF     ///////////////////////////////
             m_isGif = true;
-            data = loadGifImage(m_imagePath,m_imageWidth, m_imageHeight , channels, m_gifFramesCount) ;
+            data = loadGifImage(m_imagePath,m_imageWidth, m_imageHeight , channels, m_gifFramesCount,m_gifDelays) ;
+
             if (!data){
                 std::cerr << "Failed to load image: " << imagePath << std::endl;
                 // std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
@@ -353,12 +366,17 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
                 }
                 FreeImage(data,imagePath);
                 std::cout << "Successfully preloaded " << m_frameTextures.size() << " frames" << std::endl;
+                { 
+                    // for(auto it :m_gifDelays){
+                    //     std::cout << " delay: " << it << std::endl;
+                    // }
+                }
                 m_currentFrame = 0;
                 m_nvgImage = m_frameTextures[m_currentFrame];
                 // 释放 stb_image 分配的内存
                  
-
-                return true;
+                FreeImage(data,imagePath); 
+                m_frameTimeAccumulator =0;
             } catch (const std::exception& e) {
                 std::cerr << "Exception during frame preloading: " << e.what() << std::endl;
                 // clearFrameTextures(vg);
@@ -394,13 +412,16 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
     updateSize();
     setPaintValid(false);
 
+    double read_time = timer.elapsed();
+    timer.reset();
+
     if (m_nvgImage == -1) {
         std::cerr << "Failed to create NanoVG image from: " << imagePath << std::endl;
         return false;
     }
     
     m_imagePath = imagePath;
-    std::cout << "Loaded image: " << imagePath << " (" << m_imageWidth << "x" << m_imageHeight << ")" <<"  channels:"<<channels<< std::endl;
+    std::cout << "Loaded image: " << imagePath << " (" << m_imageWidth << "x" << m_imageHeight << ")" <<"  channels:"<< channels <<" coding time:"<<read_time<< std::endl;
     m_paintValid = false;
     return true;
 } 
@@ -431,6 +452,7 @@ void UITexture::unloadImage(NVGcontext* vg) {
 
 void UITexture::setImagePath(NVGcontext* vg, const std::string& imagePath) {
     if (m_imagePath != imagePath) {
+
         // 先释放旧资源
         unloadImage(vg);
         // 设置新路径

@@ -1,24 +1,25 @@
 #include "UILabel.h"
 #include <nanovg.h>
+#include <sstream>
 
 UILabel::UILabel(float x, float y, float width, float height, const std::string& text)
     : UIComponent(x, y, width, height), m_text(text) {
 }
 
 void UILabel::render(NVGcontext* vg) {
-    if (!m_visible) return;
+    if (!m_visible || !m_display) return;  // 同时检查visible和display属性
     
     nvgSave(vg);
+    
+    // 先设置透明度，再应用其他变换
+    nvgGlobalAlpha(vg, m_animationOpacity);
     
     // 应用动画变换
     nvgTranslate(vg, m_x + m_animationOffsetX, m_y + m_animationOffsetY);
     nvgRotate(vg, m_animationRotation);
     nvgScale(vg, m_animationScaleX, m_animationScaleY);
     
-    // 应用透明度
-    nvgGlobalAlpha(vg, m_animationOpacity);
-    
-    // 渲染文字（需要修改 renderText 方法使用相对坐标）
+    // 渲染文字
     renderText(vg);
     
     nvgRestore(vg);
@@ -53,8 +54,21 @@ void UILabel::renderText(NVGcontext* vg) {
     nvgFillColor(vg, m_textColor);
     nvgTextAlign(vg, m_textAlign | m_verticalAlign);
     
-    float textX = 0; // 使用相对坐标
-    float textY = 0; // 使用相对坐标
+    // 分割文本为多行
+    std::vector<std::string> lines;
+    std::stringstream ss(m_text);
+    std::string line;
+    
+    while (std::getline(ss, line, '\n')) {
+        lines.push_back(line);
+    }
+    
+    // 计算行高
+    float lineHeight = m_fontSize * 1.2f; // 通常行高是字体大小的1.2倍
+    float totalHeight = lines.size() * lineHeight;
+    
+    float textX = 0;
+    float startY = 0;
     
     // 根据对齐方式调整文字位置
     if (m_textAlign == CENTER) {
@@ -64,10 +78,16 @@ void UILabel::renderText(NVGcontext* vg) {
     }
     
     if (m_verticalAlign == MIDDLE) {
-        textY += m_height / 2.0f;
+        startY += (m_height - totalHeight) / 2.0f + lineHeight;
     } else if (m_verticalAlign == BOTTOM) {
-        textY += m_height;
+        startY += m_height - totalHeight + lineHeight;
+    } else {
+        startY += lineHeight; // TOP对齐
     }
     
-    nvgText(vg, textX, textY, m_text.c_str(), nullptr);
+    // 逐行渲染文本
+    for (size_t i = 0; i < lines.size(); ++i) {
+        float textY = startY + i * lineHeight;
+        nvgText(vg, textX, textY, lines[i].c_str(), nullptr);
+    }
 }

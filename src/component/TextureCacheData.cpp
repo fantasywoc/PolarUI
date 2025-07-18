@@ -75,7 +75,7 @@ ImageData TextureCaches::loadImageData(const fs::path& path) {
     std::string pathStr = path.generic_string();
     
     if (result.type == GIF) {
-        result.data = loadGifImage(pathStr, result.width, result.height, result.channels, result.frames);
+        // result.data = loadGifImage(pathStr, result.width, result.height, result.channels, result.frames);
     } else if (result.type != UNKNOWN) {
         result.data = LoadImage(pathStr, result.width, result.height, result.channels);
         result.frames = 1;

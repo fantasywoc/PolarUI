@@ -139,7 +139,9 @@ private:
     bool m_isGif = false;
     int m_currentFrame = 0;
     int m_gifFramesCount = 0;
-    double m_frameTime = 0.0;
+    std::vector<int> m_gifDelays;
+    double m_frameTimeAccumulator = 0.0;  // 当前帧时间累积器（毫秒）
+    double m_deltaTime=0;
     bool m_gifPlaying = true;
     //存储每一帧的NanoVG纹理ID
     std::vector<int> m_frameTextures;  // 每帧的纹理数组

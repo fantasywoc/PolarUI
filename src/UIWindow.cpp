@@ -94,6 +94,8 @@ bool UIWindow::initialize() {
         return false;
     }
 
+
+    
     // 配置窗口图标
     GLFWimage icon;
     icon.pixels = stbi_load("./logo.png", &icon.width, &icon.height, nullptr, 4); // 强制 RGBA
@@ -188,9 +190,16 @@ void UIWindow::setWindowHints() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+    // 考虑添加多重采样抗锯齿
+    glfwWindowHint(GLFW_SAMPLES, 4);
     // 启用透明帧缓冲区，支持窗口透明效果
-    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
+    
+    // 创建时隐藏窗口，避免闪烁
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    
+
 }
 
 /**
@@ -307,6 +316,8 @@ void UIWindow::endFrame() {
  * @description 清除颜色缓冲区、深度缓冲区和模板缓冲区
  */
 void UIWindow::clearBackground(float r, float g, float b, float a) {
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_STENCIL_TEST);
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT); // 只清除颜色缓冲区
 }
@@ -497,9 +508,10 @@ void UIWindow::showTitleBar() {
             titleBarVisible = true;
         }
 #elif defined(__linux__)
-        // Linux 平台使用 X11 窗口管理器提示
-        GLFWwindow* window = getGLFWWindow();
+        // // Linux 平台使用 X11 窗口管理器提示
+        // GLFWwindow* window = getGLFWWindow();
         if (window) {
+        //     glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_TRUE);
             glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_TRUE);
             titleBarVisible = true;
         }
@@ -527,18 +539,11 @@ void UIWindow::hideTitleBar() {
     #elif defined(__linux__)
             GLFWwindow* window = getGLFWWindow();
             if (window) {
-                // 设置窗口为无装饰
+                // // 设置窗口为无装饰
+                // glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
+                
+         
                 glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
-                
-                // 在 Linux 下，我们可以通过 NanoVG 绘制圆角
-                // 在每次渲染时，在背景层绘制圆角矩形
-                if (vg) {
-                    nvgBeginPath(vg);
-                    nvgRoundedRect(vg, 0, 0, windowWidth, windowHeight, 15);
-                    nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
-                    nvgFill(vg);
-                }
-                
                 titleBarVisible = false;
             }
     #endif

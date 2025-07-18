@@ -67,15 +67,34 @@ bool UIButton::handleEvent(const UIEvent& event) {
         std::cout << "contains结果: " << contains(event.mouseX, event.mouseY) << std::endl;
     }
     
+    bool wasHovered = m_isHovered;
+    bool wasFocused = m_isFocused;
+    
     switch (event.type) {
         case UIEvent::MOUSE_MOVE:
             m_isHovered = contains(event.mouseX, event.mouseY);
+            // 如果 hover 状态发生变化，触发重绘
+            if (wasHovered != m_isHovered) {
+                // 可以在这里添加 hover 状态变化的回调
+                std::cout << "Button hover 状态: " << (m_isHovered ? "进入" : "离开") << std::endl;
+            }
             return m_isHovered;
             
         case UIEvent::MOUSE_PRESS:
             if (m_isHovered && event.mouseButton == 0) { // 左键
                 m_isPressed = true;
+                m_isFocused = true; // 点击时获得焦点
+                // 如果焦点状态发生变化，输出调试信息
+                if (wasFocused != m_isFocused) {
+                    std::cout << "Button focus 状态: 获得焦点" << std::endl;
+                }
                 return true;
+            } else {
+                // 点击其他区域时失去焦点
+                if (m_isFocused) {
+                    m_isFocused = false;
+                    std::cout << "Button focus 状态: 失去焦点" << std::endl;
+                }
             }
             break;
             
@@ -96,15 +115,12 @@ bool UIButton::handleEvent(const UIEvent& event) {
 }
 
 NVGcolor UIButton::getCurrentBackgroundColor() const {
-    if (!m_enabled) {
-        return nvgRGBA(m_backgroundColor.r * 0.5f, m_backgroundColor.g * 0.5f, 
-                       m_backgroundColor.b * 0.5f, m_backgroundColor.a);
-    }
     if (m_isPressed) {
         return m_pressedColor;
-    }
-    if (m_isHovered) {
+    } else if (m_isHovered) {
         return m_hoverColor;
+    } else if (m_isFocused) {
+        return m_focusColor;
     }
     return m_backgroundColor;
 }

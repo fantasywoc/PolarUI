@@ -4,6 +4,8 @@
 #include <fstream>
 #include <vector>
 #include <set>
+#include <cmath>
+#include <algorithm>
 #include <cstdlib>
 #include <iostream> // \以包含 std::cout 和 std::cerr
 #include <cstring> // 包含 std::strerror 函数的头文件
@@ -111,21 +113,34 @@ unsigned char* LoadImage(const std::string& path,  int& outWidth, int& outHeight
      */
 // 修改函数声明
 void FreeImage(unsigned char*& data, const std::string& path);
-// // 需要添加以下声明
-// struct GifImage {
-//     int width;
-//     int height;
-//     int frame_count;
-//     std::unique_ptr<unsigned char[]> frames; 
-//     std::unique_ptr<int[]> delays;
-//     int channels;
-// };
 
-// 确保所有在utils.cpp中实现的函数都在这里声明
-unsigned char* loadGifImage(const std::string& path, int& outWidth, int& outHeight, int& channels, int& frames) ;
+
+// GIF
+unsigned char* loadGifImage(const std::string& path, int& outWidth, int& outHeight, int& channels, int& frames,std::vector<int>& outDelays) ;
 // GifImage loadGif(const std::string& path,  int& outWidth, int& outHeight,int& frame_count);
 
 
 void enableImageCycle(size_t& current_index,size_t& limit_index, bool& is_cycle);
-std::string getExifInfo(const std::string& imagPath);
-void playGif(int& currentFrame, int& gifFramesCount, bool& is_cycle);
+bool getExifInfo(const std::string& imagPath,std::string& image_exif,int& orientation);
+int get_Orientation(int orientation);
+void playGif(int& currentFrame, int& gifFramesCount,double& m_frameTimeAccumulator,double deltaTime,std::vector<int>& gifDelays, bool& is_cycle);
+
+
+
+class Timer {
+public:
+    Timer() : start_time(std::chrono::high_resolution_clock::now()) {}
+    
+    double elapsed() {
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+        return duration.count() / 1000.0; // 返回毫秒
+    }
+    
+    void reset() {
+        start_time = std::chrono::high_resolution_clock::now();
+    }
+    
+private:
+    std::chrono::high_resolution_clock::time_point start_time;
+};

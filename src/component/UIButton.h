@@ -17,6 +17,8 @@ private:
     bool m_isHovered = false;
     bool m_isPressed = false;
     std::function<void()> m_onClick;
+    bool m_isFocused = false;
+    NVGcolor m_focusColor = nvgRGB(80, 120, 180);
     
 public:
     // 构造函数
@@ -49,4 +51,9 @@ public:
     // 样式
     NVGcolor getCurrentBackgroundColor() const;
     void renderText(NVGcontext* vg);
+    
+    // 新增 focus 相关方法
+    bool isFocused() const { return m_isFocused; }
+    void setFocusColor(NVGcolor color) { m_focusColor = color; }
+    void setFocus(bool focused) { m_isFocused = focused; }
 };

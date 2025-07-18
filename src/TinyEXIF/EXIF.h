@@ -42,6 +42,7 @@ EXIF(const std::string& imagePath) : m_imageWidth(0), m_imageHeight(0), m_isVali
     // 解析EXIF
     if (info.parseFrom(file_data.data(), file_size) != TinyEXIF::PARSE_SUCCESS) {
         std::cerr << "Error: EXIF parsing failed" << std::endl;
+        m_isValid=false;
         return;
     }
 

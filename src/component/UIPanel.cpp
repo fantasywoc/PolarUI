@@ -8,7 +8,7 @@ UIPanel::UIPanel(float x, float y, float width, float height)
 }
 
 void UIPanel::render(NVGcontext* vg) {
-    if (!m_visible) return;
+    if (!m_visible || !m_display) return;  // 同时检查visible和display属性
     
     nvgSave(vg);
     
@@ -71,8 +71,8 @@ bool UIPanel::handleEvent(const UIEvent& event) {
     
     // 添加调试输出
     if (event.type == UIEvent::MOUSE_PRESS) {
-        std::cout << "Panel处理事件: 面板位置(" << m_x << ", " << m_y << ") \n";
-        std::cout << " 原始鼠标坐标: (" << event.mouseX << ", " << event.mouseY << ") \n";
+        // std::cout << "Panel处理事件: 面板位置(" << m_x << ", " << m_y << ") \n";
+        // std::cout << " 原始鼠标坐标: (" << event.mouseX << ", " << event.mouseY << ") \n";
     }
     
     // 从后往前遍历子组件（后添加的在上层）
@@ -83,10 +83,10 @@ bool UIPanel::handleEvent(const UIEvent& event) {
             localEvent.mouseX = event.mouseX - (m_x + m_animationOffsetX);
             localEvent.mouseY = event.mouseY - (m_y + m_animationOffsetY);
             
-            // 添加调试输出
-            if (event.type == UIEvent::MOUSE_PRESS) {
-                std::cout << " 转换后的鼠标坐标: (" << localEvent.mouseX << ", " << localEvent.mouseY << ") \n";
-            }
+            // // 添加调试输出
+            // if (event.type == UIEvent::MOUSE_PRESS) {
+            //     std::cout << " 转换后的鼠标坐标: (" << localEvent.mouseX << ", " << localEvent.mouseY << ") \n";
+            // }
             
             if ((*it)->handleEvent(localEvent)) {
                 return true; // 事件被子组件处理
