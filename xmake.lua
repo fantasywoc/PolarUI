@@ -1,76 +1,52 @@
--- -- 全局配置
--- set_policy("package.install_locally", true) -- 强制将依赖库复制到输出目录
--- set_policy("build.merge_archive", true)    -- 合并静态库依赖
+-- 全局配置
+add_rules("plugin.compile_commands.autoupdate", { outputdir = ".vscode" })
+-- set_policy("build.merge_archive", true)
 
 -- 设置项目基本信息
-add_rules("mode.debug", "mode.release")    -- 添加调试和发布模式
-set_project("LiteUI")                      -- 设置项目名称
-set_languages("c++17")                    -- 设置 C++ 标准
-set_version("1.0.0")                      -- 设置版本号
+add_rules("mode.debug", "mode.release")
+set_project("LiteUI")
+set_languages("c++17")
+set_version("1.0.0")
 
-includes("@builtin/xpack")  -- 引入XPack模块
+includes("@builtin/xpack")
 
+if is_plat("linux") then
+    add_ldflags("-Wl,-rpath=$ORIGIN")
+end
 
 -- 添加第三方库依赖
--- shared = true 表示使用动态链接库
 add_requires("glfw 3.3.8", {configs = {shared = true}})
 add_requires("nanovg", {configs = {shared = true}})
 add_requires("glew", {configs = {shared = true}})
 
--- 定义 UI 静态库目标
+-- UI 静态库
 target("ui")
-    set_kind("static")                     -- 设置为静态库
-    add_files("src/UIWindow.cpp")         -- 添加窗口相关源文件
-    add_files("src/component/*.cpp")      -- 添加所有组件源文件
-    add_files("src/animation/*.cpp")      -- 添加动画系统源文件
-    add_files("src/utils/*.cpp")          -- 添加图像处理文件
-    add_files("src/TinyEXIF/*.cpp")         -- 添加图像处理文件
-    add_includedirs("src", "src/component", "src/animation","src/utils","src/TinyEXIF")  -- 添加头文件搜索路径
-    add_packages("glfw", "nanovg", "glew") -- 添加依赖包
+    set_kind("static")
+    add_files("src/UIWindow.cpp")
+    add_files("src/component/*.cpp")
+    add_files("src/animation/*.cpp")
+    add_files("src/utils/*.cpp")
+    add_files("src/TinyEXIF/*.cpp")
+    add_includedirs("src", "src/component", "src/animation","src/utils","src/TinyEXIF")
+    add_packages("glfw", "nanovg", "glew")
 
--- 定义按钮演示程序目标
-target("button-demo")
-    set_kind("binary")                     -- 设置为可执行文件
-    add_files("src/main.cpp")             -- 添加主程序源文件
-    add_deps("ui")                         -- 添加对 UI 库的依赖
-    add_packages("glfw", "nanovg", "glew") -- 添加第三方依赖包
+
+
+target("VIMAG")
+    set_kind("binary")
+    add_rpathdirs("$ORIGIN")
+    add_files("src/Vimag.cpp","src/TinyEXIF/TinyEXIF.cpp","src/component/TextureCache.cpp","src/VimagApp.cpp")
     
-    -- 添加头文件搜索路径
-    add_includedirs("src", "src/component", "src/widget", "src/animation")
-    
-    -- 根据平台添加不同的编译选项和链接库
+    -- 添加Windows资源文件
     if is_plat("windows") then
-        add_cxflags("/utf-8")             -- Windows 下启用 UTF-8 编码
-        add_links("opengl32", "gdi32", "user32", "kernel32")  -- Windows 系统库
-    else
-        add_links("GL", "X11", "pthread", "Xrandr", "Xi", "dl")  -- Linux 系统库
+        add_files("src/Vimag.rc")
     end
     
-    set_rundir("$(projectdir)")           -- 设置运行目录为项目根目录
+    add_deps("ui")
+    add_packages("glfw", "nanovg", "glew")
     
-    -- 调试模式配置
-    if is_mode("debug") then
-        set_symbols("debug")              -- 启用调试符号
-        set_optimize("none")              -- 禁用优化
-        add_defines("DEBUG")              -- 定义 DEBUG 宏
-    else
-        set_optimize("fast")              -- 发布模式启用最快优化
-    end
+    add_includedirs("src", "src/component", "src/animation", "src/TinyEXIF")
     
-    add_cxxflags("/EHsc")                 -- 启用 C++ 异常处理
-
--- 定义图片查看器演示程序目标
-target("vimag-demo")
-    set_kind("binary")                     -- 设置为可执行文件
-    add_rpathdirs("$ORIGIN")              -- 设置运行时库搜索路径
-    add_files("src/Vimag.cpp","src/TinyEXIF/TinyEXIF.cpp","src/component/TextureCache.cpp")  -- 添加源文件
-    add_deps("ui")                         -- 添加对 UI 库的依赖
-    add_packages("glfw", "nanovg", "glew") -- 添加第三方依赖包
-    
-    -- 添加头文件搜索路径
-    add_includedirs("src", "src/component", "src/widget", "src/animation", "src/TinyEXIF")
-    
-    -- 平台相关配置
     if is_plat("windows") then
         add_cxflags("/utf-8")
         add_links("opengl32", "gdi32", "user32", "kernel32")
@@ -80,7 +56,6 @@ target("vimag-demo")
     
     set_rundir("$(projectdir)")
     
-    -- 调试/发布模式配置
     if is_mode("debug") then
         set_symbols("debug")
         set_optimize("none")
@@ -91,56 +66,83 @@ target("vimag-demo")
     
     add_cxxflags("/EHsc")
 
--- 构建后自动复制依赖 DLL 到目标目录
-after_build(function (target)
-    local targetdir = path.directory(target:targetfile())
-    for _, pkg in ipairs(target:pkgs()) do
-        local libfiles = pkg:get("libfiles")
-        if libfiles then
-            for _, libfile in ipairs(libfiles) do
-                if libfile:endswith(".dll") then
-                    os.cp(libfile, targetdir)
-                end
-            end
-        end
-    end
- end)
-
-
-
+-- 在 dist_package target 中直接定义函数
 target("dist_package")
     set_kind("phony")
-    add_deps("button-demo", "vimag-demo")
+    add_deps("VIMAG")
     on_build(function (target)
+        -- 智能查找和复制依赖库函数 - 在这里定义
+        local function smart_copy_package_dlls()
+            local user_home = os.getenv("USERPROFILE") or os.getenv("HOME")
+            local xmake_packages_dir = path.join(user_home, "AppData", "Local", ".xmake", "packages")
+            
+            print("📦 智能查找依赖库...")
+            
+            -- 包名映射到搜索路径和 DLL 名称
+            local packages = {
+                glfw = {search_dir = "g/glfw", dll_name = "glfw3.dll"},
+                nanovg = {search_dir = "n/nanovg", dll_name = "nanovg.dll"},
+                glew = {search_dir = "g/glew", dll_name = "glew32.dll"}
+            }
+            
+            -- 确保 dist 目录存在
+            if not os.isdir("dist") then
+                os.mkdir("dist")
+            end
+            
+            for pkg_name, pkg_info in pairs(packages) do
+                local pkg_base_dir = path.join(xmake_packages_dir, pkg_info.search_dir)
+                
+                if os.isdir(pkg_base_dir) then
+                    -- 查找所有版本目录
+                    local version_dirs = os.dirs(path.join(pkg_base_dir, "*"))
+                    
+                    for _, version_dir in ipairs(version_dirs) do
+                        -- 查找哈希目录
+                        local hash_dirs = os.dirs(path.join(version_dir, "*"))
+                        
+                        for _, hash_dir in ipairs(hash_dirs) do
+                            local dll_path = path.join(hash_dir, "bin", pkg_info.dll_name)
+                            
+                            if os.isfile(dll_path) then
+                                local dest_path = path.join("dist", pkg_info.dll_name)
+                                
+                                if os.cp(dll_path, dest_path) then
+                                    print("✅ 已复制: " .. pkg_name .. " -> " .. dest_path)
+                                    goto next_package
+                                end
+                            end
+                        end
+                    end
+                    
+                    -- print("⚠️ 未找到: " .. pkg_name .. " 的 DLL 文件")
+                else
+                    -- print("⚠️ 包目录不存在: " .. pkg_base_dir)
+                end
+                
+                ::next_package::
+            end
+            
+            print("🚀 依赖库复制完成！")
+        end
+        
         -- 1. 复制可执行文件
         if is_plat("windows") then
-            os.cp("build/windows/x64/release/*.exe", "dist")
-        else
-            os.cp("build/linux/x86_64/release/button-demo", "dist")
-            os.cp("build/linux/x86_64/release/vimag-demo", "dist")
+            os.trycp("build/windows/x64/release/*.exe", "dist")
         end
 
-        -- 2. 修复依赖库复制逻辑
-        local packages = {"glfw", "nanovg", "glew"}
-        for _, pkg_name in ipairs(packages) do
-            -- ✅ 正确方式：通过 Xmake 包管理接口获取依赖
-            local pkg = import("package.manager").find_package(pkg_name)
-            if pkg then
-                -- 获取库安装目录
-                local libdir = pkg:installdir() .. "/lib"
-                if is_plat("windows") then
-                    os.cp(path.join(libdir, "*.dll"), "dist")  -- Windows 复制 DLL
-                else
-                    os.cp(path.join(libdir, "*.so*"), "dist")   -- Linux 复制 SO
-                end
-                print("✅ 已复制依赖库: " .. pkg_name)
-            else
-                print("⚠️ 警告: 依赖包未找到 - " .. pkg_name)
-            end
-        end
+        -- 2. 智能复制依赖库
+        smart_copy_package_dlls()
 
+        -- 3. 更新打包配置
+        
+      
+        -- 在 dist_package target 的 on_build 函数中添加
         -- 3. 复制资源文件
-        os.cp("res/fonts/*.ttf", "dist")
-        os.cp("res/images/*.png", "dist")
-        print("🚀 打包完成！所有文件已复制到 dist 目录")
+        os.trycp("src/font/*.ttc", "dist")
+        os.trycp("src/icons/*.png", "dist")
+        os.trycp("src/icons/*.ico", "dist")  -- 添加这行
+        os.trycp("src/icons/*.gif", "dist")
+        os.trycp("config.ini", "dist")
+        print("🚀 打包完成！")
     end)

@@ -1,6 +1,0 @@
-{
-    errdata = "_775FB00633BC4F66BF87D39CCDE5CF30.c\
-",
-    outdata = "__cpp__B5DF8570ECB7451085F1EDC679308970.c\
-"
-}
