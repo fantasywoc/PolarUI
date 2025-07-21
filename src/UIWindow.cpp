@@ -69,7 +69,6 @@ void UIWindow::dropCallbackWrapper(GLFWwindow* window, int count, const char** p
     }
 }
 
-// 在initialize()方法中添加
 bool UIWindow::initialize() {
     // 防止重复初始化
     if (initialized) return true;
@@ -154,6 +153,10 @@ bool UIWindow::initialize() {
 
     // 所有组件初始化成功
     initialized = true;
+    
+    // 显示窗口
+    glfwShowWindow(window);
+    
     return true;
 }
 

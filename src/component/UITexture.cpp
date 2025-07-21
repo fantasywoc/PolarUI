@@ -38,6 +38,7 @@ void UITexture::cleanupAll(NVGcontext* vg) {
 }
 
 void UITexture::render(NVGcontext* vg) {
+    // std::cout<<"UITexture::render"<<std::endl;
     if (!m_visible) return;
     
     if (!m_visible || (m_alpha * m_animationOpacity) <= 0.0f) {  // 检查总透明度
@@ -329,10 +330,10 @@ bool UITexture::loadImage(NVGcontext* vg, const std::string& imagePath) {
         std::cerr << "NVGcontext is null, cannot load image" << std::endl;
         return false;
     }
-    FreeImage(data,imagePath); 
+    
     // 先卸载之前的图像
     unloadImage(vg);
-    // unsigned char* data = nullptr;
+    unsigned char* data = nullptr; // 取消注释，确保初始化data变量
     // 使用 stb_image 加载图像
     int channels;
     Timer timer;

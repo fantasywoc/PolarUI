@@ -3,6 +3,9 @@
 #include "component/UIButton.h"
 #include "component/UILabel.h"
 #include "component/FlexLayout.h"
+#include "component/UICheckbox.h"
+#include "component/UISwitch.h"
+#include "component/UIDropdown.h"
 #include <iostream>
 #include <memory>
 #include "component/UITexture.h"
@@ -297,12 +300,58 @@ int main() {
         });
         UIAnimationManager::getInstance().addAnimation(flashAnim, exitButton.get());
     });
-    
+    // 创建复选框
+    auto checkbox = std::make_shared<UICheckbox>(50, 50, 150, 25, "启用功能");
+    checkbox->setOnStateChanged([](bool checked) {
+        std::cout << "复选框状态: " << (checked ? "选中" : "未选中") << std::endl;
+    });
 
+    // 创建开关
+    auto switch_control = std::make_shared<UISwitch>(100,200, false);
+    switch_control->setOnStateChanged([](bool on) {
+        std::cout << "开关状态: " << (on ? "开启" : "关闭") << std::endl;
+    });
+    // 修改UISwitch颜色（如果需要在代码中动态设置）
+    switch_control->setOnColor(nvgRGB(0, 200, 0));   // 绿色
+    switch_control->setOffColor(nvgRGB(255, 255, 255)); // 白色
+    // 创建单选框组
+    UICheckboxGroup radioGroup("options");
+
+    // 创建单选框
+    auto radio1 = std::make_shared<UICheckbox>(10, 10, 150, 30, "选项1", UICheckbox::RADIO);
+    auto radio2 = std::make_shared<UICheckbox>(10, 50, 150, 30, "选项2", UICheckbox::RADIO);
+    auto radio3 = std::make_shared<UICheckbox>(10, 90, 150, 30, "选项3", UICheckbox::RADIO);
+
+    // 添加到组
+    radioGroup.addCheckbox(radio1.get());
+    radioGroup.addCheckbox(radio2.get());
+    radioGroup.addCheckbox(radio3.get());
+
+    // 创建复选框
+    auto checkbox1 = std::make_shared<UICheckbox>(200, 10, 150, 30, "复选框1", UICheckbox::CHECKBOX);
+    auto checkbox2 = std::make_shared<UICheckbox>(200, 50, 150, 30, "复选框2", UICheckbox::CHECKBOX);
+
+
+
+
+
+    // 创建下拉列表
+    auto dropdown = std::make_shared<UIDropdown>(50, 150, 200, 30);
+    dropdown->addItem("选项1");
+    dropdown->addItem("选项2");
+    dropdown->addItem("选项3");
+    dropdown->setOnSelectionChanged([](int index, const std::string& text) {
+        std::cout << "选择了: " << text << " (索引: " << index << ")" << std::endl;
+    });
+    // leftPanel->addChild(radioGroup);
+
+    leftPanel->addChild(checkbox);
+    leftPanel->addChild(switch_control);
+    leftPanel->addChild(dropdown);
 
     rightPanel->addChild(okButton);
     rightPanel->addChild(exitButton);
-    rightPanel1->addChild(texture);
+    // rightPanel1->addChild(texture);
     rightPanel1->addChild(label);
     // 添加子面板到主面板
     mainPanel->addChild(leftPanel);
@@ -358,7 +407,7 @@ int main() {
     });
     
     // 在渲染前输出所有组件的位置和尺寸信息
-    printAllComponentsInfo(mainPanel, leftPanel, rightPanel, label, button1, button2, button3, okButton, exitButton);
+    // printAllComponentsInfo(mainPanel, leftPanel, rightPanel, label, button1, button2, button3, okButton, exitButton);
     
     // 主渲染循环
     auto lastTime = glfwGetTime();
@@ -371,7 +420,9 @@ int main() {
         lastTime = currentTime;
         
         // 更新动画系统
-        UIAnimationManager::getInstance().update(deltaTime);
+        // 在主渲染循环中，在 mainPanel->render() 之前添加：
+        // 在主渲染循环中，在 mainPanel->render() 之前添加：
+        mainPanel->update(deltaTime);  // 确保所有组件都被更新
         
         window.beginFrame();
         window.clearBackground(0.0f, 0.0f, 0.0f, 0.0f);
