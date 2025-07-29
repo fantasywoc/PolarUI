@@ -1,7 +1,7 @@
 
     
 <div align=center>
-<img src="./src/icons/logo.png" width="150" height="150">
+<!-- <img src="./src/icons/logo.png" width="150" height="150"> -->
 
 <h1>PolarUI</h1>
 
