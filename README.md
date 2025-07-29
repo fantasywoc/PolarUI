@@ -1,20 +1,20 @@
-# VIMAG 轻量图片查看工具
+
     
 <div align=center>
 <img src="./src/icons/logo.png" width="150" height="150">
 
-<h1>VIMAG</h1>
-<h3>完全开源免费的轻量图像查看软件</h3>
+<h1>PolarUI</h1>
+
 <a href="https://dyblog.online/"><img src="https://img.shields.io/badge/Author-Fantasy-orange" alt="Author" /></a>
-<img src="https://img.shields.io/github/languages/count/fantasywoc/Vimag" alt="languages-count" />
-<img src="https://img.shields.io/github/languages/top/fantasywoc/Vimag?color=yellow" alt="languages-top" />
-<img src="https://img.shields.io/github/last-commit/fantasywoc/Vimag" alt="last-commit" />
+<img src="https://img.shields.io/github/languages/count/fantasywoc/PolarUI" alt="languages-count" />
+<img src="https://img.shields.io/github/languages/top/fantasywoc/PolarUI?color=yellow" alt="languages-top" />
+<img src="https://img.shields.io/github/last-commit/fantasywoc/PolarUI" alt="last-commit" />
 
 
 
-[![Feature Requests](https://img.shields.io/github/issues/fantasywoc/Vimag/feature-request?label=Features&color=4CC61E&logo=github)](https://github.com/fantasywoc/Vimag/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request)
-[![Bugs](https://img.shields.io/github/issues/fantasywoc/Vimag/bug?label=Bugs&color=red&logo=github)](https://github.com/fantasywoc/Vimag/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
-[![Downloads](https://img.shields.io/github/downloads/fantasywoc/Vimag/total?label=Downloads)](https://github.com/fantasywoc/Vimag/releases)
+[![Feature Requests](https://img.shields.io/github/issues/fantasywoc/PolarUI/feature-request?label=Features&color=4CC61E&logo=github)](https://github.com/fantasywoc/PolarUI/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request)
+[![Bugs](https://img.shields.io/github/issues/fantasywoc/PolarUI/bug?label=Bugs&color=red&logo=github)](https://github.com/fantasywoc/PolarUI/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+[![Downloads](https://img.shields.io/github/downloads/fantasywoc/PolarUI/total?label=Downloads)](https://github.com/fantasywoc/PolarUI/releases)
 
 
 
@@ -38,37 +38,13 @@
 ## 编译
 ```
 xmake
-xmake run VIMAG 或者 xmake run VIMAG image-path/dist
+
 ```
 
 
 
 
-# VIMAG
 
-
-## Vimag格式支持
-   - 支持多种图像格式（JPG/JPEG/PNG/BMP/GIF/TGA/HDR/PSD）
-## 快捷键
-[鼠标]/[键盘]
-- 滚轮：缩放
-- 左键拖拽：移动
-- 左键双击：重置移动和缩放
-- 左键单击+滚轮||左右方向键：切换图片
-- 中键||"F"：窗口最大化/最小化
-- 右键单击：打开设置面板
-- 鼠标移入窗口上边缘：显示标题栏
-
-- **预览**：选中图片后，空格预览/关闭预览图像(仅支持windows)(需要启用Vimag_hook)
-[windows Vimag_hook]
-windows 运行dist/Vimag_hook 可以启用预览钩子,
-**Vimag_hook需要和Vimag放在同一目录下**
-资源浏览器里面选中所支持的图像格式点击**空格**可以预览图像
-- 托盘可以配置
-    - 启用/禁止
-    - 开始/暂停
-    - 开机自启
-    - 开启/关闭控制台(仅供简单调试使用)
 
 ## 项目结构
 
@@ -84,7 +60,7 @@ UI/
 │   ├── icon            # 图像资源
 │   ├── UIWindow.h      # UIWindow 类头文件
 │   ├── UIWindow.cpp    # UIWindow 类实现
-│   └── Vimag.cpp       # Vimag 程序
+│   └── PolarUI.cpp       # PolarUI 程序
 ├── xmake.lua           # 构建配置
 └── README.md           # 项目说明
 ```
@@ -177,16 +153,16 @@ xmake project -k compile_commands
 
 
 ## 📊 动态统计
-[![Stars](https://img.shields.io/github/stars/fantasywoc/Vimag?label=Stars&color=yellow&logo=github)](https://github.com/fantasywoc/Vimag/stargazers)
-[![Forks](https://img.shields.io/github/forks/fantasywoc/Vimag?label=Forks&color=blue&logo=github)](https://github.com/fantasywoc/Vimag/network/members)
+[![Stars](https://img.shields.io/github/stars/fantasywoc/PolarUI?label=Stars&color=yellow&logo=github)](https://github.com/fantasywoc/PolarUI/stargazers)
+[![Forks](https://img.shields.io/github/forks/fantasywoc/PolarUI?label=Forks&color=blue&logo=github)](https://github.com/fantasywoc/PolarUI/network/members)
 
 ## ⭐ 星标历史 Star History
 
-<a href="https://star-history.com/#fantasywoc/Vimag&Date">
+<a href="https://star-history.com/#fantasywoc/PolarUI&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=fantasywoc/Vimag&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=fantasywoc/Vimag&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=fantasywoc/Vimag&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=fantasywoc/PolarUI&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=fantasywoc/PolarUI&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=fantasywoc/PolarUI&type=Date" />
  </picture>
 </a>
 
